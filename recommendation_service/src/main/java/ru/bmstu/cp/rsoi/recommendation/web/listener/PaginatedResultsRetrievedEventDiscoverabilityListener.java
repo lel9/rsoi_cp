@@ -69,7 +69,7 @@ class PaginatedResultsRetrievedEventDiscoverabilityListener
 
     String constructLastPageUri(final UriComponentsBuilder uriBuilder, final int totalPages, final int size) {
         return uriBuilder
-                .replaceQueryParam("page", totalPages)
+                .replaceQueryParam("page", totalPages - 1)
                 .replaceQueryParam("size", size)
                 .build().encode().toUriString();
     }
