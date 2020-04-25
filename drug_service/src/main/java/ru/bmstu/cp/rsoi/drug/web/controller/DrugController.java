@@ -1,4 +1,4 @@
-package ru.bmstu.cp.rsoi.drug.web;
+package ru.bmstu.cp.rsoi.drug.web.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -45,4 +45,5 @@ public class DrugController {
     public void putDrug(@PathVariable String id, @RequestBody DrugIn drug) {
         drugService.putDrug(drug, id);
     }
+
 }
