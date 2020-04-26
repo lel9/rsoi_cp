@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import ru.bmstu.cp.rsoi.recommendation.domain.Profile;
 import ru.bmstu.cp.rsoi.recommendation.domain.Recommendation;
-import ru.bmstu.cp.rsoi.recommendation.domain.User;
 import ru.bmstu.cp.rsoi.recommendation.exception.NoSuchRecommendationException;
 import ru.bmstu.cp.rsoi.recommendation.model.RecommendationIn;
 import ru.bmstu.cp.rsoi.recommendation.repository.RecommendationRepository;
@@ -27,7 +27,7 @@ public class RecommendationService {
         recommendation.setDate(System.currentTimeMillis());
         recommendation.setDrugId(recommendationIn.getDrugId());
         recommendation.setText(recommendationIn.getText());
-        recommendation.setAuthor(new User());
+        recommendation.setAuthor(new Profile());
         Recommendation save = recommendationRepository.save(recommendation);
         return save.getId();
     }
@@ -40,7 +40,7 @@ public class RecommendationService {
             recommendation.setDate(System.currentTimeMillis());
             recommendation.setDrugId(recommendationIn.getDrugId());
             recommendation.setText(recommendationIn.getText());
-            recommendation.setAuthor(new User());
+            recommendation.setAuthor(new Profile());
             recommendationRepository.save(recommendation);
         } else {
             Recommendation recommendation = oldRecommendation.get();

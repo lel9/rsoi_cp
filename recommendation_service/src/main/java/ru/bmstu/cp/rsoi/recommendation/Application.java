@@ -1,10 +1,6 @@
 package ru.bmstu.cp.rsoi.recommendation;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.amqp.core.Exchange;
-import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -32,16 +28,6 @@ public class Application {
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
-    }
-
-    @Bean
-    public Exchange eventExchange() {
-        return new TopicExchange("eventExchange");
-    }
-
-    @Bean
-    public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
     }
 
 }
