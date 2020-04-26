@@ -19,7 +19,7 @@ public class Recommendation implements Serializable {
     @Field(value = "drug_id")
     private String drugId;
 
-    private User author;
+    private Profile author;
 
     private String text;
 
