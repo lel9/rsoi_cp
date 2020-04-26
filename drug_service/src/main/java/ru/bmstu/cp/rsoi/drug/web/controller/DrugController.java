@@ -17,6 +17,7 @@ import ru.bmstu.cp.rsoi.drug.web.event.PaginatedResultsRetrievedEvent;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -65,14 +66,14 @@ public class DrugController {
     @PostMapping("/protected/drug/")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add drug")
-    public String postDrug(@RequestBody DrugIn drug) {
+    public String postDrug(@RequestBody @Valid DrugIn drug) {
         return drugService.postDrug(drug);
     }
 
     @PutMapping("/protected/drug/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update drug")
-    public void putDrug(@PathVariable String id, @RequestBody DrugIn drug) {
+    public void putDrug(@PathVariable String id, @RequestBody @Valid DrugIn drug) {
         drugService.putDrug(drug, id);
     }
 
