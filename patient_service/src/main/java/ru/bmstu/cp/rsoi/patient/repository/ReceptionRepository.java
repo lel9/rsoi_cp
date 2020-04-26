@@ -13,6 +13,9 @@ public interface ReceptionRepository extends MongoRepository<Reception, String> 
     @Query(value="{'patient.$id': ?0}")
     List<Reception> findByPatient(ObjectId id, Sort sort);
 
+    @Query(value="{'patient.$id': ?0}")
+    List<Reception> findByPatient(ObjectId id);
+
     @Query(value = "{'patient.$id': ?0}}", delete = true)
     void deleteReceptionByPatient(ObjectId id);
 

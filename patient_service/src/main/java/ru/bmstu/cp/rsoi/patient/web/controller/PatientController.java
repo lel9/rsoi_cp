@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.bmstu.cp.rsoi.patient.model.*;
 import ru.bmstu.cp.rsoi.patient.service.PatientService;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/1.0/rsoi")
 @Api(value = "Patient service")
@@ -30,17 +32,17 @@ public class PatientController {
         return patientService.findPatient(text);
     }
 
-    @PostMapping("/protected/patient/")
+    @PostMapping("/protected/patient")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add patient")
-    public String postPatient(@RequestBody PatientIn patient) {
+    public String postPatient(@RequestBody @Valid PatientIn patient) {
         return patientService.postPatient(patient);
     }
 
     @PutMapping("/protected/patient/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update patient")
-    public String putPatient(@RequestBody PatientIn patient, @PathVariable String id) {
+    public String putPatient(@RequestBody @Valid PatientIn patient, @PathVariable String id) {
         return patientService.putPatient(patient, id);
     }
 
@@ -51,24 +53,4 @@ public class PatientController {
         patientService.deletePatient(id);
     }
 
-    @PostMapping("/protected/patient/reception")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(value = "Add reception")
-    public String postReception(@RequestBody ReceptionInPost receptionInPost) {
-        return patientService.postReception(receptionInPost);
-    }
-
-    @PutMapping("/protected/patient/reception/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Update reception")
-    public String postReception(@RequestBody ReceptionInPut receptionInPut, @PathVariable String id) {
-        return patientService.putReception(receptionInPut, id);
-    }
-
-    @DeleteMapping("/protected/patient/reception/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "Delete reception")
-    public void deleteReception(@PathVariable String id) {
-        patientService.deleteReception(id);
-    }
 }
