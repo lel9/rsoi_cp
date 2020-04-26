@@ -42,12 +42,12 @@ public class ProfileService {
     public void putProfile(String name, ProfileIn profileIn) {
         Profile profile = modelMapper.map(profileIn, Profile.class);
         profile.setName(name);
+        profileRepository.save(profile);
 
         String routingKey = "profile.updated";
         ProfileOutShort profileOutShort = modelMapper.map(profile, ProfileOutShort.class);
         rabbitTemplate.convertAndSend(exchange.getName(), routingKey, profileOutShort);
 
-        profileRepository.save(profile);
     }
 
     public Page<Profile> getProfiles(int page, int size) {

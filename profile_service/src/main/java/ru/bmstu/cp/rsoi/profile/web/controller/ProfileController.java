@@ -16,6 +16,7 @@ import ru.bmstu.cp.rsoi.profile.web.event.PaginatedResultsRetrievedEvent;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -54,10 +55,17 @@ public class ProfileController {
         return profileService.getProfile(name);
     }
 
+    @GetMapping("/private/profile/{name}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "Get profile by name", response = Profile.class)
+    public Profile getProfilePrivate(@PathVariable String name) {
+        return profileService.getProfile(name);
+    }
+
     @PutMapping("/protected/profile/{name}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update profile")
-    public void putProfile(@PathVariable String name, @RequestBody ProfileIn profile) {
+    public void putProfile(@PathVariable String name, @RequestBody @Valid ProfileIn profile) {
         profileService.putProfile(name, profile);
     }
 
