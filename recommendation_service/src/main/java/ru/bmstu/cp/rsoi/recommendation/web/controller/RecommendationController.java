@@ -16,6 +16,8 @@ import ru.bmstu.cp.rsoi.recommendation.web.event.PaginatedResultsRetrievedEvent;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @RestController
@@ -49,17 +51,17 @@ public class RecommendationController {
         return resultPage.getContent();
     }
 
-    @PostMapping("/protected/recommendation/")
+    @PostMapping("/protected/recommendation")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add recommendation")
-    public String postDrug(@RequestBody RecommendationIn recommendation) {
+    public String postDrug(@RequestBody @Valid RecommendationIn recommendation) throws URISyntaxException {
         return recommendationService.postRecommendation(recommendation);
     }
 
     @PutMapping("/protected/recommendation/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update recommendation")
-    public void putDrug(@PathVariable String id, @RequestBody RecommendationIn recommendation) {
+    public void putDrug(@PathVariable String id, @RequestBody @Valid RecommendationIn recommendation) throws URISyntaxException {
         recommendationService.putRecommendation(id, recommendation);
     }
 

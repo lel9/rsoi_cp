@@ -7,6 +7,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.bmstu.cp.rsoi.recommendation.exception.NoSuchRecommendationException;
@@ -42,6 +43,13 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     public ResponseEntity<Object> handleRecommendationsNotFoundException(final RecommendationsNotFoundException ex, final WebRequest request) {
         final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "RecommendationsNotFound");
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
+    // 503
+    @ExceptionHandler(ResourceAccessException.class)
+    public ResponseEntity<Object> handleResourceAccessException(final ResourceAccessException ex, final WebRequest request) {
+        final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "TimeOut");
+        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE, request);
     }
 
     // 500

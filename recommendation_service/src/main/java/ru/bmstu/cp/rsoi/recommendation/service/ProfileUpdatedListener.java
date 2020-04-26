@@ -1,4 +1,4 @@
-package ru.bmstu.cp.rsoi.recommendation.web.listener;
+package ru.bmstu.cp.rsoi.recommendation.service;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +16,9 @@ public class ProfileUpdatedListener {
 
     @RabbitListener(queues="profileServiceQueue")
     public void receive(ProfileIn message) {
-        Query query = new Query(Criteria.where("recommendations.author").is(message.getName()));
+        Query query = new Query(Criteria.where("author.name").is(message.getName()));
         Update update = new Update();
-        update.set("author.$.display_name", message.getDisplayName());
+        update.set("author.displayName", message.getDisplayName());
         mongoTemplate.updateMulti(query, update, Recommendation.class);
     }
 
