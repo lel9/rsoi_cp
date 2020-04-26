@@ -1,4 +1,4 @@
-package ru.bmstu.cp.rsoi.patient.handler;
+package ru.bmstu.cp.rsoi.patient.web.handler;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

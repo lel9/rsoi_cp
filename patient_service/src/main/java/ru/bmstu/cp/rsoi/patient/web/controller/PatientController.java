@@ -1,4 +1,4 @@
-package ru.bmstu.cp.rsoi.patient.web;
+package ru.bmstu.cp.rsoi.patient.web.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -1,4 +1,4 @@
-package ru.bmstu.cp.rsoi.patient.service;
+package ru.bmstu.cp.rsoi.patient.web.listener;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
