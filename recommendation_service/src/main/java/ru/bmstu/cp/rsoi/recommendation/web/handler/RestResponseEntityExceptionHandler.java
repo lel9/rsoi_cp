@@ -11,7 +11,6 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.bmstu.cp.rsoi.recommendation.exception.NoSuchRecommendationException;
-import ru.bmstu.cp.rsoi.recommendation.exception.RecommendationsNotFoundException;
 import ru.bmstu.cp.rsoi.recommendation.model.GenericResponse;
 
 @ControllerAdvice
@@ -36,12 +35,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler({NoSuchRecommendationException.class})
     public ResponseEntity<Object> handleNoSuchRecommendation(final NoSuchRecommendationException ex, final WebRequest request) {
         final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "NoSuchRecommendation");
-        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
-    }
-
-    @ExceptionHandler({RecommendationsNotFoundException.class})
-    public ResponseEntity<Object> handleRecommendationsNotFoundException(final RecommendationsNotFoundException ex, final WebRequest request) {
-        final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "RecommendationsNotFound");
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 

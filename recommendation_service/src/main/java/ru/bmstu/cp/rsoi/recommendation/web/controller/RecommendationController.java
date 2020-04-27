@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.bmstu.cp.rsoi.recommendation.domain.Recommendation;
-import ru.bmstu.cp.rsoi.recommendation.exception.RecommendationsNotFoundException;
 import ru.bmstu.cp.rsoi.recommendation.model.RecommendationIn;
 import ru.bmstu.cp.rsoi.recommendation.service.RecommendationService;
 import ru.bmstu.cp.rsoi.recommendation.web.event.PaginatedResultsRetrievedEvent;
@@ -39,9 +38,6 @@ public class RecommendationController {
                                               HttpServletResponse response,
                                               HttpServletRequest request) {
         Page<Recommendation> resultPage = recommendationService.getRecommendations(drugId, page, size);
-        if (page > resultPage.getTotalPages()) {
-            throw new RecommendationsNotFoundException();
-        }
 
         uriBuilder.path(request.getRequestURI());
         uriBuilder.queryParam("drugId", drugId);
