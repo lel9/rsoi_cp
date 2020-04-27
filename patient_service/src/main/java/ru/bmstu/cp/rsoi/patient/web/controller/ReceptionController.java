@@ -2,9 +2,11 @@ package ru.bmstu.cp.rsoi.patient.web.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.bmstu.cp.rsoi.patient.domain.Reception;
 import ru.bmstu.cp.rsoi.patient.model.ReceptionIn;
 import ru.bmstu.cp.rsoi.patient.service.ReceptionService;
 
@@ -18,18 +20,23 @@ public class ReceptionController {
     @Autowired
     private ReceptionService receptionService;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @PostMapping("/protected/patient/{pid}/reception")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add reception")
     public String postReception(@PathVariable String pid, @RequestBody @Valid ReceptionIn receptionIn) {
-        return receptionService.postReception(pid, receptionIn);
+        Reception map = modelMapper.map(receptionIn, Reception.class);
+        return receptionService.postReception(pid, map);
     }
 
     @PutMapping("/protected/patient/{pid}/reception/{rid}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update reception")
-    public String postReception(@PathVariable String pid, @RequestBody @Valid ReceptionIn receptionIn, @PathVariable String rid) {
-        return receptionService.putReception(pid, receptionIn, rid);
+    public void putReception(@PathVariable String pid, @RequestBody @Valid ReceptionIn receptionIn, @PathVariable String rid) {
+        Reception map = modelMapper.map(receptionIn, Reception.class);
+        receptionService.putReception(pid, map, rid);
     }
 
     @DeleteMapping("/protected/patient/{pid}/reception/{rid}")

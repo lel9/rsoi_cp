@@ -26,37 +26,33 @@ public class ReceptionService {
     @Autowired
     private PatientService patientService;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
     public List<Reception> findByPatient(String id) {
-        return receptionRepository.findByPatient(new ObjectId(id),
+        return receptionRepository.findByPatient(id,
                 new Sort(Sort.Direction.ASC, "date"));
     }
 
     public void deleteReceptionByPatient(String id) {
-        receptionRepository.deleteReceptionByPatient(new ObjectId(id));
+        receptionRepository.deleteReceptionByPatient(id);
     }
 
-    public String postReception(String patientId, ReceptionIn in) {
+    public String postReception(String patientId, Reception in) {
         return saveReception(patientId, in, null);
     }
 
-    public String putReception(String patientId, ReceptionIn in, String id) {
-        return saveReception(patientId, in, id);
+    public void putReception(String patientId, Reception in, String id) {
+        saveReception(patientId, in, id);
     }
 
     public void deleteReception(String pid, String rid) {
         receptionRepository.deleteById(rid);
     }
 
-    private String saveReception(String patientId, ReceptionIn in, String id) {
+    private String saveReception(String patientId, Reception reception, String id) {
         Optional<Patient> patientOptional = patientService.findById(patientId);
         if (!patientOptional.isPresent())
             throw new NoSuchPatientException();
 
         Patient patient = patientOptional.get();
-        Reception reception = modelMapper.map(in, Reception.class);
         reception.setState(getStateAccordingToPatient(reception, patient));
         reception.setPatient(patient);
         reception.setId(id);

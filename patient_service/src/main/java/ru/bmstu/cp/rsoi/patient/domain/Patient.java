@@ -5,9 +5,11 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import ru.bmstu.cp.rsoi.patient.model.PatientIn;
 
+import java.io.Serializable;
+
 @Document(collection = "patients")
 @Data
-public class Patient {
+public class Patient implements Serializable {
 
     @Id
     private String id;
