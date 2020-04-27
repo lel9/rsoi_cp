@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.bmstu.cp.rsoi.profile.exception.NoSuchProfileException;
-import ru.bmstu.cp.rsoi.profile.exception.ProfilesNotFoundException;
 import ru.bmstu.cp.rsoi.profile.model.GenericResponse;
 
 @ControllerAdvice
@@ -35,12 +34,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler({NoSuchProfileException.class})
     public ResponseEntity<Object> handleNoSuchProfile(final NoSuchProfileException ex, final WebRequest request) {
         final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "NoSuchProfile");
-        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
-    }
-
-    @ExceptionHandler({ProfilesNotFoundException.class})
-    public ResponseEntity<Object> handleProfilesNotFound(final ProfilesNotFoundException ex, final WebRequest request) {
-        final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "ProfilesNotFound");
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
