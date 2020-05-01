@@ -1,5 +1,8 @@
 package ru.bmstu.cp.rsoi.drug.model;
 
+import lombok.Data;
+
+@Data
 public class DrugOut {
 
     private String id;
