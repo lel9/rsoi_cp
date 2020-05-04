@@ -10,9 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.bmstu.cp.rsoi.drug.domain.Drug;
-import ru.bmstu.cp.rsoi.drug.model.DrugIn;
-import ru.bmstu.cp.rsoi.drug.model.DrugOut;
-import ru.bmstu.cp.rsoi.drug.model.DrugOutShort;
+import ru.bmstu.cp.rsoi.drug.model.*;
 import ru.bmstu.cp.rsoi.drug.service.DrugService;
 import ru.bmstu.cp.rsoi.drug.web.event.PaginatedResultsRetrievedEvent;
 
@@ -23,8 +21,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/1.0/rsoi")
 @Api(value = "Drug service")
+@RequestMapping("/api/1.0/rsoi/drug")
 public class DrugController {
 
     @Autowired
@@ -36,14 +34,14 @@ public class DrugController {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    @GetMapping("/protected/drug/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get drug by id", response = DrugOut.class)
     public DrugOut getDrug(@PathVariable String id) {
         return modelMapper.map(drugService.getDrug(id), DrugOut.class);
     }
 
-    @GetMapping("/private/drug/{id}/analogs")
+    @GetMapping("/{id}/analogs")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get analogs")
     public List<DrugOutShort> getDrugAnalogs(@PathVariable String id) {
@@ -54,14 +52,14 @@ public class DrugController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping(path = "/protected/drug", params = { "page", "size" })
+    @GetMapping(path = "/", params = { "page", "size" })
     @ResponseStatus(HttpStatus.OK)
-    public List<DrugOutShort> findDrug(@RequestParam(defaultValue = "", required = false) String text,
-                                       @RequestParam(value = "page", defaultValue = "0", required = false) int page,
-                                       @RequestParam(value = "size", defaultValue = "15", required = false) int size,
-                                       UriComponentsBuilder uriBuilder,
-                                       HttpServletResponse response,
-                                       HttpServletRequest request) {
+    public PageDrugOut findDrug(@RequestParam(defaultValue = "", required = false) String text,
+                                @RequestParam(value = "page", defaultValue = "0", required = false) int page,
+                                @RequestParam(value = "size", defaultValue = "15", required = false) int size,
+                                UriComponentsBuilder uriBuilder,
+                                HttpServletResponse response,
+                                HttpServletRequest request) {
         Page<Drug> resultPage = drugService.findDrugs(text, page, size);
 
         uriBuilder.path(request.getRequestURI());
@@ -69,26 +67,37 @@ public class DrugController {
         eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<>(
                 Drug.class, uriBuilder, response, page, resultPage.getTotalPages(), size));
 
-        return resultPage.getContent()
+        int totalPages = resultPage.getTotalPages();
+        long totalElements = resultPage.getTotalElements();
+        int number = resultPage.getNumber();
+        int pageSize = resultPage.getSize();
+        List<DrugOutShort> result = resultPage.getContent()
                 .stream()
                 .map(drug -> modelMapper.map(drug, DrugOutShort.class))
                 .collect(Collectors.toList());
+
+        return new PageDrugOut(totalPages, totalElements, number, pageSize, result);
+
     }
 
-    @PostMapping("/protected/drug")
+    //@Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
+    @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add drug")
-    public String postDrug(@RequestBody @Valid DrugIn drugIn) {
+    //@ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
+    public String postDrug(@RequestBody @Valid DrugInPost drugIn) {
         Drug drug = modelMapper.map(drugIn, Drug.class);
         return drugService.postDrug(drug);
     }
 
-    @PutMapping("/protected/drug/{id}")
+    //@Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
+    @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update drug")
-    public void putDrug(@PathVariable String id, @RequestBody @Valid DrugIn drugIn) {
+    //@ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
+    public void patchDrug(@PathVariable String id, @RequestBody @Valid DrugInPatch drugIn) {
         Drug drug = modelMapper.map(drugIn, Drug.class);
-        drugService.putDrug(drug, id);
+        drugService.patchDrug(drug, id);
     }
 
 }

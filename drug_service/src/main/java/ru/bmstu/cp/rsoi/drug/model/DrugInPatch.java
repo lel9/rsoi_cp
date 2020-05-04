@@ -1,15 +1,12 @@
 package ru.bmstu.cp.rsoi.drug.model;
 
 import lombok.Data;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import ru.bmstu.cp.rsoi.drug.model.annotation.NullOrNotBlank;
 
 @Data
-public class DrugIn {
+public class DrugInPatch {
 
-    @NotNull(message = "Торговое наименование должно быть задано")
-    @NotEmpty(message = "Торговое наименование не должно быть пусто")
+    @NullOrNotBlank(message = "Торговое наименование не должно быть пусто")
     private String tradeName;
 
     private String activeSubstance;
