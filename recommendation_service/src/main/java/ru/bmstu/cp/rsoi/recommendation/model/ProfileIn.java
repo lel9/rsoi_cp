@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ProfileIn {
 
-    private String name;
+    private String id;
 
     private String displayName;
 

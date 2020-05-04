@@ -27,21 +27,21 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
                                                                   final HttpStatus status,
                                                                   final WebRequest request) {
         final BindingResult result = ex.getBindingResult();
-        final GenericResponse bodyOfResponse = new GenericResponse(result.getAllErrors(), "Invalid" + result.getObjectName());
+        final GenericResponse bodyOfResponse = new GenericResponse(result.getAllErrors(), "invalid_" + result.getObjectName());
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
     // 404
     @ExceptionHandler({NoSuchRecommendationException.class})
     public ResponseEntity<Object> handleNoSuchRecommendation(final NoSuchRecommendationException ex, final WebRequest request) {
-        final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "NoSuchRecommendation");
+        final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "no_such_recommendation");
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
     // 503
     @ExceptionHandler(ResourceAccessException.class)
     public ResponseEntity<Object> handleResourceAccessException(final ResourceAccessException ex, final WebRequest request) {
-        final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "TimeOut");
+        final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "time_out");
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE, request);
     }
 
@@ -49,7 +49,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler({ Exception.class })
     public ResponseEntity<Object> handleInternal(final RuntimeException ex, final WebRequest request) {
         ex.printStackTrace();
-        final GenericResponse bodyOfResponse = new GenericResponse("Внутренняя ошибка сервера", "InternalError");
+        final GenericResponse bodyOfResponse = new GenericResponse("Внутренняя ошибка сервера", "internal_error");
         return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

@@ -4,17 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import ru.bmstu.cp.rsoi.recommendation.domain.Profile;
 import ru.bmstu.cp.rsoi.recommendation.domain.Recommendation;
 import ru.bmstu.cp.rsoi.recommendation.model.RecommendationIn;
 import ru.bmstu.cp.rsoi.recommendation.repository.RecommendationRepository;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
@@ -71,13 +67,14 @@ public class RecommendationService {
     }
 
     private Profile getProfile() throws URISyntaxException {
-        String name = "user2";
-        try {
-            URI thirdPartyApi = new URI("http", null, profileServiceHost, profileServicePort, "/api/1.0/rsoi/private/profile/" + name, null, null);
-            ResponseEntity<Profile> exchange = restTemplate.exchange(thirdPartyApi, HttpMethod.GET, null, Profile.class);
-            return exchange.getBody();
-        } catch (HttpStatusCodeException ex) {
-            return new Profile(name, null);
-        }
+        return new Profile("stub", "stub"); // todo
+//        String name = "user2";
+//        try {
+//            URI thirdPartyApi = new URI("http", null, profileServiceHost, profileServicePort, "/api/1.0/rsoi/private/profile/" + name, null, null);
+//            ResponseEntity<Profile> exchange = restTemplate.exchange(thirdPartyApi, HttpMethod.GET, null, Profile.class);
+//            return exchange.getBody();
+//        } catch (HttpStatusCodeException ex) {
+//            return new Profile(name, null);
+//        }
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 public class Profile {
 
-    private String name;
+    private String id;
 
     private String displayName;
 

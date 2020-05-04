@@ -16,7 +16,7 @@ public class ProfileUpdatedListener {
 
     @RabbitListener(queues="profileServiceQueue")
     public void receive(ProfileIn message) {
-        Query query = new Query(Criteria.where("author.name").is(message.getName()));
+        Query query = new Query(Criteria.where("author.id").is(message.getId()));
         Update update = new Update();
         update.set("author.displayName", message.getDisplayName());
         mongoTemplate.updateMulti(query, update, Recommendation.class);
