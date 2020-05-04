@@ -39,6 +39,9 @@ dependencies {
 
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.2.4'
     compile group: 'org.projectlombok', name: 'lombok', version: '+'
+    compile('javax.xml.bind:jaxb-api:2.3.0')
+    compile('javax.activation:activation:1.1')
+    compile('org.glassfish.jaxb:jaxb-runtime:2.3.0')
 
     annotationProcessor 'org.projectlombok:lombok:+'
 
