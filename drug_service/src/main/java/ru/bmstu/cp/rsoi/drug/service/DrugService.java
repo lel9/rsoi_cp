@@ -11,6 +11,7 @@ import ru.bmstu.cp.rsoi.drug.domain.Drug;
 import ru.bmstu.cp.rsoi.drug.exception.DrugAlreadyExistsException;
 import ru.bmstu.cp.rsoi.drug.exception.NoSuchDrugException;
 import ru.bmstu.cp.rsoi.drug.repository.DrugRepository;
+import ru.bmstu.cp.rsoi.drug.web.utility.MyBeansUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,18 +51,6 @@ public class DrugService {
         return save.getId();
     }
 
-    public void putDrug(Drug drug, String id) {
-        Optional<Drug> byTradeName = drugRepository.findByTradeName(drug.getTradeName());
-        if (byTradeName.isPresent() && !byTradeName.get().getId().equals(id))
-            throw new DrugAlreadyExistsException(drug.getTradeName());
-
-        drug.setId(id);
-        Drug saved = drugRepository.save(drug);
-
-        String routingKey = "drug.updated";
-        rabbitTemplate.convertAndSend(exchange.getName(), routingKey, saved);
-    }
-
     public List<Drug> getDrugAnalogs(String id) {
         Optional<Drug> byId = drugRepository.findById(id);
         if (!byId.isPresent())
@@ -71,5 +60,31 @@ public class DrugService {
         List<Drug> byActiveSubstance = drugRepository.findByActiveSubstance(activeSubstance);
         byActiveSubstance.removeIf(drug -> drug.getId().equals(id));
         return byActiveSubstance;
+    }
+
+    public void patchDrug(Drug drug, String id) {
+        Optional<Drug> byId = drugRepository.findById(id);
+        if (!byId.isPresent())
+            throw new NoSuchDrugException();
+
+        if (drug.getTradeName() != null) {
+            Optional<Drug> byTradeName = drugRepository.findByTradeName(drug.getTradeName());
+            if (byTradeName.isPresent() && !byTradeName.get().getId().equals(id))
+                throw new DrugAlreadyExistsException(drug.getTradeName());
+        }
+
+        Drug target = byId.get();
+        MyBeansUtil<Drug> util = new MyBeansUtil<>();
+        util.copyNonNullProperties(target, drug);
+
+        Drug saved = drugRepository.save(target);
+
+        try {
+            String routingKey = "drug.updated";
+            rabbitTemplate.convertAndSend(exchange.getName(), routingKey, saved);
+        } catch (Exception ex) {
+            // todo логгирование
+        }
+
     }
 }
