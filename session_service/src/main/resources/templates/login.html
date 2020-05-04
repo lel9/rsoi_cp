@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Авторизация</title>
+
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/auth.css}" rel="stylesheet">
+</head>
+
+<body class="text-center">
+<form class="form-signin" th:action="@{/login}" method="post">
+    <h1 class="h3 mb-4 font-weight-normal">Вход в систему</h1>
+    <label for="inputUsername" class="sr-only">Имя пользователя</label>
+    <input type="text" name="username" id="inputUsername"
+           class="form-control" placeholder="Имя пользователя" required autofocus>
+    <label for="inputPassword" class="sr-only">Пароль</label>
+    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Пароль" required>
+
+    <div th:if="${param.error}" align="center" id = "invalidUser">
+        Неверные логин и пароль
+    </div>
+    <div th:if="${param.logout}" align="center">
+        Вы вышли из системы
+    </div>
+
+    <button class="btn my-4 btn-lg btn-primary btn-block" id="loginButton" type="submit">Войти</button>
+
+</form>
+</body>
+
+</html>
