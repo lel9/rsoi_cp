@@ -1,11 +1,11 @@
-package ru.bmstu.cp.rsoi.patient.model;
+package ru.bmstu.cp.rsoi.patient.model.reception;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class ReceptionInPut {
+public class ReceptionIn {
 
     private Long date;
 
@@ -14,4 +14,5 @@ public class ReceptionInPut {
     private DiagnosisIn diagnosis;
 
     private List<DrugIn> drugs;
+
 }

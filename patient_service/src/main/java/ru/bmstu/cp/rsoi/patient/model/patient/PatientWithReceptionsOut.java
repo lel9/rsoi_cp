@@ -1,13 +1,13 @@
-package ru.bmstu.cp.rsoi.patient.model;
-
+package ru.bmstu.cp.rsoi.patient.model.patient;
 
 import lombok.Data;
+import ru.bmstu.cp.rsoi.patient.model.reception.ReceptionOut;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class PatientOut {
+public class PatientWithReceptionsOut {
 
     private String id;
 

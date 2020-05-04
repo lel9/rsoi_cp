@@ -1,9 +1,9 @@
-package ru.bmstu.cp.rsoi.patient.model;
+package ru.bmstu.cp.rsoi.patient.model.reception;
 
 import lombok.Data;
 
 @Data
-public class DrugIn {
+public class DrugOut {
 
     private String id;
 

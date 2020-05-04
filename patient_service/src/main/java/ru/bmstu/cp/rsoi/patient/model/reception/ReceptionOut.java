@@ -1,7 +1,7 @@
-package ru.bmstu.cp.rsoi.patient.model;
+package ru.bmstu.cp.rsoi.patient.model.reception;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
+import ru.bmstu.cp.rsoi.patient.model.StateOut;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,6 @@ import java.util.List;
 @Data
 public class ReceptionOut {
 
-    @Id
     private String id;
 
     private Long date;

@@ -1,4 +1,4 @@
-package ru.bmstu.cp.rsoi.patient.web.listener;
+package ru.bmstu.cp.rsoi.patient.service;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import ru.bmstu.cp.rsoi.patient.domain.Reception;
-import ru.bmstu.cp.rsoi.patient.model.DrugIn;
+import ru.bmstu.cp.rsoi.patient.model.reception.DrugIn;
 
 public class DrugUpdatedListener {
 

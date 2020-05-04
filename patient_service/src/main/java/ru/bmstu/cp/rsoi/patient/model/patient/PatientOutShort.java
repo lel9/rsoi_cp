@@ -1,4 +1,4 @@
-package ru.bmstu.cp.rsoi.patient.model;
+package ru.bmstu.cp.rsoi.patient.model.patient;
 
 import lombok.Data;
 
