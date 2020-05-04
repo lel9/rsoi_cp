@@ -9,13 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.bmstu.cp.rsoi.recommendation.domain.Recommendation;
-import ru.bmstu.cp.rsoi.recommendation.exception.RecommendationsNotFoundException;
 import ru.bmstu.cp.rsoi.recommendation.model.RecommendationIn;
 import ru.bmstu.cp.rsoi.recommendation.service.RecommendationService;
 import ru.bmstu.cp.rsoi.recommendation.web.event.PaginatedResultsRetrievedEvent;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @RestController
@@ -37,9 +38,6 @@ public class RecommendationController {
                                               HttpServletResponse response,
                                               HttpServletRequest request) {
         Page<Recommendation> resultPage = recommendationService.getRecommendations(drugId, page, size);
-        if (page > resultPage.getTotalPages()) {
-            throw new RecommendationsNotFoundException();
-        }
 
         uriBuilder.path(request.getRequestURI());
         uriBuilder.queryParam("drugId", drugId);
@@ -49,17 +47,17 @@ public class RecommendationController {
         return resultPage.getContent();
     }
 
-    @PostMapping("/protected/recommendation/")
+    @PostMapping("/protected/recommendation")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add recommendation")
-    public String postDrug(@RequestBody RecommendationIn recommendation) {
+    public String postDrug(@RequestBody @Valid RecommendationIn recommendation) throws URISyntaxException {
         return recommendationService.postRecommendation(recommendation);
     }
 
     @PutMapping("/protected/recommendation/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update recommendation")
-    public void putDrug(@PathVariable String id, @RequestBody RecommendationIn recommendation) {
+    public void putDrug(@PathVariable String id, @RequestBody @Valid RecommendationIn recommendation) throws URISyntaxException {
         recommendationService.putRecommendation(id, recommendation);
     }
 

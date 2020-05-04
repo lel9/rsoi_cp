@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 public class Application {
@@ -29,5 +30,8 @@ public class Application {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
+
+    @Bean
+    public RestTemplate restTemplate() { return new RestTemplate(); }
 
 }
