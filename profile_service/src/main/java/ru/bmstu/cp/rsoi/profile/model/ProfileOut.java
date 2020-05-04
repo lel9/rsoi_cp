@@ -5,11 +5,9 @@ import lombok.Data;
 @Data
 public class ProfileOut {
 
-    private String name;
+    private String id;
 
     private String displayName;
-
-    private String email;
 
     private String organization;
 

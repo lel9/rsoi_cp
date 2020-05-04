@@ -12,12 +12,10 @@ import java.io.Serializable;
 public class Profile implements Serializable {
 
     @Id
-    private String name;
+    private String id;
 
     @Field(value = "display_name")
     private String displayName;
-
-    private String email;
 
     private String organization;
 
