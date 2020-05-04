@@ -8,40 +8,40 @@ import java.util.stream.Collectors;
 
 public class GenericResponse {
 
-    private String message;
-    private String type;
+    private String error_description;
+    private String error;
 
     public GenericResponse(final String message) {
         super();
-        this.message = message;
+        this.error_description = message;
     }
 
     public GenericResponse(String message, String type) {
-        this.message = message;
-        this.type = type;
+        this.error_description = message;
+        this.error = type;
     }
 
     public GenericResponse(List<ObjectError> allErrors, String error) {
-        this.type = error;
-        this.message = allErrors
+        this.error = error;
+        this.error_description = allErrors
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(System.lineSeparator()));
     }
 
-    public String getMessage() {
-        return message;
+    public String getError_description() {
+        return error_description;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setError_description(String error_description) {
+        this.error_description = error_description;
     }
 
-    public String getType() {
-        return type;
+    public String getError() {
+        return error;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setError(String error) {
+        this.error = error;
     }
 }
