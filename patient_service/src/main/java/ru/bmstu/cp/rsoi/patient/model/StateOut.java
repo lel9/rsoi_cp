@@ -5,6 +5,12 @@ import lombok.Data;
 @Data
 public class StateOut {
 
+    private Character sex;
+
+    private Integer years;
+
+    private Integer months;
+
     private String lifeAnamnesis;
 
     private String diseaseAnamnesis;

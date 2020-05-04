@@ -3,7 +3,6 @@ package ru.bmstu.cp.rsoi.patient.domain;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import ru.bmstu.cp.rsoi.patient.model.PatientIn;
 
 import java.io.Serializable;
 

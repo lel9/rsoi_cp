@@ -1,7 +1,6 @@
 package ru.bmstu.cp.rsoi.patient.service;
 
 import org.bson.types.ObjectId;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -9,14 +8,9 @@ import ru.bmstu.cp.rsoi.patient.domain.Patient;
 import ru.bmstu.cp.rsoi.patient.domain.Reception;
 import ru.bmstu.cp.rsoi.patient.domain.State;
 import ru.bmstu.cp.rsoi.patient.exception.NoSuchPatientException;
-import ru.bmstu.cp.rsoi.patient.model.ReceptionIn;
-import ru.bmstu.cp.rsoi.patient.repository.PatientRepository;
 import ru.bmstu.cp.rsoi.patient.repository.ReceptionRepository;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ReceptionService {
@@ -27,12 +21,26 @@ public class ReceptionService {
     private PatientService patientService;
 
     public List<Reception> findByPatient(String id) {
-        return receptionRepository.findByPatient(id,
+        ObjectId objectId;
+        try {
+            objectId = new ObjectId(id);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+
+        return receptionRepository.findByPatient(objectId,
                 new Sort(Sort.Direction.ASC, "date"));
     }
 
     public void deleteReceptionByPatient(String id) {
-        receptionRepository.deleteReceptionByPatient(id);
+        ObjectId objectId;
+        try {
+            objectId = new ObjectId(id);
+        } catch (Exception ignored) {
+            return;
+        }
+
+        receptionRepository.deleteReceptionByPatient(objectId);
     }
 
     public String postReception(String patientId, Reception in) {
@@ -87,5 +95,20 @@ public class ReceptionService {
             reception.setState(getStateAccordingToPatient(reception, patient));
             receptionRepository.save(reception);
         }
+    }
+
+    public Reception getLastReception(String pid) {
+        ObjectId objectId;
+        try {
+            objectId = new ObjectId(pid);
+        } catch (Exception ignored) {
+            return null;
+        }
+
+        List<Reception> receptions = receptionRepository.findByPatient(objectId, new Sort(Sort.Direction.DESC, "date"));
+        if (receptions != null && !receptions.isEmpty())
+            return receptions.get(0);
+        return null;
+
     }
 }

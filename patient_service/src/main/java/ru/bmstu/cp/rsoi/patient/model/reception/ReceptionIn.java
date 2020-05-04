@@ -1,9 +1,7 @@
-package ru.bmstu.cp.rsoi.patient.model;
+package ru.bmstu.cp.rsoi.patient.model.reception;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data

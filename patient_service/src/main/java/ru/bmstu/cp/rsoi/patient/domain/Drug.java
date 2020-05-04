@@ -10,7 +10,7 @@ public class Drug {
 
     private String id;
 
-    @Field(value = "tread_name")
-    private String treadName;
+    @Field(value = "trade_name")
+    private String tradeName;
 
 }

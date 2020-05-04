@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.bmstu.cp.rsoi.patient.domain.Patient;
 import ru.bmstu.cp.rsoi.patient.domain.Reception;
-import ru.bmstu.cp.rsoi.patient.model.*;
+import ru.bmstu.cp.rsoi.patient.model.patient.PagePatientOut;
+import ru.bmstu.cp.rsoi.patient.model.patient.PatientIn;
+import ru.bmstu.cp.rsoi.patient.model.patient.PatientOut;
+import ru.bmstu.cp.rsoi.patient.model.patient.PatientWithReceptionsOut;
+import ru.bmstu.cp.rsoi.patient.model.reception.ReceptionOut;
 import ru.bmstu.cp.rsoi.patient.service.PatientService;
 import ru.bmstu.cp.rsoi.patient.service.ReceptionService;
 import ru.bmstu.cp.rsoi.patient.web.event.PaginatedResultsRetrievedEvent;
@@ -24,7 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/1.0/rsoi")
+@RequestMapping("/api/1.0/rsoi/patient")
 @Api(value = "Patient service")
 public class PatientController {
 
@@ -40,10 +44,10 @@ public class PatientController {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    @GetMapping("/protected/patient/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Get patient by id", response = PatientOut.class)
-    public PatientOut getDrug(@PathVariable String id) {
+    @ApiOperation(value = "Get patient by id", response = PatientWithReceptionsOut.class)
+    public PatientWithReceptionsOut getPatient(@PathVariable String id) {
         Patient patient = patientService.getPatient(id);
         List<Reception> all = receptionService.findByPatient(id);
 
@@ -53,20 +57,20 @@ public class PatientController {
             reception.add(map);
         });
 
-        PatientOut patientOut = modelMapper.map(patient, PatientOut.class);
+        PatientWithReceptionsOut patientOut = modelMapper.map(patient, PatientWithReceptionsOut.class);
         patientOut.setReceptions(reception);
 
         return patientOut;
     }
 
-    @GetMapping(path = "/protected/patient/byCardId", params = { "page", "size" })
+    @GetMapping(path = "/byCardId", params = { "page", "size" })
     @ResponseStatus(HttpStatus.OK)
-    public List<PatientOutShort> findPatient(@RequestParam(defaultValue = "", required = false) String cardId,
-                                             @RequestParam(value = "page", defaultValue = "0", required = false) int page,
-                                             @RequestParam(value = "size", defaultValue = "15", required = false) int size,
-                                             UriComponentsBuilder uriBuilder,
-                                             HttpServletResponse response,
-                                             HttpServletRequest request) {
+    public PagePatientOut findPatient(@RequestParam(defaultValue = "", required = false) String cardId,
+                                      @RequestParam(value = "page", defaultValue = "0", required = false) int page,
+                                      @RequestParam(value = "size", defaultValue = "15", required = false) int size,
+                                      UriComponentsBuilder uriBuilder,
+                                      HttpServletResponse response,
+                                      HttpServletRequest request) {
 
         Page<Patient> resultPage = patientService.findPatients(cardId, page, size);
 
@@ -75,13 +79,19 @@ public class PatientController {
         eventPublisher.publishEvent(new PaginatedResultsRetrievedEvent<>(
                 Patient.class, uriBuilder, response, page, resultPage.getTotalPages(), size));
 
-        return resultPage.getContent()
+        int totalPages = resultPage.getTotalPages();
+        long totalElements = resultPage.getTotalElements();
+        int number = resultPage.getNumber();
+        int pageSize = resultPage.getSize();
+        List<PatientOut> results = resultPage.getContent()
                 .stream()
-                .map(patient -> modelMapper.map(patient, PatientOutShort.class))
+                .map(patient -> modelMapper.map(patient, PatientOut.class))
                 .collect(Collectors.toList());
+
+        return new PagePatientOut(totalPages, totalElements, page, pageSize, results);
     }
 
-    @PostMapping("/protected/patient")
+    @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add patient")
     public String postPatient(@RequestBody @Valid PatientIn patient) {
@@ -89,7 +99,7 @@ public class PatientController {
         return patientService.postPatient(map);
     }
 
-    @PutMapping("/protected/patient/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update patient")
     public String putPatient(@RequestBody @Valid PatientIn patient, @PathVariable String id) {
@@ -97,7 +107,7 @@ public class PatientController {
         return patientService.putPatient(map, id);
     }
 
-    @DeleteMapping("/protected/patient/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "Delete patient")
     public void deletePatient(@PathVariable String id) {
