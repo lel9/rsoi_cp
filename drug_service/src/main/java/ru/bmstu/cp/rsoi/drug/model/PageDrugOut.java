@@ -19,6 +19,6 @@ public class PageDrugOut {
 
     private Integer size;
 
-    private List<DrugOutShort> result;
+    private List<DrugOutShort> results;
 
 }

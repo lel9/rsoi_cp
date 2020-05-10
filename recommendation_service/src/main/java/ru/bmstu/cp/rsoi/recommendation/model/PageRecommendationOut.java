@@ -20,5 +20,5 @@ public class PageRecommendationOut {
 
     private Integer size;
 
-    private List<Recommendation> result;
+    private List<Recommendation> results;
 }
