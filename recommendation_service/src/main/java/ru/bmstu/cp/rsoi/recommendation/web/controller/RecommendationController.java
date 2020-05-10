@@ -11,6 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.bmstu.cp.rsoi.recommendation.domain.Recommendation;
 import ru.bmstu.cp.rsoi.recommendation.model.PageRecommendationOut;
 import ru.bmstu.cp.rsoi.recommendation.model.RecommendationIn;
+import ru.bmstu.cp.rsoi.recommendation.model.RecommendationsCount;
 import ru.bmstu.cp.rsoi.recommendation.service.RecommendationService;
 import ru.bmstu.cp.rsoi.recommendation.web.event.PaginatedResultsRetrievedEvent;
 
@@ -50,6 +51,11 @@ public class RecommendationController {
         int pageSize = resultPage.getSize();
 
         return new PageRecommendationOut(totalPages, totalElements, page, size, resultPage.getContent());
+    }
+
+    @GetMapping(path = "/count")
+    public RecommendationsCount getCount(@RequestParam String drugId) {
+        return new RecommendationsCount(recommendationService.getCountByDrugId(drugId));
     }
 
     @PostMapping("/")

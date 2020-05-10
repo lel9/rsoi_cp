@@ -10,4 +10,6 @@ public interface RecommendationRepository extends MongoRepository<Recommendation
 
     Page<Recommendation> findByDrugId(String id, Pageable pageable);
 
+    Long countAllByDrugId(String id);
+
 }
