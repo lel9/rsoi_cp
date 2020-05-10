@@ -94,4 +94,4 @@ VALUES('12412cdb-398f-4def-9cec-325b11968b56', '12412cdb-398f-4def-9cec-325b1196
 
 INSERT INTO oauth_client_details(client_id, resource_ids, client_secret, scope, authorized_grant_types,
 access_token_validity, refresh_token_validity, additional_information, autoapprove)
-VALUES ('client', 'all', '$2a$10$Odvg916t3HI8m96htwghqufjg63XzYwFgzWC5g/KlI2whSWJZL7iq', 'all', 'password,refresh_token', 3600, 2592000, 'frontend app', 'true');
+VALUES ('client', 'all', '$2a$10$jSOeYsfUOVbRkj3ndXcYsugcI535XWx1SmWzRel5LeREqDeU.egiq', 'all', 'password,refresh_token', 3600, 2592000, 'frontend app', 'true');
