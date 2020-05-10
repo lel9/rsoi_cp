@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.servlet.config.annotation.EnableWebMvc
 import ru.bmstu.cp.rsoi.session.service.SimpleUserDetailService
@@ -30,8 +31,10 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
         http
             .csrf().disable()
             .authorizeRequests()
-            .antMatchers("/login**", "/client", "/oauth/authorize", "/bootstrap/**", "/css/**", "/js/**", "/img/**").permitAll()
+            .antMatchers("/login**", "/client", "/registration", "/oauth/authorize", "/bootstrap/**", "/css/**", "/js/**", "/img/**").permitAll()
             .anyRequest().authenticated()
+            .and().sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.NEVER)
             .and()
             .formLogin().permitAll()//.loginPage("/login").permitAll()
             .and().logout().permitAll().clearAuthentication(true).invalidateHttpSession(true)

@@ -1,9 +1,11 @@
 package ru.bmstu.cp.rsoi.session.web.controller;
 
+import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
+import ru.bmstu.cp.rsoi.session.domain.entity.User
 import ru.bmstu.cp.rsoi.session.model.UserRegistrationData
 import ru.bmstu.cp.rsoi.session.service.UserService
 import java.util.*
@@ -14,8 +16,12 @@ class UserController {
     @Autowired
     private lateinit var userService: UserService
 
-    @PostMapping("/user")
+    @Autowired
+    private lateinit var modelMapper: ModelMapper
+
+    @PostMapping("/registration")
     fun addUser(@RequestBody model: UserRegistrationData): UUID {
-        return userService.registerUser(model)
+        val user = modelMapper.map(model, User::class.java)
+        return userService.registerUser(user)
     }
 }

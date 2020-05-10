@@ -7,7 +7,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "users")
-class User(val username: String, val password: String) : Serializable {
+class User(var username: String, var password: String) : Serializable {
 
     @Id
     @GeneratedValue
