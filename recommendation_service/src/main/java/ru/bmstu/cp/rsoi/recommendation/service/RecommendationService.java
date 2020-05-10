@@ -33,6 +33,10 @@ public class RecommendationService {
         return recommendationRepository.findByDrugId(drugId, PageRequest.of(page, size));
     }
 
+    public Long getCountByDrugId(String drugId) {
+        return recommendationRepository.countAllByDrugId(drugId);
+    }
+
     public String postRecommendation(RecommendationIn recommendationIn) throws URISyntaxException {
         Recommendation recommendation = new Recommendation();
         recommendation.setDate(System.currentTimeMillis());
