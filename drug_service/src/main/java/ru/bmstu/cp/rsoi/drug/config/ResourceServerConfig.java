@@ -17,7 +17,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     public void configure(final HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/api/**").permitAll()//.authenticated()
+                .antMatchers("/api/**").authenticated()
                 .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());
     }
 
@@ -27,7 +27,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         RemoteTokenServices tokenServices = new RemoteTokenServices();
         tokenServices.setClientId("client");
         tokenServices.setClientSecret("secret");
-        tokenServices.setCheckTokenEndpointUrl("http://localhost:8084/auth/oauth/check_token");
+        tokenServices.setCheckTokenEndpointUrl("http://79.174.13.21/:8084/oauth/check_token");
         return tokenServices;
     }
 }

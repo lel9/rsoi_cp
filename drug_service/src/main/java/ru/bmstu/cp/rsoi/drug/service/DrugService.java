@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.bmstu.cp.rsoi.drug.domain.Drug;
-import ru.bmstu.cp.rsoi.drug.exception.DrugAlreadyExistsException;
 import ru.bmstu.cp.rsoi.drug.exception.NoSuchDrugException;
 import ru.bmstu.cp.rsoi.drug.repository.DrugRepository;
 import ru.bmstu.cp.rsoi.drug.web.utility.MyBeansUtil;
@@ -43,9 +42,6 @@ public class DrugService {
     }
 
     public String postDrug(Drug drug) {
-        if (drugRepository.findByTradeName(drug.getTradeName()).isPresent())
-            throw new DrugAlreadyExistsException(drug.getTradeName());
-
         drug.setId(null);
         Drug save = drugRepository.save(drug);
         return save.getId();
@@ -66,12 +62,6 @@ public class DrugService {
         Optional<Drug> byId = drugRepository.findById(id);
         if (!byId.isPresent())
             throw new NoSuchDrugException();
-
-        if (drug.getTradeName() != null) {
-            Optional<Drug> byTradeName = drugRepository.findByTradeName(drug.getTradeName());
-            if (byTradeName.isPresent() && !byTradeName.get().getId().equals(id))
-                throw new DrugAlreadyExistsException(drug.getTradeName());
-        }
 
         Drug target = byId.get();
         MyBeansUtil<Drug> util = new MyBeansUtil<>();
