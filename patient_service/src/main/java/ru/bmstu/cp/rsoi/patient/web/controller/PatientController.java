@@ -1,12 +1,14 @@
 package ru.bmstu.cp.rsoi.patient.web.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.bmstu.cp.rsoi.patient.domain.Patient;
@@ -44,9 +46,11 @@ public class PatientController {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
+    @Secured({"ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get patient by id", response = PatientWithReceptionsOut.class)
+    @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public PatientWithReceptionsOut getPatient(@PathVariable String id) {
         Patient patient = patientService.getPatient(id);
         List<Reception> all = receptionService.findByPatient(id);
@@ -63,8 +67,10 @@ public class PatientController {
         return patientOut;
     }
 
+    @Secured({"ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})
     @GetMapping(path = "/byCardId", params = { "page", "size" })
     @ResponseStatus(HttpStatus.OK)
+    @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public PagePatientOut findPatient(@RequestParam(defaultValue = "", required = false) String cardId,
                                       @RequestParam(value = "page", defaultValue = "0", required = false) int page,
                                       @RequestParam(value = "size", defaultValue = "15", required = false) int size,
@@ -91,25 +97,31 @@ public class PatientController {
         return new PagePatientOut(totalPages, totalElements, page, pageSize, results);
     }
 
+    @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add patient")
+    @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public String postPatient(@RequestBody @Valid PatientIn patient) {
         Patient map = modelMapper.map(patient, Patient.class);
         return patientService.postPatient(map);
     }
 
+    @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update patient")
+    @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public String putPatient(@RequestBody @Valid PatientIn patient, @PathVariable String id) {
         Patient map = modelMapper.map(patient, Patient.class);
         return patientService.putPatient(map, id);
     }
 
+    @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "Delete patient")
+    @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public void deletePatient(@PathVariable String id) {
         patientService.deletePatient(id);
     }

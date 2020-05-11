@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.bmstu.cp.rsoi.patient.domain.Patient;
 import ru.bmstu.cp.rsoi.patient.domain.Reception;
 import ru.bmstu.cp.rsoi.patient.domain.State;
+import ru.bmstu.cp.rsoi.patient.exception.InvalidReceptionDateException;
 import ru.bmstu.cp.rsoi.patient.exception.NoSuchPatientException;
 import ru.bmstu.cp.rsoi.patient.repository.ReceptionRepository;
 
@@ -21,6 +22,17 @@ public class ReceptionService {
     private PatientService patientService;
 
     public List<Reception> findByPatient(String id) {
+        ObjectId objectId;
+        try {
+            objectId = new ObjectId(id);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+
+        return receptionRepository.findByPatient(objectId);
+    }
+
+    public List<Reception> findByPatientOrdered(String id) {
         ObjectId objectId;
         try {
             objectId = new ObjectId(id);
@@ -82,8 +94,14 @@ public class ReceptionService {
             Calendar endCalendar = new GregorianCalendar();
             endCalendar.setTimeInMillis(reception.getDate());
 
-            state.setYears(endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR));
-            state.setMonths(endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH));
+            int diffYears = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
+            int diffMonths = diffYears * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
+
+            if (diffMonths < 0)
+                throw new InvalidReceptionDateException();
+
+            state.setYears(diffMonths / 12);
+            state.setMonths(diffMonths % 12);
         }
 
         return state;
