@@ -13,7 +13,7 @@ zuul:
   routes:
     drug_service:
       path: /api/1.0/**/drug/**
-      url: http://localhost:8080/api/1.0
+      url: http://79.174.13.21:8080/api/1.0
 
     patient_service:
       path: /api/1.0/**/patient/**
