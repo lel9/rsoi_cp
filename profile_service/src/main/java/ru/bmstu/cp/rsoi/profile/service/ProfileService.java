@@ -28,14 +28,10 @@ public class ProfileService {
     @Autowired
     private Exchange exchange;
 
-    public Profile getProfile(String id, boolean needCheckAuth) {
-        if (needCheckAuth)
-            checkAuth(id);
-
+    public Profile getProfile(String id) {
         Optional<Profile> byId = profileRepository.findById(id);
         if (!byId.isPresent())
             throw new NoSuchProfileException();
-
         return byId.get();
     }
 
