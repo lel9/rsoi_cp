@@ -92,6 +92,23 @@ VALUES('12412cdb-398f-4def-9cec-325b11968b60', 'ROLE_EXPERT');
 INSERT INTO user_roles(user_id, role_id)
 VALUES('12412cdb-398f-4def-9cec-325b11968b56', '12412cdb-398f-4def-9cec-325b11968b57');
 
-INSERT INTO oauth_client_details(client_id, resource_ids, client_secret, scope, authorized_grant_types,
+INSERT INTO oauth_client_details(client_id, client_secret, scope, authorized_grant_types,
 access_token_validity, refresh_token_validity, additional_information, autoapprove)
-VALUES ('client', 'all', '$2a$10$jSOeYsfUOVbRkj3ndXcYsugcI535XWx1SmWzRel5LeREqDeU.egiq', 'all', 'password,refresh_token', 3600, 2592000, 'frontend app', 'true');
+VALUES ('client', '$2a$10$jSOeYsfUOVbRkj3ndXcYsugcI535XWx1SmWzRel5LeREqDeU.egiq', 'all', 'password,refresh_token', 3600, 2592000, 'frontend app', 'true');
+
+
+INSERT INTO oauth_client_details(client_id, client_secret, scope, authorized_grant_types, authorities,
+access_token_validity, refresh_token_validity, additional_information, autoapprove)
+VALUES ('drug_service', '$2a$10$jSOeYsfUOVbRkj3ndXcYsugcI535XWx1SmWzRel5LeREqDeU.egiq', 'all', 'client_credentials,refresh_token', 'ROLE_INTERNAL_CLIENT', 3600, 2592000, 'microservice', 'true');
+
+INSERT INTO oauth_client_details(client_id, client_secret, scope, authorized_grant_types, authorities,
+access_token_validity, refresh_token_validity, additional_information, autoapprove)
+VALUES ('patient_service', '$2a$10$jSOeYsfUOVbRkj3ndXcYsugcI535XWx1SmWzRel5LeREqDeU.egiq', 'all', 'client_credentials,refresh_token', 'ROLE_INTERNAL_CLIENT', 3600, 2592000, 'microservice', 'true');
+
+INSERT INTO oauth_client_details(client_id, client_secret, scope, authorized_grant_types, authorities,
+access_token_validity, refresh_token_validity, additional_information, autoapprove)
+VALUES ('profile_service', '$2a$10$jSOeYsfUOVbRkj3ndXcYsugcI535XWx1SmWzRel5LeREqDeU.egiq', 'all', 'client_credentials,refresh_token', 'ROLE_INTERNAL_CLIENT', 3600, 2592000, 'microservice', 'true');
+
+INSERT INTO oauth_client_details(client_id, client_secret, scope, authorized_grant_types, authorities,
+access_token_validity, refresh_token_validity, additional_information, autoapprove)
+VALUES ('recommendation_service', '$2a$10$jSOeYsfUOVbRkj3ndXcYsugcI535XWx1SmWzRel5LeREqDeU.egiq', 'all', 'client_credentials,refresh_token', 'ROLE_INTERNAL_CLIENT', 3600, 2592000, 'microservice', 'true');
