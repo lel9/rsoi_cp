@@ -1,5 +1,6 @@
 package ru.bmstu.cp.rsoi.drug.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -13,6 +14,18 @@ import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 @EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
+    @Value( "${service.session.host}" )
+    private String sessionServiceHost;
+
+    @Value( "${service.session.port}" )
+    private Integer sessionServicePort;
+
+    @Value( "${service.session.clientId}" )
+    private String sessionServiceClientId;
+
+    @Value( "${service.session.secret}" )
+    private String sessionServiceSecret;
+
     @Override
     public void configure(final HttpSecurity http) throws Exception {
         http
@@ -25,9 +38,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Primary
     public RemoteTokenServices tokenServices() {
         RemoteTokenServices tokenServices = new RemoteTokenServices();
-        tokenServices.setClientId("client");
-        tokenServices.setClientSecret("secret");
-        tokenServices.setCheckTokenEndpointUrl("http://79.174.13.21/:8084/oauth/check_token");
+        tokenServices.setClientId(sessionServiceClientId);
+        tokenServices.setClientSecret(sessionServiceSecret);
+        tokenServices.setCheckTokenEndpointUrl(String.format("http://%s:%d/oauth/check_token", sessionServiceHost, sessionServicePort));
         return tokenServices;
     }
 }

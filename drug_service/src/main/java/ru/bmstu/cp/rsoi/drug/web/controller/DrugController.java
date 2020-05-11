@@ -39,6 +39,7 @@ public class DrugController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get drug by id", response = DrugOut.class)
+    @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public DrugOut getDrug(@PathVariable String id) {
         return modelMapper.map(drugService.getDrug(id), DrugOut.class);
     }
@@ -46,6 +47,7 @@ public class DrugController {
     @GetMapping("/{id}/analogs")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get analogs")
+    @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public List<DrugOutShort> getDrugAnalogs(@PathVariable String id) {
         List<Drug> drugAnalogs = drugService.getDrugAnalogs(id);
         return drugAnalogs
@@ -56,6 +58,7 @@ public class DrugController {
 
     @GetMapping(path = "/", params = { "page", "size" })
     @ResponseStatus(HttpStatus.OK)
+    @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public PageDrugOut findDrug(@RequestParam(defaultValue = "", required = false) String text,
                                 @RequestParam(value = "page", defaultValue = "0", required = false) int page,
                                 @RequestParam(value = "size", defaultValue = "15", required = false) int size,
