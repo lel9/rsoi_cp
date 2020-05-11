@@ -17,7 +17,7 @@ import ru.bmstu.cp.rsoi.profile.service.ProfileService;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/1.0/rsoi/profile")
+@RequestMapping("/api/1.0")
 @Api(value = "Profile service")
 public class ProfileController {
 
@@ -27,8 +27,7 @@ public class ProfileController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Secured({"ROLE_USER", "ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})
-    @GetMapping("/{id}")
+    @GetMapping("/protected/profile/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get profile by id", response = ProfileOut.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -37,8 +36,7 @@ public class ProfileController {
         return modelMapper.map(profile, ProfileOut.class);
     }
 
-    @Secured({"ROLE_INTERNAL_CLIENT"})
-    @GetMapping("/{id}/displayName")
+    @GetMapping("/private/profile/{id}/displayName")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get profile by id", response = ProfileOutShort.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -47,8 +45,7 @@ public class ProfileController {
         return modelMapper.map(profile, ProfileOutShort.class);
     }
 
-    @Secured({"ROLE_USER", "ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})
-    @PutMapping("/{id}")
+    @PutMapping("/protected/profile/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update profile")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")

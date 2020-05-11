@@ -1,0 +1,45 @@
+server:
+  port: 8086
+
+service:
+  session:
+    host: 79.174.13.21
+    port: 8084
+    clientId: gateway
+    secret: secret
+
+zuul:
+  sensitiveHeaders: Cookie,Set-Cookie
+  routes:
+    drug_service:
+      path: /api/1.0/**/drug/**
+      url: http://79.174.13.21:8080/api/1.0
+
+    patient_service:
+      path: /api/1.0/**/patient/**
+      url: http://79.174.13.21:8081/api/1.0
+
+    recommendation_service:
+      path: /api/1.0/**/recommendation/**
+      url: http://79.174.13.21:8082/api/1.0
+
+    profile_service:
+      path: /api/1.0/**/profile/**
+      url: http://79.174.13.21:8083/api/1.0
+
+    session_service:
+      path: /oauth/**
+      url: http://79.174.13.21:8084/oauth
+
+    login:
+      path: /login/**
+      url: http://79.174.13.21:8084/login
+
+    logout:
+      path: /logout/**
+      url: http://79.174.13.21:8084/logout
+
+    registration:
+      path: /registration/**
+      url: http://79.174.13.21:8084/registration
+
