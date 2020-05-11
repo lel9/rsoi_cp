@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @Api(value = "Drug service")
-@RequestMapping("/api/1.0/rsoi/drug")
+@RequestMapping("/api/1.0")
 public class DrugController {
 
     @Autowired
@@ -36,7 +36,7 @@ public class DrugController {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    @GetMapping("/{id}")
+    @GetMapping("/public/drug/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get drug by id", response = DrugOut.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -44,7 +44,7 @@ public class DrugController {
         return modelMapper.map(drugService.getDrug(id), DrugOut.class);
     }
 
-    @GetMapping("/{id}/analogs")
+    @GetMapping("/private/drug/{id}/analogs")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get analogs")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -56,7 +56,7 @@ public class DrugController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping(path = "/", params = { "page", "size" })
+    @GetMapping(path = "/public/drug", params = { "page", "size" })
     @ResponseStatus(HttpStatus.OK)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public PageDrugOut findDrug(@RequestParam(defaultValue = "", required = false) String text,
@@ -86,7 +86,7 @@ public class DrugController {
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
-    @PostMapping("/")
+    @PostMapping("/protected/drug")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add drug")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -96,7 +96,7 @@ public class DrugController {
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
-    @PatchMapping("/{id}")
+    @PatchMapping("/protected/drug/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update drug")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")

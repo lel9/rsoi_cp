@@ -14,7 +14,7 @@ class ClientController {
     @Autowired
     private lateinit var clientService: ClientService
 
-    @PostMapping("/client")
+    @PostMapping("/registration/client")
     fun addClient(@RequestBody model: ClientRegistrationData): ClientOutData {
         return clientService.registerClient(model)
     }
