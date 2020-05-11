@@ -33,17 +33,17 @@ public class ProfileController {
     @ApiOperation(value = "Get profile by id", response = ProfileOut.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public ProfileOut getProfile(@PathVariable String id) {
-        Profile profile = profileService.getProfile(id, true);
+        Profile profile = profileService.getProfile(id);
         return modelMapper.map(profile, ProfileOut.class);
     }
 
     @Secured({"ROLE_INTERNAL_CLIENT"})
-    @GetMapping("/{id}/dispayName")
+    @GetMapping("/{id}/displayName")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get profile by id", response = ProfileOutShort.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public ProfileOutShort getDisplayName(@PathVariable String id) {
-        Profile profile = profileService.getProfile(id, false);
+        Profile profile = profileService.getProfile(id);
         return modelMapper.map(profile, ProfileOutShort.class);
     }
 
