@@ -23,7 +23,7 @@ import javax.validation.Valid;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/1.0/rsoi/recommendation")
+@RequestMapping("/api/1.0")
 @Api(value = "Recommendation service")
 public class RecommendationController {
 
@@ -33,8 +33,7 @@ public class RecommendationController {
     @Autowired
     private RecommendationService recommendationService;
 
-    @Secured({"ROLE_USER", "ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})
-    @GetMapping(path = "/", params = { "page", "size" })
+    @GetMapping(path = "/public/recommendation", params = { "page", "size" })
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public PageRecommendationOut findPaginated(@RequestParam String drugId,
                                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
@@ -57,15 +56,14 @@ public class RecommendationController {
         return new PageRecommendationOut(totalPages, totalElements, number, pageSize, resultPage.getContent());
     }
 
-    @Secured({"ROLE_USER", "ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})
-    @GetMapping(path = "/count")
+    @GetMapping(path = "/public/recommendation/count")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public RecommendationsCount getCount(@RequestParam String drugId) {
         return new RecommendationsCount(recommendationService.getCountByDrugId(drugId));
     }
 
     @Secured({"ROLE_EXPERT", "ROLE_ADMIN"})
-    @PostMapping("/")
+    @PostMapping("/protected/recommendation")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add recommendation")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -74,7 +72,7 @@ public class RecommendationController {
     }
 
     @Secured({"ROLE_EXPERT", "ROLE_ADMIN"})
-    @PutMapping("/{id}")
+    @PutMapping("/protected/recommendation/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update recommendation")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -83,7 +81,7 @@ public class RecommendationController {
     }
 
     @Secured({"ROLE_EXPERT", "ROLE_ADMIN"})
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/protected/recommendation/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "Delete recommendation")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")

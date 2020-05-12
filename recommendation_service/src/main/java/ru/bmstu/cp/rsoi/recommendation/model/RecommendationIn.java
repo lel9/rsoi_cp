@@ -13,5 +13,4 @@ public class RecommendationIn {
     @NotBlank(message = "Текст рекомендации не должен быть пуст")
     private String text;
 
-    private ProfileIn author;
 }
