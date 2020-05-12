@@ -30,6 +30,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(final HttpSecurity http) throws Exception {
         http
+                .cors()
+                .and()
                 .requestMatcher(request -> {
                     String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
                     return auth == null || auth.startsWith("Bearer");

@@ -28,6 +28,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(final HttpSecurity http) throws Exception {
         http
+                .cors()
+                .and()
                 .authorizeRequests()
                 .antMatchers("/api/**/protected/**").hasAnyRole("USER", "EXPERT", "OPERATOR", "ADMIN")
                 .antMatchers("/api/**/public/**").permitAll()
