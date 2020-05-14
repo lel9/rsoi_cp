@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS oauth_refresh_token (
 );
 
 CREATE TABLE IF NOT EXISTS oauth_code (
-  code VARCHAR(255), authentication BYTEA
+  code VARCHAR(255),
+  authentication BYTEA
 );
 
 CREATE TABLE IF NOT EXISTS oauth_approvals (
