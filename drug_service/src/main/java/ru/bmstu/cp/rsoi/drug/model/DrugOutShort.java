@@ -9,7 +9,7 @@ public class DrugOutShort {
 
     private String tradeName;
 
-    private String form;
+    private String releaseFormVSDosage;
 
     private String manufacturer;
 
