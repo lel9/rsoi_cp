@@ -26,7 +26,7 @@ class UserService{
     ): UUID {
         val user = userRepository.findByUsername(newUser.username)
         if (user != null) {
-            throw UserAlreadyExistAuthenticationException(null)
+            throw UserAlreadyExistAuthenticationException("Пользователь с именем ${newUser.username} уже существует")
         }
 
         newUser.password = passwordEncoder.encode(newUser.password)

@@ -8,6 +8,7 @@ import org.springframework.core.annotation.Order
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -30,6 +31,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
         http
             .csrf().disable()
+            .cors().and()
             .authorizeRequests()
             .antMatchers("/login**", "/client", "/registration", "/oauth/authorize", "/bootstrap/**", "/css/**", "/js/**", "/img/**").permitAll()
             .anyRequest().authenticated()
@@ -50,6 +52,11 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Throws(java.lang.Exception::class)
     override fun authenticationManagerBean(): AuthenticationManager? {
         return super.authenticationManagerBean()
+    }
+
+    @Throws(Exception::class)
+    override fun configure(webSecurity: WebSecurity) {
+        webSecurity.ignoring().antMatchers("/registration/**")
     }
 
     @Bean
