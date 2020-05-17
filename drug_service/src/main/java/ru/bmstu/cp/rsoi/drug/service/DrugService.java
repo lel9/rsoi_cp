@@ -1,6 +1,5 @@
 package ru.bmstu.cp.rsoi.drug.service;
 
-import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.bmstu.cp.rsoi.drug.domain.Drug;
 import ru.bmstu.cp.rsoi.drug.exception.NoSuchDrugException;
+import ru.bmstu.cp.rsoi.drug.model.OperationOut;
 import ru.bmstu.cp.rsoi.drug.repository.DrugRepository;
 import ru.bmstu.cp.rsoi.drug.web.utility.MyBeansUtil;
 
@@ -24,13 +24,17 @@ public class DrugService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @Autowired
-    private Exchange exchange;
-
     public Drug getDrug(String id) {
         Optional<Drug> byId = drugRepository.findById(id);
         if (!byId.isPresent())
             throw new NoSuchDrugException();
+
+        try {
+            String routingKey = "operation";
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, "R"));
+        } catch (Exception ex) {
+            // todo логгирование
+        }
 
         return byId.get();
     }
@@ -44,7 +48,16 @@ public class DrugService {
     public String postDrug(Drug drug) {
         drug.setId(null);
         Drug save = drugRepository.save(drug);
-        return save.getId();
+        String id = save.getId();
+
+        try {
+            String routingKey = "operation";
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, "C"));
+        } catch (Exception ex) {
+            // todo логгирование
+        }
+
+        return id;
     }
 
     public List<Drug> getDrugAnalogs(String id) {
@@ -71,7 +84,14 @@ public class DrugService {
 
         try {
             String routingKey = "drug.updated";
-            rabbitTemplate.convertAndSend(exchange.getName(), routingKey, saved);
+            rabbitTemplate.convertAndSend("eventExchange", routingKey, saved);
+        } catch (Exception ex) {
+            // todo логгирование
+        }
+
+        try {
+            String routingKey = "operation";
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, "U"));
         } catch (Exception ex) {
             // todo логгирование
         }

@@ -112,9 +112,9 @@ public class PatientController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update patient")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
-    public String putPatient(@RequestBody @Valid PatientIn patient, @PathVariable String id) {
+    public void putPatient(@RequestBody @Valid PatientIn patient, @PathVariable String id) {
         Patient map = modelMapper.map(patient, Patient.class);
-        return patientService.putPatient(map, id);
+        patientService.putPatient(map, id);
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})

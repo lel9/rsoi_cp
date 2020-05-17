@@ -1,6 +1,7 @@
 package ru.bmstu.cp.rsoi.recommendation.service;
 
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import ru.bmstu.cp.rsoi.recommendation.domain.Profile;
 import ru.bmstu.cp.rsoi.recommendation.domain.Recommendation;
 import ru.bmstu.cp.rsoi.recommendation.exception.FailureWhenRecommendationAddException;
 import ru.bmstu.cp.rsoi.recommendation.exception.NoProfileException;
+import ru.bmstu.cp.rsoi.recommendation.model.OperationOut;
 import ru.bmstu.cp.rsoi.recommendation.model.RecommendationIn;
 import ru.bmstu.cp.rsoi.recommendation.model.Token;
 import ru.bmstu.cp.rsoi.recommendation.repository.RecommendationRepository;
@@ -38,6 +40,9 @@ public class RecommendationService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Value( "${service.profile.host}" )
     private String profileServiceHost;
@@ -74,7 +79,16 @@ public class RecommendationService {
         recommendation.setText(recommendationIn.getText());
         recommendation.setAuthor(getProfile());
         Recommendation save = recommendationRepository.save(recommendation);
-        return save.getId();
+        String id = save.getId();
+
+        try {
+            String routingKey = "operation";
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, recommendationIn.getDrugId(), "C"));
+        } catch (Exception ex) {
+            // todo логгирование
+        }
+
+        return id;
     }
 
     public void putRecommendation(String id, RecommendationIn recommendationIn) throws URISyntaxException {
@@ -94,6 +108,13 @@ public class RecommendationService {
             recommendation.setText(recommendationIn.getText());
             recommendationRepository.save(recommendation);
         }
+
+        try {
+            String routingKey = "operation";
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, recommendationIn.getDrugId(), "U"));
+        } catch (Exception ex) {
+            // todo логгирование
+        }
     }
 
     public void deleteRecommendation(String id) {
@@ -101,6 +122,13 @@ public class RecommendationService {
         if (recommendation.isPresent()) {
             checkAuth(recommendation.get().getAuthor().getId());
             recommendationRepository.deleteById(id);
+
+            try {
+                String routingKey = "operation";
+                rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, recommendation.get().getDrugId(), "D"));
+            } catch (Exception ex) {
+                // todo логгирование
+            }
         }
     }
 
