@@ -46,7 +46,7 @@ class UserService{
 
         try {
             val routingKey = "operation"
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, OperationOut(id.toString(), "C"))
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, OperationOut(newUser.username, "C"))
         } catch (ex: Exception) {
             // todo логгирование
         }
