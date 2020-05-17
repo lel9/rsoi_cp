@@ -1,9 +1,6 @@
 package ru.bmstu.cp.rsoi.statistic.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -14,17 +11,17 @@ import ru.bmstu.cp.rsoi.statistic.service.OperationListener;
 public class RabbitMQConfig {
 
     @Bean
-    public TopicExchange eventExchange() {
-        return new TopicExchange("eventExchange");
+    public DirectExchange directExchange(){
+        return new DirectExchange("operationExchange");
     }
 
     @Bean
     public Queue queue() {
-        return new Queue("operationServiceQueue");
+        return new Queue("operation-queue");
     }
 
     @Bean
-    public Binding binding(Queue queue, TopicExchange eventExchange) {
+    public Binding binding(Queue queue, DirectExchange eventExchange) {
         return BindingBuilder
                 .bind(queue)
                 .to(eventExchange)

@@ -13,6 +13,7 @@ import java.util.List;
 @Repository
 @Transactional
 public interface OperationRepository extends CrudRepository<Operation, String> {
-    public Page<Operation> findAllByEntityNameOrParentEntityNameAndDateBetween(String entityName, String parentEntityName, Long start, Long end, Pageable pageable);
+    public Page<Operation> findAllByEntityNameAndDateBetweenOrParentEntityNameAndDateBetween(
+            String entityName, Long start1, Long end1, String parentEntityName, Long start2, Long end2, Pageable pageable);
     public long countAllByParentEntityIdAndDateBetweenAndOperationName(String parentEntityId, Long start, Long end, String operationName);
 }

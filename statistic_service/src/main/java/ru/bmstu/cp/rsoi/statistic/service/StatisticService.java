@@ -33,7 +33,9 @@ public class StatisticService {
 
     public ListStatisticOut getStatistic(Long dateStart, Long dateEnd, String entityName) {
         Page<Operation> operations = operationRepository.
-                findAllByEntityNameOrParentEntityNameAndDateBetween(entityName, entityName, dateStart, dateEnd, PageRequest.of(0, maxOperationsCount));
+                findAllByEntityNameAndDateBetweenOrParentEntityNameAndDateBetween(entityName, dateStart, dateEnd,
+                        entityName, dateStart, dateEnd,
+                        PageRequest.of(0, maxOperationsCount));
 
         String errMessage = null;
         long totalElements = operations.getTotalElements();
@@ -42,17 +44,19 @@ public class StatisticService {
                             "Найдено операций %d, обработано операций %d. " +
                             "Рекомендуется уменьшить временной диапазон подсчета статистики.", totalElements, maxOperationsCount);
 
-        Map<String, List<Operation>> groupedOperations = operations
+        List<String> groupedOperations = operations
                 .stream()
-                .collect(Collectors.groupingBy(Operation::getEntityId));
+                .filter(operation -> operation.getEntityName().equals(entityName))
+                .map(Operation::getEntityId)
+                .distinct()
+                .collect(Collectors.toList());
 
         List<EntityStatisticOut> list = new ArrayList<>();
 
         Counts totalCounts = new Counts();
         List<Counts> childrenTotalCounts = new ArrayList<>();
-        int iter = 0;
-        for (Map.Entry<String, List<Operation>> childEntry : groupedOperations.entrySet()) {
-            EntityStatisticOut row = getRow(childEntry.getKey(), childEntry.getValue());
+        groupedOperations.forEach(operation -> {
+            EntityStatisticOut row = getRow(operation, operations.getContent());
             list.add(row);
             Counts counts = row.getCounts();
             totalCounts.setReadCount(totalCounts.getReadCount() + counts.getReadCount());
@@ -63,7 +67,7 @@ public class StatisticService {
             List<Counts> childrenStatistic = row.getChildrenStatistic();
             int size = childrenStatistic.size();
             for (int i = 0; i < size; i++) {
-                if (iter == 0)
+                if (i == 0)
                     childrenTotalCounts.add(new Counts());
                 Counts childCounts = childrenTotalCounts.get(i);
                 childCounts.setUpdateCount(childCounts.getUpdateCount() + childrenStatistic.get(i).getUpdateCount());
@@ -71,8 +75,7 @@ public class StatisticService {
                 childCounts.setDeleteCount(childCounts.getDeleteCount() + childrenStatistic.get(i).getDeleteCount());
                 childCounts.setReadCount(childCounts.getReadCount() + childrenStatistic.get(i).getReadCount());
             }
-            iter++;
-        }
+        });
 
         return new ListStatisticOut(totalCounts, childrenTotalCounts, list, errMessage);
     }
@@ -80,9 +83,10 @@ public class StatisticService {
     private EntityStatisticOut getRow(String entityId, List<Operation> operations) {
         EntityStatisticOut statistic = new EntityStatisticOut();
         statistic.setEntityId(entityId);
-        Stream<Operation> entityOperations = operations
+        List<Operation> entityOperations = operations
                 .stream()
-                .filter(operation -> entityId.equals(operation.getEntityId()));
+                .filter(operation -> entityId.equals(operation.getEntityId()))
+                .collect(Collectors.toList());
         statistic.setCounts(getCounts(null, entityOperations));
 
         Map<String, List<Operation>> childrenMap = operations
@@ -91,7 +95,7 @@ public class StatisticService {
                 .collect(Collectors.groupingBy(Operation::getEntityName));
 
         for (Map.Entry<String, List<Operation>> childEntry : childrenMap.entrySet()) {
-            Counts counts = getCounts(childEntry.getKey(), childEntry.getValue().stream());
+            Counts counts = getCounts(childEntry.getKey(), childEntry.getValue());
             statistic.getChildrenStatistic().add(counts);
         }
 
@@ -99,11 +103,11 @@ public class StatisticService {
 
     }
 
-    private Counts getCounts(String entityName, Stream<Operation> stream) {
-        long create = stream.filter(operation -> "C".equals(operation.getOperationName())).count();
-        long read = stream.filter(operation -> "R".equals(operation.getOperationName())).count();
-        long update = stream.filter(operation -> "U".equals(operation.getOperationName())).count();
-        long delete = stream.filter(operation -> "D".equals(operation.getOperationName())).count();
+    private Counts getCounts(String entityName, List<Operation> operations) {
+        long create = operations.stream().filter(operation -> "C".equals(operation.getOperationName())).count();
+        long read = operations.stream().filter(operation -> "R".equals(operation.getOperationName())).count();
+        long update = operations.stream().filter(operation -> "U".equals(operation.getOperationName())).count();
+        long delete = operations.stream().filter(operation -> "D".equals(operation.getOperationName())).count();
         return new Counts(entityName, create, delete, read, update);
     }
 

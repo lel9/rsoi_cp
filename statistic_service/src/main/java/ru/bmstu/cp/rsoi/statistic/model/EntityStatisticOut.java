@@ -1,5 +1,6 @@
 package ru.bmstu.cp.rsoi.statistic.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.util.ArrayList;

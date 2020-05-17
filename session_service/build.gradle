@@ -37,6 +37,8 @@ dependencies {
     implementation("org.modelmapper:modelmapper:2.3.5")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation('org.springframework.boot:spring-boot-starter-amqp')
+
     compile group: 'org.hibernate', name: 'hibernate-validator', version: '6.0.15.Final'
     compile('javax.xml.bind:jaxb-api:2.3.0')
     compile('javax.activation:activation:1.1')

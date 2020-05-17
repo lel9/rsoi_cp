@@ -35,11 +35,6 @@ public class Application {
     }
 
     @Bean
-    public Exchange eventExchange() {
-        return new TopicExchange("eventExchange");
-    }
-
-    @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }

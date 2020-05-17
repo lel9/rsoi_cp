@@ -13,7 +13,7 @@ public class OperationListener {
     @Autowired
     private ModelMapper modelMapper;
 
-    @RabbitListener(queues="operationServiceQueue")
+    @RabbitListener(queues="operation-queue")
     public void receive(OperationIn message) {
         service.saveOperation(modelMapper.map(message, ru.bmstu.cp.rsoi.statistic.domain.Operation.class));
     }
