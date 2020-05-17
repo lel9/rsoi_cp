@@ -24,7 +24,7 @@ public class StatisticController {
     private StatisticService statisticService;
 
     @Secured({"ROLE_ADMIN"})
-    @GetMapping(path = "/protected/statistic", params = { "page", "size" })
+    @GetMapping(path = "/protected/statistic")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public ListStatisticOut getStatistic(@RequestParam(value = "dateStart", required = true) Long dateStart,
                                           @RequestParam(value = "dateEnd", required = true) Long dateEnd,
