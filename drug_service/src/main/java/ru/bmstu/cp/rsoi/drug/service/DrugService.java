@@ -97,4 +97,8 @@ public class DrugService {
         }
 
     }
+
+    public Iterable<Drug> findByIds(List<String> ids) {
+        return drugRepository.findAllById(ids);
+    }
 }
