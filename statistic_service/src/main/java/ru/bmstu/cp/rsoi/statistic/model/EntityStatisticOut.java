@@ -11,8 +11,8 @@ public class EntityStatisticOut {
     private Long readCount = 0L;
     private Long updateCount = 0L;
 
-    private Long child1CreateCount = 0L;
-    private Long child1DeleteCount = 0L;
-    private Long child1ReadCount = 0L;
-    private Long child1UpdateCount = 0L;
+    private Long childCreateCount = 0L;
+    private Long childDeleteCount = 0L;
+    //private Long childReadCount = 0L;
+    private Long childUpdateCount = 0L;
 }
