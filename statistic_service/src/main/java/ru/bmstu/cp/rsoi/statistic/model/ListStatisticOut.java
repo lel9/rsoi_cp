@@ -1,6 +1,5 @@
 package ru.bmstu.cp.rsoi.statistic.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,8 +11,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ListStatisticOut {
-    private Counts totalCounts;
-    private List<Counts> childrenTotalCount;
-    private List<EntityStatisticOut> entityiesStatistic = new ArrayList<>();
+    private Long totalCreateCount = 0L;
+    private Long totalDeleteCount = 0L;
+    private Long totalReadCount = 0L;
+    private Long totalUpdateCount = 0L;
+
+    private Long child1TotalCreateCount = 0L;
+    private Long child1TotalDeleteCount = 0L;
+    private Long child1TotalReadCount = 0L;
+    private Long child1TotalUpdateCount = 0L;
+
+    private List<EntityStatisticOut> entitiesStatistic = new ArrayList<>();
     private String errMessage;
 }
