@@ -9,6 +9,7 @@ import ru.bmstu.cp.rsoi.patient.exception.NoSuchPatientException;
 import ru.bmstu.cp.rsoi.patient.exception.PatientAlreadyExistsException;
 import ru.bmstu.cp.rsoi.patient.repository.PatientRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -65,5 +66,9 @@ public class PatientService {
 
     public Optional<Patient> findById(String patientId) {
         return patientRepository.findById(patientId);
+    }
+
+    public Iterable<Patient> findByIds(List<String> ids) {
+        return patientRepository.findAllById(ids);
     }
 }

@@ -19,12 +19,13 @@ import ru.bmstu.cp.rsoi.drug.web.event.PaginatedResultsRetrievedEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @Api(value = "Drug service")
-@RequestMapping("/api/1.0/rsoi/drug")
+@RequestMapping("/api/1.0")
 public class DrugController {
 
     @Autowired
@@ -36,7 +37,7 @@ public class DrugController {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    @GetMapping("/{id}")
+    @GetMapping("/public/drug/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get drug by id", response = DrugOut.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -44,7 +45,7 @@ public class DrugController {
         return modelMapper.map(drugService.getDrug(id), DrugOut.class);
     }
 
-    @GetMapping("/{id}/analogs")
+    @GetMapping("/private/drug/{id}/analogs")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get analogs")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -56,8 +57,9 @@ public class DrugController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping(path = "/", params = { "page", "size" })
+    @GetMapping(path = "/public/drug")
     @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "Find drugs by TradeName", response = PageDrugOut.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public PageDrugOut findDrug(@RequestParam(defaultValue = "", required = false) String text,
                                 @RequestParam(value = "page", defaultValue = "0", required = false) int page,
@@ -85,8 +87,23 @@ public class DrugController {
 
     }
 
+    @Secured({"ROLE_ADMIN"})
+    @GetMapping(path = "/protected/drug/byIds")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "Get drugs by ids", response = ListDrugOut.class)
+    @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
+    public ListDrugOut findDrug(@RequestParam(defaultValue = "", required = true) List<String> ids) {
+        List<DrugOutShort> result = new ArrayList<>();
+        drugService.findByIds(ids)
+                .forEach(drug -> {
+                    DrugOutShort map = modelMapper.map(drug, DrugOutShort.class);
+                    result.add(map);
+                });
+        return new ListDrugOut(result);
+    }
+
     @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
-    @PostMapping("/")
+    @PostMapping("/protected/drug")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add drug")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -96,7 +113,7 @@ public class DrugController {
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
-    @PatchMapping("/{id}")
+    @PatchMapping("/protected/drug/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update drug")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
