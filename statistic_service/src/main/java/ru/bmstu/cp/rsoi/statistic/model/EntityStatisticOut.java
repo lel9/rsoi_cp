@@ -1,14 +1,18 @@
 package ru.bmstu.cp.rsoi.statistic.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 public class EntityStatisticOut {
     private String entityId;
-    private Counts counts;
-    private List<Counts> childrenStatistic = new ArrayList<>();
+
+    private Long createCount = 0L;
+    private Long deleteCount = 0L;
+    private Long readCount = 0L;
+    private Long updateCount = 0L;
+
+    private Long child1CreateCount = 0L;
+    private Long child1DeleteCount = 0L;
+    private Long child1ReadCount = 0L;
+    private Long child1UpdateCount = 0L;
 }
