@@ -13,10 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.bmstu.cp.rsoi.patient.domain.Patient;
 import ru.bmstu.cp.rsoi.patient.domain.Reception;
-import ru.bmstu.cp.rsoi.patient.model.patient.PagePatientOut;
-import ru.bmstu.cp.rsoi.patient.model.patient.PatientIn;
-import ru.bmstu.cp.rsoi.patient.model.patient.PatientOut;
-import ru.bmstu.cp.rsoi.patient.model.patient.PatientWithReceptionsOut;
+import ru.bmstu.cp.rsoi.patient.model.patient.ListPatientOut;
+import ru.bmstu.cp.rsoi.patient.model.patient.*;
 import ru.bmstu.cp.rsoi.patient.model.reception.ReceptionOut;
 import ru.bmstu.cp.rsoi.patient.service.PatientService;
 import ru.bmstu.cp.rsoi.patient.service.ReceptionService;
@@ -94,7 +92,7 @@ public class PatientController {
                 .map(patient -> modelMapper.map(patient, PatientOut.class))
                 .collect(Collectors.toList());
 
-        return new PagePatientOut(totalPages, totalElements, page, pageSize, results);
+        return new PagePatientOut(totalPages, totalElements, number, pageSize, results);
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
@@ -105,6 +103,21 @@ public class PatientController {
     public String postPatient(@RequestBody @Valid PatientIn patient) {
         Patient map = modelMapper.map(patient, Patient.class);
         return patientService.postPatient(map);
+    }
+
+    @Secured({"ROLE_ADMIN"})
+    @GetMapping(path = "/protected/patient/byIds")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "Get patients by ids", response = ListPatientOut.class)
+    @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
+    public ListPatientOut findDrug(@RequestParam(defaultValue = "", required = true) List<String> ids) {
+        List<PatientOut> result = new ArrayList<>();
+        patientService.findByIds(ids)
+                .forEach(patient -> {
+                    PatientOut map = modelMapper.map(patient, PatientOut.class);
+                    result.add(map);
+                });
+        return new ListPatientOut(result);
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})

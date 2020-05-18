@@ -11,6 +11,7 @@ import ru.bmstu.cp.rsoi.patient.exception.PatientAlreadyExistsException;
 import ru.bmstu.cp.rsoi.patient.model.OperationOut;
 import ru.bmstu.cp.rsoi.patient.repository.PatientRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static ru.bmstu.cp.rsoi.patient.model.OperationOut.getPatientOperation;
@@ -99,5 +100,9 @@ public class PatientService {
 
     public Optional<Patient> findById(String patientId) {
         return patientRepository.findById(patientId);
+    }
+
+    public Iterable<Patient> findByIds(List<String> ids) {
+        return patientRepository.findAllById(ids);
     }
 }

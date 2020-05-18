@@ -88,7 +88,7 @@ public class DrugController {
     }
 
     @Secured({"ROLE_ADMIN"})
-    @GetMapping(path = "/protected/drug")
+    @GetMapping(path = "/protected/drug/byIds")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get drugs by ids", response = ListDrugOut.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
