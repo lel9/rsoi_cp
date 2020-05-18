@@ -53,18 +53,18 @@ public class StatisticService {
 
         ListStatisticOut statistic = new ListStatisticOut();
         List<EntityStatisticOut> list = new ArrayList<>();
-        groupedOperations.forEach(operation -> {
-            EntityStatisticOut row = getRow(operation, operations.getContent());
+        groupedOperations.forEach(entityId -> {
+            EntityStatisticOut row = getRow(entityId, operations.getContent());
             list.add(row);
             statistic.setTotalCreateCount(statistic.getTotalCreateCount() + row.getCreateCount());
             statistic.setTotalReadCount(statistic.getTotalReadCount() + row.getReadCount());
             statistic.setTotalUpdateCount(statistic.getTotalUpdateCount() + row.getUpdateCount());
             statistic.setTotalDeleteCount(statistic.getTotalDeleteCount() + row.getDeleteCount());
 
-            statistic.setChild1TotalCreateCount(statistic.getChild1TotalCreateCount() + row.getChild1CreateCount());
-            statistic.setChild1TotalReadCount(statistic.getChild1TotalReadCount() + row.getChild1ReadCount());
-            statistic.setChild1TotalUpdateCount(statistic.getChild1TotalUpdateCount() + row.getChild1UpdateCount());
-            statistic.setChild1TotalDeleteCount(statistic.getChild1TotalDeleteCount() + row.getChild1DeleteCount());
+            statistic.setChildTotalCreateCount(statistic.getChildTotalCreateCount() + row.getChildCreateCount());
+            //statistic.setChildTotalReadCount(statistic.getChildTotalReadCount() + row.getChildReadCount());
+            statistic.setChildTotalUpdateCount(statistic.getChildTotalUpdateCount() + row.getChildUpdateCount());
+            statistic.setChildTotalDeleteCount(statistic.getChildTotalDeleteCount() + row.getChildDeleteCount());
 
         });
 
@@ -76,30 +76,28 @@ public class StatisticService {
     private EntityStatisticOut getRow(String entityId, List<Operation> operations) {
         EntityStatisticOut statistic = new EntityStatisticOut();
         statistic.setEntityId(entityId);
+
         List<Operation> entityOperations = operations
                 .stream()
                 .filter(operation -> entityId.equals(operation.getEntityId()))
                 .collect(Collectors.toList());
+
         Counts counts = getCounts(entityOperations);
         statistic.setCreateCount(counts.getCreateCount());
         statistic.setReadCount(counts.getReadCount());
         statistic.setUpdateCount(counts.getUpdateCount());
         statistic.setDeleteCount(counts.getDeleteCount());
 
-        Map<String, List<Operation>> childrenMap = operations
+        List<Operation> childOperations = operations
                 .stream()
                 .filter(operation -> entityId.equals(operation.getParentEntityId()))
-                .collect(Collectors.groupingBy(Operation::getEntityName));
+                .collect(Collectors.toList());
 
-        Iterator<Map.Entry<String, List<Operation>>> iterator = childrenMap.entrySet().iterator();
-        if (iterator.hasNext()) {
-            Map.Entry<String, List<Operation>> childEntry = iterator.next();
-            Counts childCounts = getCounts(childEntry.getValue());
-            statistic.setChild1CreateCount(childCounts.getCreateCount());
-            statistic.setReadCount(childCounts.getReadCount());
-            statistic.setUpdateCount(childCounts.getUpdateCount());
-            statistic.setDeleteCount(childCounts.getDeleteCount());
-        }
+        Counts childCounts = getCounts(childOperations);
+        statistic.setChildCreateCount(childCounts.getCreateCount());
+        //statistic.setChildReadCount(childCounts.getReadCount());
+        statistic.setChildUpdateCount(childCounts.getUpdateCount());
+        statistic.setChildDeleteCount(childCounts.getDeleteCount());
 
         return statistic;
 

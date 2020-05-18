@@ -16,10 +16,10 @@ public class ListStatisticOut {
     private Long totalReadCount = 0L;
     private Long totalUpdateCount = 0L;
 
-    private Long child1TotalCreateCount = 0L;
-    private Long child1TotalDeleteCount = 0L;
-    private Long child1TotalReadCount = 0L;
-    private Long child1TotalUpdateCount = 0L;
+    private Long childTotalCreateCount = 0L;
+    private Long childTotalDeleteCount = 0L;
+    //private Long childTotalReadCount = 0L;
+    private Long childTotalUpdateCount = 0L;
 
     private List<EntityStatisticOut> entitiesStatistic = new ArrayList<>();
     private String errMessage;
