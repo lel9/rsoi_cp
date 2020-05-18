@@ -12,6 +12,9 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices
 import org.springframework.security.oauth2.provider.token.TokenStore
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import org.springframework.web.filter.CorsFilter
 import ru.bmstu.cp.rsoi.session.service.CouchbaseClientDetailsService
 import ru.bmstu.cp.rsoi.session.service.SimpleUserDetailService
 
@@ -50,6 +53,15 @@ class OAuth2AuthorizationServer : AuthorizationServerConfigurerAdapter() {
         security
             .tokenKeyAccess("permitAll()")
             .checkTokenAccess("isAuthenticated()")
+
+        val source = UrlBasedCorsConfigurationSource()
+        val config = CorsConfiguration()
+        config.applyPermitDefaultValues()
+
+        source.registerCorsConfiguration("/oauth/check_token", config)
+        source.registerCorsConfiguration("/oauth/token", config)
+        val filter = CorsFilter(source)
+        security.addTokenEndpointAuthenticationFilter(filter)
     }
 
     @Throws(java.lang.Exception::class)

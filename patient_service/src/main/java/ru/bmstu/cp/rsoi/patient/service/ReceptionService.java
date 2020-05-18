@@ -1,6 +1,7 @@
 package ru.bmstu.cp.rsoi.patient.service;
 
 import org.bson.types.ObjectId;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,9 @@ import ru.bmstu.cp.rsoi.patient.repository.ReceptionRepository;
 
 import java.util.*;
 
+import static ru.bmstu.cp.rsoi.patient.model.OperationOut.getPatientOperation;
+import static ru.bmstu.cp.rsoi.patient.model.OperationOut.getReceptionOperation;
+
 @Service
 public class ReceptionService {
     @Autowired
@@ -20,6 +24,9 @@ public class ReceptionService {
 
     @Autowired
     private PatientService patientService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     public List<Reception> findByPatient(String id) {
         ObjectId objectId;
@@ -52,19 +59,46 @@ public class ReceptionService {
             return;
         }
 
-        receptionRepository.deleteReceptionByPatient(objectId);
+        List<Reception> receptions = receptionRepository.deleteReceptionByPatient(objectId);
+        receptions.forEach(reception -> {
+            try {
+                String routingKey = "operation";
+                rabbitTemplate.convertAndSend("operationExchange", routingKey, getReceptionOperation(reception.getId(), id,"D"));
+            } catch (Exception ex) {
+                // todo логгирование
+            }
+        });
     }
 
     public String postReception(String patientId, Reception in) {
-        return saveReception(patientId, in, null);
+        String id = saveReception(patientId, in, null);
+        try {
+            String routingKey = "operation";
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, getReceptionOperation(id, patientId,"C"));
+        } catch (Exception ex) {
+            // todo логгирование
+        }
+        return id;
     }
 
     public void putReception(String patientId, Reception in, String id) {
-        saveReception(patientId, in, id);
+        id = saveReception(patientId, in, id);
+        try {
+            String routingKey = "operation";
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, getReceptionOperation(id, patientId,"U"));
+        } catch (Exception ex) {
+            // todo логгирование
+        }
     }
 
     public void deleteReception(String pid, String rid) {
         receptionRepository.deleteById(rid);
+        try {
+            String routingKey = "operation";
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, getReceptionOperation(rid, pid, "D"));
+        } catch (Exception ex) {
+            // todo логгирование
+        }
     }
 
     private String saveReception(String patientId, Reception reception, String id) {
@@ -112,6 +146,13 @@ public class ReceptionService {
         for (Reception reception: receptions) {
             reception.setState(getStateAccordingToPatient(reception, patient));
             receptionRepository.save(reception);
+
+            try {
+                String routingKey = "operation";
+                rabbitTemplate.convertAndSend("operationExchange", routingKey, getReceptionOperation(reception.getId(), patient.getId(), "U"));
+            } catch (Exception ex) {
+                // todo логгирование
+            }
         }
     }
 

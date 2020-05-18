@@ -19,7 +19,7 @@ class UserController {
     @Autowired
     private lateinit var modelMapper: ModelMapper
 
-    @PostMapping("/registration")
+    @PostMapping("/registration/user")
     fun addUser(@RequestBody model: UserRegistrationData): UUID {
         val user = modelMapper.map(model, User::class.java)
         return userService.registerUser(user)

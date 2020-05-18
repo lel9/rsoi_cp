@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/1.0/rsoi/patient")
+@RequestMapping("/api/1.0")
 @Api(value = "Patient service")
 public class PatientController {
 
@@ -45,7 +45,7 @@ public class PatientController {
     private ApplicationEventPublisher eventPublisher;
 
     @Secured({"ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})
-    @GetMapping("/{id}")
+    @GetMapping("/protected/patient/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get patient by id", response = PatientWithReceptionsOut.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -66,7 +66,7 @@ public class PatientController {
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})
-    @GetMapping(path = "/byCardId", params = { "page", "size" })
+    @GetMapping(path = "/protected/patient", params = { "page", "size" })
     @ResponseStatus(HttpStatus.OK)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
     public PagePatientOut findPatient(@RequestParam(defaultValue = "", required = false) String cardId,
@@ -96,7 +96,7 @@ public class PatientController {
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
-    @PostMapping("/")
+    @PostMapping("/protected/patient")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add patient")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -121,17 +121,17 @@ public class PatientController {
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
-    @PutMapping("/{id}")
+    @PutMapping("/protected/patient/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update patient")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
-    public String putPatient(@RequestBody @Valid PatientIn patient, @PathVariable String id) {
+    public void putPatient(@RequestBody @Valid PatientIn patient, @PathVariable String id) {
         Patient map = modelMapper.map(patient, Patient.class);
-        return patientService.putPatient(map, id);
+        patientService.putPatient(map, id);
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/protected/patient/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "Delete patient")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")

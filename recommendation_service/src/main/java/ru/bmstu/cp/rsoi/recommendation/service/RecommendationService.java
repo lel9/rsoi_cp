@@ -1,17 +1,35 @@
 package ru.bmstu.cp.rsoi.recommendation.service;
 
+import org.apache.commons.codec.binary.Base64;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import ru.bmstu.cp.rsoi.recommendation.domain.Profile;
 import ru.bmstu.cp.rsoi.recommendation.domain.Recommendation;
+import ru.bmstu.cp.rsoi.recommendation.exception.FailureWhenRecommendationAddException;
+import ru.bmstu.cp.rsoi.recommendation.exception.NoProfileException;
+import ru.bmstu.cp.rsoi.recommendation.model.OperationOut;
 import ru.bmstu.cp.rsoi.recommendation.model.RecommendationIn;
+import ru.bmstu.cp.rsoi.recommendation.model.Token;
 import ru.bmstu.cp.rsoi.recommendation.repository.RecommendationRepository;
 
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Optional;
 
 @Service
@@ -23,14 +41,31 @@ public class RecommendationService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     @Value( "${service.profile.host}" )
     private String profileServiceHost;
 
     @Value( "${service.profile.port}" )
     private Integer profileServicePort;
 
+    @Value( "${service.session.host}" )
+    private String sessionServiceHost;
+
+    @Value( "${service.session.port}" )
+    private Integer sessionServicePort;
+
+    @Value( "${service.session.clientId}" )
+    private String sessionServiceClientId;
+
+    @Value( "${service.session.secret}" )
+    private String sessionServiceSecret;
+
+    private static Token TOKEN = new Token();
+
     public Page<Recommendation> getRecommendations(String drugId, int page, int size) {
-        return recommendationRepository.findByDrugId(drugId, PageRequest.of(page, size));
+        return recommendationRepository.findByDrugId(drugId, PageRequest.of(page, size, new Sort(Sort.Direction.DESC, "date")));
     }
 
     public Long getCountByDrugId(String drugId) {
@@ -44,10 +79,19 @@ public class RecommendationService {
         recommendation.setText(recommendationIn.getText());
         recommendation.setAuthor(getProfile());
         Recommendation save = recommendationRepository.save(recommendation);
-        return save.getId();
+        String id = save.getId();
+
+        try {
+            String routingKey = "operation";
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, recommendationIn.getDrugId(), "C"));
+        } catch (Exception ex) {
+            // todo логгирование
+        }
+
+        return id;
     }
 
-    public String putRecommendation(String id, RecommendationIn recommendationIn) throws URISyntaxException {
+    public void putRecommendation(String id, RecommendationIn recommendationIn) throws URISyntaxException {
         Optional<Recommendation> oldRecommendation = recommendationRepository.findById(id);
         if (!oldRecommendation.isPresent()) {
             Recommendation recommendation = new Recommendation();
@@ -59,26 +103,111 @@ public class RecommendationService {
             recommendationRepository.save(recommendation);
         } else {
             Recommendation recommendation = oldRecommendation.get();
+            checkAuth(recommendation.getAuthor().getId());
             recommendation.setDrugId(recommendationIn.getDrugId());
             recommendation.setText(recommendationIn.getText());
             recommendationRepository.save(recommendation);
         }
-        return id;
+
+        try {
+            String routingKey = "operation";
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, recommendationIn.getDrugId(), "U"));
+        } catch (Exception ex) {
+            // todo логгирование
+        }
     }
 
     public void deleteRecommendation(String id) {
-        recommendationRepository.deleteById(id);
+        Optional<Recommendation> recommendation = recommendationRepository.findById(id);
+        if (recommendation.isPresent()) {
+            checkAuth(recommendation.get().getAuthor().getId());
+            recommendationRepository.deleteById(id);
+
+            try {
+                String routingKey = "operation";
+                rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, recommendation.get().getDrugId(), "D"));
+            } catch (Exception ex) {
+                // todo логгирование
+            }
+        }
     }
 
     private Profile getProfile() throws URISyntaxException {
-        return new Profile("stub", "stub"); // todo
-//        String name = "user2";
-//        try {
-//            URI thirdPartyApi = new URI("http", null, profileServiceHost, profileServicePort, "/api/1.0/rsoi/private/profile/" + name, null, null);
-//            ResponseEntity<Profile> exchange = restTemplate.exchange(thirdPartyApi, HttpMethod.GET, null, Profile.class);
-//            return exchange.getBody();
-//        } catch (HttpStatusCodeException ex) {
-//            return new Profile(name, null);
-//        }
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            return callProfileService(principal);
+        } catch (HttpStatusCodeException ex) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                TOKEN = getToken();
+                try {
+                    return callProfileService(principal);
+                } catch (HttpStatusCodeException ex2) {
+                    if (ex2.getStatusCode() == HttpStatus.NOT_FOUND) {
+                        throw new NoProfileException();
+                    }
+                    throw new FailureWhenRecommendationAddException();
+                } catch (Exception ex3) {
+                    throw new FailureWhenRecommendationAddException();
+                }
+            }
+            if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
+                throw new NoProfileException();
+            }
+            throw new FailureWhenRecommendationAddException();
+        } catch (Exception ex) {
+            throw new FailureWhenRecommendationAddException();
+        }
+    }
+
+    private Profile callProfileService(Object principal) throws URISyntaxException {
+        URI thirdPartyApi = new URI("http", null, profileServiceHost, profileServicePort, "/api/1.0/private/profile/" + principal + "/displayName", null, null);
+        ResponseEntity<Profile> exchange = restTemplate.exchange(thirdPartyApi,
+                HttpMethod.GET, new HttpEntity<>(createHeaders()), Profile.class);
+        Profile body = exchange.getBody();
+        if (body == null)
+            throw new NoProfileException();
+        body.setId(principal.toString());
+        return body;
+    }
+
+    private void checkAuth(String profileId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        if (authorities != null && authorities.contains(new SimpleGrantedAuthority("ROLE_ADMIN")))
+            return;
+        if (authentication.getPrincipal().equals(profileId))
+            return;
+        throw new AccessDeniedException("Доступ запрещен");
+    }
+
+    private Token getToken() throws URISyntaxException {
+        try {
+            LinkedMultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+            params.add("grant_type", "client_credentials");
+
+            URI thirdPartyApi = new URI("http", null, sessionServiceHost, sessionServicePort, "/oauth/token", null, null);
+            ResponseEntity<Token> exchange = restTemplate.exchange(thirdPartyApi, HttpMethod.POST, new HttpEntity<>(params, createHeaders(sessionServiceClientId, sessionServiceSecret)), Token.class);
+            return exchange.getBody();
+        } catch (HttpStatusCodeException ex) {
+            throw new FailureWhenRecommendationAddException();
+        }
+
+    }
+
+    private HttpHeaders createHeaders(String username, String password){
+        return new HttpHeaders() {{
+            String auth = username + ":" + password;
+            byte[] encodedAuth = Base64.encodeBase64(
+                    auth.getBytes(StandardCharsets.UTF_8) );
+            String authHeader = "Basic " + new String(encodedAuth);
+            set("Authorization", authHeader);
+        }};
+    }
+
+    private HttpHeaders createHeaders() {
+        return new HttpHeaders() {{
+            String authHeader = "Bearer " + TOKEN.getAccess_token();
+            set("Authorization", authHeader);
+        }};
     }
 }

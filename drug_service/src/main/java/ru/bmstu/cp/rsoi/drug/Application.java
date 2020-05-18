@@ -1,8 +1,7 @@
 package ru.bmstu.cp.rsoi.drug;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.amqp.core.Exchange;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.SpringApplication;
@@ -32,11 +31,6 @@ public class Application {
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
-    }
-
-    @Bean
-    public Exchange eventExchange() {
-        return new TopicExchange("eventExchange");
     }
 
     @Bean

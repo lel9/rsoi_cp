@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/1.0/rsoi/patient")
+@RequestMapping("/api/1.0")
 @Api(value = "Patient service")
 public class ReceptionController {
 
@@ -29,8 +29,7 @@ public class ReceptionController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Secured({"ROLE_USER", "ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN", "ROLE_INTERNAL_CLIENT"})
-    @GetMapping("/{pid}/reception")
+    @GetMapping("/public/patient/{pid}/reception")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get receptions by id", response = Receptions.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -47,7 +46,7 @@ public class ReceptionController {
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})
-    @GetMapping("/{pid}/reception/last")
+    @GetMapping("/protected/patient/{pid}/reception/last")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get last reception")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -57,7 +56,7 @@ public class ReceptionController {
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})
-    @PostMapping("/{pid}/reception")
+    @PostMapping("/protected/patient/{pid}/reception")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add reception")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -67,7 +66,7 @@ public class ReceptionController {
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})
-    @PutMapping("/{pid}/reception/{rid}")
+    @PutMapping("/protected/patient/{pid}/reception/{rid}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update reception")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
@@ -77,7 +76,7 @@ public class ReceptionController {
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
-    @DeleteMapping("/{pid}/reception/{rid}")
+    @DeleteMapping("/protected/patient/{pid}/reception/{rid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "Delete reception")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")

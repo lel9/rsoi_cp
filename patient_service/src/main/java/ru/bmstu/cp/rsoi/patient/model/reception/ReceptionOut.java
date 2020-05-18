@@ -1,7 +1,6 @@
 package ru.bmstu.cp.rsoi.patient.model.reception;
 
 import lombok.Data;
-import ru.bmstu.cp.rsoi.patient.model.StateOut;
 
 import java.util.ArrayList;
 import java.util.List;

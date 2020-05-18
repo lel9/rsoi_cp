@@ -8,7 +8,7 @@ import ru.bmstu.cp.rsoi.session.domain.entity.User
 class CustomUserDetails(private val user: User) : UserDetails {
 
     override fun getUsername(): String {
-        return user.id.toString()
+        return user.username
     }
 
     override fun getPassword(): String {
