@@ -113,3 +113,12 @@ VALUES ('profile_service', '$2a$10$jSOeYsfUOVbRkj3ndXcYsugcI535XWx1SmWzRel5LeREq
 INSERT INTO oauth_client_details(client_id, client_secret, scope, authorized_grant_types, authorities,
 access_token_validity, refresh_token_validity, additional_information, autoapprove)
 VALUES ('recommendation_service', '$2a$10$jSOeYsfUOVbRkj3ndXcYsugcI535XWx1SmWzRel5LeREqDeU.egiq', 'all', 'client_credentials,refresh_token', 'ROLE_INTERNAL_CLIENT', 3600, 2592000, 'microservice', 'true');
+
+INSERT INTO oauth_client_details(client_id, client_secret, scope, authorized_grant_types, authorities,
+access_token_validity, refresh_token_validity, additional_information, autoapprove)
+VALUES ('gateway', '$2a$10$jSOeYsfUOVbRkj3ndXcYsugcI535XWx1SmWzRel5LeREqDeU.egiq', 'all', 'client_credentials,refresh_token', 'ROLE_INTERNAL_CLIENT', 3600, 2592000, 'microservice', 'true');
+
+
+INSERT INTO oauth_client_details(client_id, client_secret, scope, authorized_grant_types, authorities,
+access_token_validity, refresh_token_validity, additional_information, autoapprove)
+VALUES ('statistic_service', '$2a$10$jSOeYsfUOVbRkj3ndXcYsugcI535XWx1SmWzRel5LeREqDeU.egiq', 'all', 'client_credentials,refresh_token', 'ROLE_INTERNAL_CLIENT', 3600, 2592000, 'microservice', 'true');

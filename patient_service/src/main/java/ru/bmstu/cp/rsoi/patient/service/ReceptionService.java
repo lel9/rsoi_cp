@@ -1,16 +1,24 @@
 package ru.bmstu.cp.rsoi.patient.service;
 
 import org.bson.types.ObjectId;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.bmstu.cp.rsoi.patient.domain.Patient;
 import ru.bmstu.cp.rsoi.patient.domain.Reception;
 import ru.bmstu.cp.rsoi.patient.domain.State;
+import ru.bmstu.cp.rsoi.patient.exception.InvalidReceptionDateException;
 import ru.bmstu.cp.rsoi.patient.exception.NoSuchPatientException;
+import ru.bmstu.cp.rsoi.patient.model.OperationOut;
 import ru.bmstu.cp.rsoi.patient.repository.ReceptionRepository;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static ru.bmstu.cp.rsoi.patient.model.OperationOut.getPatientOperation;
+import static ru.bmstu.cp.rsoi.patient.model.OperationOut.getReceptionOperation;
 
 @Service
 public class ReceptionService {
@@ -20,7 +28,23 @@ public class ReceptionService {
     @Autowired
     private PatientService patientService;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    private Logger log = Logger.getLogger(ReceptionService.class.getName());
+
     public List<Reception> findByPatient(String id) {
+        ObjectId objectId;
+        try {
+            objectId = new ObjectId(id);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+
+        return receptionRepository.findByPatient(objectId);
+    }
+
+    public List<Reception> findByPatientOrdered(String id) {
         ObjectId objectId;
         try {
             objectId = new ObjectId(id);
@@ -40,19 +64,54 @@ public class ReceptionService {
             return;
         }
 
-        receptionRepository.deleteReceptionByPatient(objectId);
+        List<Reception> receptions = receptionRepository.deleteReceptionByPatient(objectId);
+        receptions.forEach(reception -> {
+            try {
+                String routingKey = "operation";
+                OperationOut operation = getReceptionOperation(reception.getId(), id, "D");
+                rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+                log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
+            } catch (Exception ex) {
+                log.log(Level.SEVERE, ex.getMessage());
+            }
+        });
     }
 
     public String postReception(String patientId, Reception in) {
-        return saveReception(patientId, in, null);
+        String id = saveReception(patientId, in, null);
+        try {
+            String routingKey = "operation";
+            OperationOut operation = getReceptionOperation(id, patientId, "C");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
+        } catch (Exception ex) {
+            log.log(Level.SEVERE, ex.getMessage());
+        }
+        return id;
     }
 
     public void putReception(String patientId, Reception in, String id) {
-        saveReception(patientId, in, id);
+        id = saveReception(patientId, in, id);
+        try {
+            String routingKey = "operation";
+            OperationOut operation = getReceptionOperation(id, patientId, "U");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
+        } catch (Exception ex) {
+            log.log(Level.SEVERE, ex.getMessage());
+        }
     }
 
     public void deleteReception(String pid, String rid) {
         receptionRepository.deleteById(rid);
+        try {
+            String routingKey = "operation";
+            OperationOut operation = getReceptionOperation(rid, pid, "D");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
+        } catch (Exception ex) {
+            log.log(Level.SEVERE, ex.getMessage());
+        }
     }
 
     private String saveReception(String patientId, Reception reception, String id) {
@@ -82,8 +141,14 @@ public class ReceptionService {
             Calendar endCalendar = new GregorianCalendar();
             endCalendar.setTimeInMillis(reception.getDate());
 
-            state.setYears(endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR));
-            state.setMonths(endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH));
+            int diffYears = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
+            int diffMonths = diffYears * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
+
+            if (diffMonths < 0)
+                throw new InvalidReceptionDateException();
+
+            state.setYears(diffMonths / 12);
+            state.setMonths(diffMonths % 12);
         }
 
         return state;
@@ -94,6 +159,15 @@ public class ReceptionService {
         for (Reception reception: receptions) {
             reception.setState(getStateAccordingToPatient(reception, patient));
             receptionRepository.save(reception);
+
+            try {
+                String routingKey = "operation";
+                OperationOut operation = getReceptionOperation(reception.getId(), patient.getId(), "U");
+                rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+                log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
+            } catch (Exception ex) {
+                log.log(Level.SEVERE, ex.getMessage());
+            }
         }
     }
 

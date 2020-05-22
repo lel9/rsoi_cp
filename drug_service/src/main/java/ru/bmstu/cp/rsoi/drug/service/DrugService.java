@@ -1,6 +1,5 @@
 package ru.bmstu.cp.rsoi.drug.service;
 
-import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -8,13 +7,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.bmstu.cp.rsoi.drug.domain.Drug;
-import ru.bmstu.cp.rsoi.drug.exception.DrugAlreadyExistsException;
 import ru.bmstu.cp.rsoi.drug.exception.NoSuchDrugException;
+import ru.bmstu.cp.rsoi.drug.model.OperationOut;
 import ru.bmstu.cp.rsoi.drug.repository.DrugRepository;
 import ru.bmstu.cp.rsoi.drug.web.utility.MyBeansUtil;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class DrugService {
@@ -25,13 +26,21 @@ public class DrugService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @Autowired
-    private Exchange exchange;
+    private Logger log = Logger.getLogger(DrugService.class.getName());
 
     public Drug getDrug(String id) {
         Optional<Drug> byId = drugRepository.findById(id);
         if (!byId.isPresent())
             throw new NoSuchDrugException();
+
+        try {
+            String routingKey = "operation";
+            OperationOut operation = new OperationOut(id, "R");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
+        } catch (Exception ex) {
+            log.log(Level.SEVERE, ex.getMessage());
+        }
 
         return byId.get();
     }
@@ -43,12 +52,20 @@ public class DrugService {
     }
 
     public String postDrug(Drug drug) {
-        if (drugRepository.findByTradeName(drug.getTradeName()).isPresent())
-            throw new DrugAlreadyExistsException(drug.getTradeName());
-
         drug.setId(null);
         Drug save = drugRepository.save(drug);
-        return save.getId();
+        String id = save.getId();
+
+        try {
+            String routingKey = "operation";
+            OperationOut operation = new OperationOut(id, "C");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
+        } catch (Exception ex) {
+            log.log(Level.SEVERE, ex.getMessage());
+        }
+
+        return id;
     }
 
     public List<Drug> getDrugAnalogs(String id) {
@@ -67,12 +84,6 @@ public class DrugService {
         if (!byId.isPresent())
             throw new NoSuchDrugException();
 
-        if (drug.getTradeName() != null) {
-            Optional<Drug> byTradeName = drugRepository.findByTradeName(drug.getTradeName());
-            if (byTradeName.isPresent() && !byTradeName.get().getId().equals(id))
-                throw new DrugAlreadyExistsException(drug.getTradeName());
-        }
-
         Drug target = byId.get();
         MyBeansUtil<Drug> util = new MyBeansUtil<>();
         util.copyNonNullProperties(target, drug);
@@ -81,10 +92,24 @@ public class DrugService {
 
         try {
             String routingKey = "drug.updated";
-            rabbitTemplate.convertAndSend(exchange.getName(), routingKey, saved);
+            rabbitTemplate.convertAndSend("eventExchange", routingKey, saved);
+            log.log(Level.INFO, "information about updating drug was sent to RabbitMQ: " + saved.getId());
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
 
+        try {
+            String routingKey = "operation";
+            OperationOut operation = new OperationOut(id, "U");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
+        } catch (Exception ex) {
+            log.log(Level.SEVERE, ex.getMessage());
+        }
+
+    }
+
+    public Iterable<Drug> findByIds(List<String> ids) {
+        return drugRepository.findAllById(ids);
     }
 }
