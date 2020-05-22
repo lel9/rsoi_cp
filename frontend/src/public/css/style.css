@@ -1,0 +1,574 @@
+@import '~antd/dist/antd.css';
+@import "./font-awesome.min.css";
+html {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+#root, .App {
+  width: 100%;
+  height: 100%;
+  min-width: 1272px;
+  overflow: auto;
+}
+
+p {
+  padding: 0;
+  margin: 0;
+}
+
+.inputF textarea {
+  width: 100%;
+  border: #dadada 1px solid;
+  border-radius: 2px;
+  min-height: 50px;
+  max-height: 150px;
+}
+
+.inputF__wrapper.disabled {
+  display: grid;
+  grid-template-columns: 100px calc(100% - 100px - 20px);
+  grid-gap: 20px;
+}
+.inputF__wrapper.disabled .inputF {
+  min-height: 20px;
+  width: 100%;
+}
+.inputF__wrapper.disabled .inputF__title {
+  margin-right: 30px;
+}
+.inputF__wrapper.disabled textarea {
+  background: white;
+  border: none;
+  resize: none;
+  min-height: 20px;
+  overflow: scroll;
+}
+
+.noData {
+  font-size: 24px;
+  height: 100%;
+  width: 100%;
+}
+
+.App .header .ant-menu {
+  padding-right: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+.App .body {
+  overflow: auto;
+  flex-direction: row;
+  display: flex;
+  height: calc(100% - 42px);
+}
+.App .body .navigation {
+  height: 100%;
+}
+.App .body .navigation .ant-menu {
+  padding-top: 20px;
+  min-width: 200px;
+  width: 17vw;
+  height: 100%;
+}
+.App .body .content {
+  background: #e8e8e894;
+  height: calc(100% - -22px - 20px);
+  min-width: 1092px;
+  padding-top: 20px;
+  width: calc(100% - 162px);
+  overflow: auto;
+}
+.App .body .content .content__breadcrumb {
+  width: 80%;
+  margin: 0 auto;
+  margin-bottom: 20px;
+}
+.App .body .content .content__breadcrumb .ant-breadcrumb {
+  font-size: 20px;
+}
+.App .body .content .content__breadcrumb .ant-breadcrumb a {
+  color: #4a4a4a;
+}
+
+.btn-group {
+  overflow: auto;
+  display: flex;
+  flex-direction: row;
+  border: 1px solid;
+  border-radius: 10px;
+}
+
+.inputF__wrapper {
+  margin-bottom: 20px;
+}
+.inputF__wrapper label {
+  font-size: 14px;
+}
+.inputF__wrapper p {
+  font-size: 12px;
+  color: #c7b110;
+}
+
+.profile {
+  padding: 30px 20px;
+  background: white;
+  width: 80%;
+  margin: 0 auto;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  position: relative;
+}
+
+.statistics {
+  padding: 30px 20px;
+  background: white;
+  width: 80%;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  position: relative;
+}
+.statistics .statistics__header .statistics__header-rangePicker, .statistics .statistics__header .statistics__header-select {
+  display: grid;
+  grid-template-columns: 180px calc(100% - 200px);
+  grid-gap: 20px;
+  margin-bottom: 20px;
+}
+.statistics .statistics__content {
+  width: 100%;
+  height: calc(100% - 104px);
+}
+.statistics .statistics__content button {
+  width: 100%;
+}
+.statistics .statistics__content .statistics__content-empty {
+  width: 100%;
+  height: 100%;
+  font-size: 30px;
+  color: #bdbbbb;
+  text-align: center;
+  margin-top: 50px;
+}
+.statistics .statistics__content .statistics__content-empty span {
+  color: #7270b9;
+}
+
+.addPatient {
+  padding: 30px 20px;
+  background: white;
+  width: 80%;
+  margin: 0 auto;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  position: relative;
+}
+.addPatient .addPatient__content .addPatient__datePicker, .addPatient .addPatient__content .addPatient__sex, .addPatient .addPatient__content .inputF__wrapper {
+  display: grid;
+  grid-template-columns: 200px 200px;
+  margin-bottom: 20px;
+}
+.addPatient .addPatient__content .inputF input {
+  width: 100%;
+}
+
+.addDrug {
+  padding-top: 30px;
+  background: white;
+  width: 80%;
+  margin: 0 auto;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  position: relative;
+}
+.addDrug .addDrug__pagination {
+  margin-bottom: 40px;
+  width: 75%;
+  margin: 0 auto;
+  margin-bottom: 20px;
+}
+.addDrug .addDrug__pagination .radioButton.inside {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+.addDrug .addDrug__pagination .radioButton.inside .radioButton-select {
+  height: 22px;
+  width: 22px;
+  text-align: center;
+  border: 1px solid black;
+  border-radius: 11px;
+  background: white;
+}
+.addDrug .addDrug__pagination .radioButton.inside img {
+  display: none;
+}
+.addDrug .addDrug__content {
+  width: 90%;
+  margin: 0 auto;
+}
+.addDrug .addDrug__footer {
+  width: 90%;
+  margin: 0 auto;
+}
+.addDrug .addDrug__footer .ant-btn:first-child {
+  margin-right: 5px;
+}
+
+.reception {
+  height: 100%;
+  background: white;
+  width: 80%;
+  margin: 0 auto;
+  min-height: 100%;
+  position: relative;
+  padding: 30px 20px;
+}
+.reception .reception__header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.reception .reception__header .reception__header-leftSide {
+  width: 200px;
+}
+.reception .reception__header .reception__header-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 30px;
+}
+.reception .reception__header .reception__header-center .reception__date {
+  margin-left: 20px;
+  margin-right: 10px;
+  font-size: 17px;
+}
+.reception .reception__header .reception__header-center i {
+  font-size: 25px;
+}
+.reception .reception__header .reception__header-center .reception__time {
+  margin-left: 10px;
+  margin-right: 20px;
+  font-size: 17px;
+}
+.reception .reception__content {
+  width: 100%;
+  height: calc(100% - 32px - 30px);
+}
+.reception .reception__content .reception__content-sex, .reception .reception__content .reception__content-brth {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: 100px calc(100% - 100px - 20px);
+  margin-bottom: 20px;
+}
+
+.instruction {
+  display: grid;
+  grid-template-columns: 65% 33%;
+  grid-gap: 2%;
+  background: white;
+  width: 80%;
+  margin: 0 auto;
+  min-height: 100%;
+  position: relative;
+  padding: 30px 20px;
+}
+.instruction .tree .branch {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+.instruction .tree .branch span {
+  margin-right: 5px;
+}
+.instruction .tree .branch .tree__branch-description {
+  word-wrap: break-word;
+  padding-left: 15px;
+  margin-left: 20px;
+  text-align: justify;
+}
+
+.recomendations {
+  background: white;
+  width: 80%;
+  margin: 0 auto;
+  padding: 30px 20px;
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+}
+.recomendations .recomendations__leftSide {
+  min-width: 160px;
+  width: 15vw;
+}
+.recomendations .recomendations__leftSide .recomendations__preparate {
+  margin-bottom: 10px;
+}
+.recomendations .recomendations__rightSide {
+  min-width: 500px;
+  width: 45vw;
+}
+.recomendations .recomendations__rightSide .recomendations__map-header {
+  display: flex;
+  flex-direction: row;
+  height: 30px;
+}
+
+.drugSelection {
+  padding: 30px 20px 30px 20px;
+  background: white;
+  width: 80%;
+  margin: 0 auto;
+  min-height: 100%;
+  position: relative;
+}
+.drugSelection .drugSelection__sex {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 25px;
+}
+.drugSelection .drugSelection__sex .raioButton__Label {
+  margin-right: 20px;
+}
+.drugSelection .drugSelection__sex .radioButton {
+  display: flex;
+  flex-direction: row;
+  height: 25px;
+  margin-bottom: 20px;
+}
+.drugSelection .drugSelection__sex .radioButton .radioButton-select {
+  display: flex;
+  flex-direction: row;
+  margin-right: 50px;
+}
+.drugSelection .drugSelection__sex .radioButton .radioButton-select div {
+  margin-left: 5px;
+  width: 20px;
+  height: 20px;
+  border: 1px solid;
+  border-radius: 20px;
+  position: relative;
+}
+.drugSelection .drugSelection__sex .radioButton .radioButton-select div img {
+  height: 10px;
+  width: 10px;
+  border-radius: 20px;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+}
+.drugSelection .drugSelection__age {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 25px;
+}
+.drugSelection .drugSelection__age label {
+  margin-right: 20px;
+}
+.drugSelection .drugSelection__age .drugSelection__years label, .drugSelection .drugSelection__age .drugSelection__month label {
+  margin-left: 5px;
+}
+
+.allDrugs {
+  background: white;
+  width: 80%;
+  margin: 0 auto;
+  min-height: 100%;
+  position: relative;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: row;
+}
+.allDrugs .allDrugs__leftSide {
+  width: 500px;
+}
+.allDrugs .allDrugs__leftSide .ant-list {
+  margin-top: 20px;
+  width: 90%;
+}
+.allDrugs .allDrugs__leftSide .ant-pagination {
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 50px;
+}
+.allDrugs .allDrugs__leftSide .allDrugs__ist-item {
+  color: black;
+}
+
+.allPatients {
+  display: flex;
+  flex-direction: row;
+  padding: 30px 20px;
+  background: white;
+  width: 80%;
+  margin: 0 auto;
+  min-height: 100%;
+  position: relative;
+}
+.allPatients .allPatients__leftSide {
+  width: 500px;
+}
+
+#portal {
+  background: #0000003d;
+  position: absolute;
+  top: 0px;
+  height: 100%;
+  width: 100%;
+}
+#portal .signIn {
+  position: absolute;
+  top: 20%;
+  height: 100%;
+  width: 100%;
+}
+#portal .signIn .signIn-wrapper {
+  position: relative;
+  padding-top: 85px;
+  width: 450px;
+  height: 300px;
+  margin: 0 auto;
+  background: #2846e0;
+  background: radial-gradient(circle, #2846e0 38%, #3d6fe2 99%);
+}
+#portal .signIn .signIn-wrapper .signIn-tittle {
+  position: absolute;
+  top: 25px;
+  left: calc(50% - 33.6px);
+  color: white;
+  font-size: 25px;
+}
+#portal .signIn .signIn-wrapper .signIn-close {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  cursor: pointer;
+}
+#portal .signIn .signIn-wrapper .signIn-close path {
+  fill: #ffffffd6;
+}
+#portal .signIn .signIn-wrapper .signIn-signUp {
+  width: 95px;
+  margin: 0 auto;
+  color: #ffffffd6;
+  margin-top: 25px;
+  cursor: pointer;
+}
+#portal .signIn .signIn-wrapper .ant-btn {
+  width: 300px;
+  top: 15px;
+  left: calc(50% - 150px);
+  color: white;
+  font-size: 14px;
+  padding: 0;
+  border: none;
+}
+#portal .signIn .signIn-wrapper .inputF {
+  width: 300px;
+  margin: 0 auto;
+}
+#portal .signIn .signIn-wrapper .inputF input {
+  height: 35px;
+  width: 100%;
+  padding-left: 40px;
+  background-size: 19px;
+  background-origin: content-box;
+  color: black;
+  background-repeat: no-repeat !important;
+  background-position: -30px 5px;
+}
+#portal .signIn .signIn-wrapper .inputF__wrapper:nth-child(3) input {
+  background-image: url("../svg/user-circle-solid.svg");
+}
+#portal .signIn .signIn-wrapper .inputF__wrapper:nth-child(4) input {
+  background-image: url("../svg/key-solid.svg");
+}
+#portal .signUp {
+  position: absolute;
+  top: 20%;
+  height: 100%;
+  width: 100%;
+}
+#portal .signUp .signUp-wrapper {
+  position: relative;
+  padding-top: 85px;
+  width: 450px;
+  height: 300px;
+  margin: 0 auto;
+  background: #2846e0;
+  background: radial-gradient(circle, #2846e0 38%, #3d6fe2 99%);
+}
+#portal .signUp .signUp-wrapper .signUp-tittle {
+  position: absolute;
+  top: 25px;
+  left: calc(50% - 88px);
+  color: white;
+  font-size: 25px;
+}
+#portal .signUp .signUp-wrapper .signUp-close {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  cursor: pointer;
+}
+#portal .signUp .signUp-wrapper .signUp-close path {
+  fill: #ffffffd6;
+}
+#portal .signUp .signUp-wrapper .signUp-signUp {
+  width: 95px;
+  margin: 0 auto;
+  color: #ffffffd6;
+  margin-top: 25px;
+  cursor: pointer;
+}
+#portal .signUp .signUp-wrapper .ant-btn {
+  width: 300px;
+  top: 15px;
+  left: calc(50% - 150px);
+  color: white;
+  font-size: 14px;
+  padding: 0;
+  border: none;
+}
+#portal .signUp .signUp-wrapper .inputF {
+  width: 300px;
+  margin: 0 auto;
+}
+#portal .signUp .signUp-wrapper .inputF input {
+  height: 35px;
+  width: 100%;
+  padding-left: 40px;
+  background-size: 19px;
+  background-origin: content-box;
+  color: black;
+  background-repeat: no-repeat !important;
+  background-position: -30px 5px;
+}
+#portal .signUp .signUp-wrapper .inputF__wrapper:nth-child(3) input {
+  background-image: url("../svg/user-circle-solid.svg");
+}
+#portal .signUp .signUp-wrapper .inputF__wrapper:nth-child(4) input {
+  background-image: url("../svg/key-solid.svg");
+}
+
+/*# sourceMappingURL=style.css.map */
