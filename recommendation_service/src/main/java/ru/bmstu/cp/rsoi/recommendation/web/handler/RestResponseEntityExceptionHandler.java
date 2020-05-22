@@ -11,9 +11,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.bmstu.cp.rsoi.recommendation.exception.FailureWhenRecommendationAddException;
 import ru.bmstu.cp.rsoi.recommendation.exception.NoProfileException;
 import ru.bmstu.cp.rsoi.recommendation.exception.NoSuchRecommendationException;
 import ru.bmstu.cp.rsoi.recommendation.model.GenericResponse;
+import ru.bmstu.cp.rsoi.recommendation.service.RecommendationService;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
@@ -21,6 +26,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     public RestResponseEntityExceptionHandler() {
         super();
     }
+
+    private Logger log = Logger.getLogger(RestResponseEntityExceptionHandler.class.getName());
 
     // 400
     @Override
@@ -57,14 +64,22 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     // 503
     @ExceptionHandler(ResourceAccessException.class)
     public ResponseEntity<Object> handleResourceAccessException(final ResourceAccessException ex, final WebRequest request) {
+        log.log(Level.SEVERE, ex.getMessage());
         final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "time_out");
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE, request);
     }
 
     // 500
+    @ExceptionHandler({ FailureWhenRecommendationAddException.class })
+    public ResponseEntity<Object> handleFailureWhenRecommendationAdd(final FailureWhenRecommendationAddException ex, final WebRequest request) {
+        log.log(Level.SEVERE, ex.getMessage());
+        final GenericResponse bodyOfResponse = new GenericResponse("Внутренняя ошибка сервера", "internal_error");
+        return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler({ Exception.class })
     public ResponseEntity<Object> handleInternal(final RuntimeException ex, final WebRequest request) {
-        ex.printStackTrace();
+        log.log(Level.SEVERE, ex.getMessage());
         final GenericResponse bodyOfResponse = new GenericResponse("Внутренняя ошибка сервера", "internal_error");
         return new ResponseEntity<>(bodyOfResponse, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }

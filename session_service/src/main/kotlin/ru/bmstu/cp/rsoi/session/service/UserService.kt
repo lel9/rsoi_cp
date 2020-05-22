@@ -10,6 +10,8 @@ import ru.bmstu.cp.rsoi.session.model.OperationOut
 import ru.bmstu.cp.rsoi.session.repository.RoleRepository
 import ru.bmstu.cp.rsoi.session.repository.UserRepository
 import java.util.*
+import java.util.logging.Level
+import java.util.logging.Logger
 
 @Service("userService")
 class UserService{
@@ -25,6 +27,8 @@ class UserService{
 
     @Autowired
     private lateinit var rabbitTemplate: RabbitTemplate
+
+    private val log = Logger.getLogger(UserService::class.java.getName())
 
     fun registerUser(
         newUser: User
@@ -46,9 +50,11 @@ class UserService{
 
         try {
             val routingKey = "operation"
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, OperationOut(newUser.username, "C"))
+            val operation = OperationOut(newUser.username, "C")
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation)
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: $operation")
         } catch (ex: Exception) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.message)
         }
         return id
     }

@@ -14,6 +14,8 @@ import ru.bmstu.cp.rsoi.drug.web.utility.MyBeansUtil;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class DrugService {
@@ -24,6 +26,8 @@ public class DrugService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    private Logger log = Logger.getLogger(DrugService.class.getName());
+
     public Drug getDrug(String id) {
         Optional<Drug> byId = drugRepository.findById(id);
         if (!byId.isPresent())
@@ -31,9 +35,11 @@ public class DrugService {
 
         try {
             String routingKey = "operation";
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, "R"));
+            OperationOut operation = new OperationOut(id, "R");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
 
         return byId.get();
@@ -52,9 +58,11 @@ public class DrugService {
 
         try {
             String routingKey = "operation";
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, "C"));
+            OperationOut operation = new OperationOut(id, "C");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
 
         return id;
@@ -85,15 +93,18 @@ public class DrugService {
         try {
             String routingKey = "drug.updated";
             rabbitTemplate.convertAndSend("eventExchange", routingKey, saved);
+            log.log(Level.INFO, "information about updating drug was sent to RabbitMQ: " + saved.getId());
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
 
         try {
             String routingKey = "operation";
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, "U"));
+            OperationOut operation = new OperationOut(id, "U");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
 
     }

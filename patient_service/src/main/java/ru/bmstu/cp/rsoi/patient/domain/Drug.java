@@ -13,4 +13,9 @@ public class Drug {
     @Field(value = "trade_name")
     private String tradeName;
 
+    @Field(value = "release_form_vs_dosage")
+    private String releaseFormVSDosage;
+
+    private String manufacturer;
+
 }

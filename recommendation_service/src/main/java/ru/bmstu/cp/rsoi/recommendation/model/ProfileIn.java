@@ -9,4 +9,11 @@ public class ProfileIn {
 
     private String displayName;
 
+    @Override
+    public String toString() {
+        return "ProfileIn{" +
+                "id='" + id + '\'' +
+                ", displayName='" + displayName + '\'' +
+                '}';
+    }
 }

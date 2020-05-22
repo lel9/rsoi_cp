@@ -31,6 +31,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class RecommendationService {
@@ -43,6 +45,8 @@ public class RecommendationService {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    private Logger log = Logger.getLogger(RecommendationService.class.getName());
 
     @Value( "${service.profile.host}" )
     private String profileServiceHost;
@@ -83,9 +87,11 @@ public class RecommendationService {
 
         try {
             String routingKey = "operation";
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, recommendationIn.getDrugId(), "C"));
+            OperationOut operation = new OperationOut(id, recommendationIn.getDrugId(), "C");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
 
         return id;
@@ -111,9 +117,11 @@ public class RecommendationService {
 
         try {
             String routingKey = "operation";
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, recommendationIn.getDrugId(), "U"));
+            OperationOut operation = new OperationOut(id, recommendationIn.getDrugId(), "U");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
     }
 
@@ -125,9 +133,11 @@ public class RecommendationService {
 
             try {
                 String routingKey = "operation";
-                rabbitTemplate.convertAndSend("operationExchange", routingKey, new OperationOut(id, recommendation.get().getDrugId(), "D"));
+                OperationOut operation = new OperationOut(id, recommendation.get().getDrugId(), "D");
+                rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+                log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
             } catch (Exception ex) {
-                // todo логгирование
+                log.log(Level.SEVERE, ex.getMessage());
             }
         }
     }
