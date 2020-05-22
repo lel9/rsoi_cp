@@ -10,9 +10,12 @@ import ru.bmstu.cp.rsoi.patient.domain.Reception;
 import ru.bmstu.cp.rsoi.patient.domain.State;
 import ru.bmstu.cp.rsoi.patient.exception.InvalidReceptionDateException;
 import ru.bmstu.cp.rsoi.patient.exception.NoSuchPatientException;
+import ru.bmstu.cp.rsoi.patient.model.OperationOut;
 import ru.bmstu.cp.rsoi.patient.repository.ReceptionRepository;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static ru.bmstu.cp.rsoi.patient.model.OperationOut.getPatientOperation;
 import static ru.bmstu.cp.rsoi.patient.model.OperationOut.getReceptionOperation;
@@ -27,6 +30,8 @@ public class ReceptionService {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    private Logger log = Logger.getLogger(ReceptionService.class.getName());
 
     public List<Reception> findByPatient(String id) {
         ObjectId objectId;
@@ -63,9 +68,11 @@ public class ReceptionService {
         receptions.forEach(reception -> {
             try {
                 String routingKey = "operation";
-                rabbitTemplate.convertAndSend("operationExchange", routingKey, getReceptionOperation(reception.getId(), id,"D"));
+                OperationOut operation = getReceptionOperation(reception.getId(), id, "D");
+                rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+                log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
             } catch (Exception ex) {
-                // todo логгирование
+                log.log(Level.SEVERE, ex.getMessage());
             }
         });
     }
@@ -74,9 +81,11 @@ public class ReceptionService {
         String id = saveReception(patientId, in, null);
         try {
             String routingKey = "operation";
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, getReceptionOperation(id, patientId,"C"));
+            OperationOut operation = getReceptionOperation(id, patientId, "C");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
         return id;
     }
@@ -85,9 +94,11 @@ public class ReceptionService {
         id = saveReception(patientId, in, id);
         try {
             String routingKey = "operation";
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, getReceptionOperation(id, patientId,"U"));
+            OperationOut operation = getReceptionOperation(id, patientId, "U");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
     }
 
@@ -95,9 +106,11 @@ public class ReceptionService {
         receptionRepository.deleteById(rid);
         try {
             String routingKey = "operation";
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, getReceptionOperation(rid, pid, "D"));
+            OperationOut operation = getReceptionOperation(rid, pid, "D");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
     }
 
@@ -149,9 +162,11 @@ public class ReceptionService {
 
             try {
                 String routingKey = "operation";
-                rabbitTemplate.convertAndSend("operationExchange", routingKey, getReceptionOperation(reception.getId(), patient.getId(), "U"));
+                OperationOut operation = getReceptionOperation(reception.getId(), patient.getId(), "U");
+                rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+                log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
             } catch (Exception ex) {
-                // todo логгирование
+                log.log(Level.SEVERE, ex.getMessage());
             }
         }
     }

@@ -16,4 +16,16 @@ public class OperationOut {
         this.parentEntityId = drugId;
         this.operationName = operationName;
     }
+
+    @Override
+    public String toString() {
+        return "OperationOut{" +
+                "entityName='" + entityName + '\'' +
+                ", parentEntityName='" + parentEntityName + '\'' +
+                ", entityId='" + entityId + '\'' +
+                ", parentEntityId='" + parentEntityId + '\'' +
+                ", operationName='" + operationName + '\'' +
+                ", date=" + date +
+                '}';
+    }
 }

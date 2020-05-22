@@ -13,6 +13,8 @@ import ru.bmstu.cp.rsoi.patient.repository.PatientRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static ru.bmstu.cp.rsoi.patient.model.OperationOut.getPatientOperation;
 
@@ -28,6 +30,8 @@ public class PatientService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    private Logger log = Logger.getLogger(PatientService.class.getName());
+
     public Patient getPatient(String id) {
         Optional<Patient> patientOptional = patientRepository.findById(id);
         if (!patientOptional.isPresent())
@@ -35,9 +39,11 @@ public class PatientService {
 
         try {
             String routingKey = "operation";
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, getPatientOperation(id, "R"));
+            OperationOut operation = getPatientOperation(id, "R");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
         return patientOptional.get();
     }
@@ -53,9 +59,11 @@ public class PatientService {
 
         try {
             String routingKey = "operation";
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, getPatientOperation(id, "C"));
+            OperationOut operation = getPatientOperation(id, "C");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
 
         return id;
@@ -76,9 +84,11 @@ public class PatientService {
 
         try {
             String routingKey = "operation";
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, getPatientOperation(id, "U"));
+            OperationOut operation = getPatientOperation(id, "U");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
     }
 
@@ -88,9 +98,11 @@ public class PatientService {
 
         try {
             String routingKey = "operation";
-            rabbitTemplate.convertAndSend("operationExchange", routingKey, getPatientOperation(id, "D"));
+            OperationOut operation = getPatientOperation(id, "D");
+            rabbitTemplate.convertAndSend("operationExchange", routingKey, operation);
+            log.log(Level.INFO, "Operation was sent to RabbitMQ: " + operation);
         } catch (Exception ex) {
-            // todo логгирование
+            log.log(Level.SEVERE, ex.getMessage());
         }
     }
 

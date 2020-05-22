@@ -9,4 +9,8 @@ public class DrugOut {
 
     private String tradeName;
 
+    private String releaseFormVSDosage;
+
+    private String manufacturer;
+
 }
