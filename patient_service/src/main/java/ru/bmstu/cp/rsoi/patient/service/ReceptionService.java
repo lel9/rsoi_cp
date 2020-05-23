@@ -136,6 +136,9 @@ public class ReceptionService {
         state.setSex(patient.getSex());
 
         if (patient.getBirthday() != null && reception.getDate() != null) {
+            if (patient.getBirthday() > reception.getDate())
+                throw new InvalidReceptionDateException();
+
             Calendar startCalendar = new GregorianCalendar();
             startCalendar.setTimeInMillis(patient.getBirthday());
             Calendar endCalendar = new GregorianCalendar();
@@ -143,9 +146,6 @@ public class ReceptionService {
 
             int diffYears = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
             int diffMonths = diffYears * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
-
-            if (diffMonths < 0)
-                throw new InvalidReceptionDateException();
 
             state.setYears(diffMonths / 12);
             state.setMonths(diffMonths % 12);
