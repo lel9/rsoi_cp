@@ -1,0 +1,163 @@
+version: '3.2'
+
+services:
+
+  drug-service:
+    image: ${REGISTRY_LOGIN}/drug_service:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/docker/drug_service/logs:/tmp/app
+    environment:
+      - JAVA_OPTIONS=-Xmx150m
+      - spring.data.mongodb.host=79.174.13.21
+      - spring.data.mongodb.port=27017
+      - spring.data.mongodb.username=${LOGIN}
+      - spring.data.mongodb.password=${PASS}
+      - spring.data.mongodb.authentication-database=admin
+      - spring.data.mongodb.database=drugs
+      - spring.rabbitmq.host=79.174.13.21
+      - spring.rabbitmq.port=5672
+      - spring.rabbitmq.username=${LOGIN}
+      - spring.rabbitmq.password=${PASS}
+      - service.session.host=79.174.13.21
+      - service.session.port=8084
+      - service.session.clientId=drug_service
+      - service.session.secret=secret
+      - logging.path=/tmp/app
+    networks:
+      - backend
+
+  patient-service:
+    image: ${REGISTRY_LOGIN}/patient_service:latest
+    ports:
+      - "8081:8081"
+    volumes:
+      - /var/docker/patient_service/logs:/tmp/app
+    environment:
+      - JAVA_OPTIONS=-Xmx150m
+      - spring.data.mongodb.host=79.174.13.21
+      - spring.data.mongodb.port=27017
+      - spring.data.mongodb.username=${LOGIN}
+      - spring.data.mongodb.password=${PASS}
+      - spring.data.mongodb.authentication-database=admin
+      - spring.data.mongodb.database=patients
+      - spring.rabbitmq.host=79.174.13.21
+      - spring.rabbitmq.port=5672
+      - spring.rabbitmq.username=${LOGIN}
+      - spring.rabbitmq.password=${PASS}
+      - service.session.host=79.174.13.21
+      - service.session.port=8084
+      - service.session.clientId=patient_service
+      - service.session.secret=secret
+      - logging.path=/tmp/app
+    depends_on:
+      - drug-service
+    networks:
+      - backend
+
+  recommendation-service:
+    image: ${REGISTRY_LOGIN}/recommendation_service:latest
+    ports:
+      - "8082:8082"
+    volumes:
+      - /var/docker/recommendation_service/logs:/tmp/app
+    environment:
+      - JAVA_OPTIONS=-Xmx150m
+      - spring.data.mongodb.host=79.174.13.21
+      - spring.data.mongodb.port=27017
+      - spring.data.mongodb.username=${LOGIN}
+      - spring.data.mongodb.password=${PASS}
+      - spring.data.mongodb.authentication-database=admin
+      - spring.data.mongodb.database=recommendations
+      - spring.rabbitmq.host=79.174.13.21
+      - spring.rabbitmq.port=5672
+      - spring.rabbitmq.username=${LOGIN}
+      - spring.rabbitmq.password=${PASS}
+      - service.session.host=79.174.13.21
+      - service.session.port=8084
+      - service.session.clientId=recommendation_service
+      - service.session.secret=secret
+      - service.profile.host=79.174.13.21
+      - service.profile.port=8083
+      - logging.path=/tmp/app
+    depends_on:
+      - drug-service
+      - profile-service
+    networks:
+      - backend
+
+  profile-service:
+    image: ${REGISTRY_LOGIN}/profile_service:latest
+    ports:
+      - "8083:8083"
+    volumes:
+      - /var/docker/profile_service/logs:/tmp/app
+    environment:
+      - JAVA_OPTIONS=-Xmx150m
+      - spring.data.mongodb.host=79.174.13.21
+      - spring.data.mongodb.port=27017
+      - spring.data.mongodb.username=${LOGIN}
+      - spring.data.mongodb.password=${PASS}
+      - spring.data.mongodb.authentication-database=admin
+      - spring.data.mongodb.database=profiles
+      - spring.rabbitmq.host=79.174.13.21
+      - spring.rabbitmq.port=5672
+      - spring.rabbitmq.username=${LOGIN}
+      - spring.rabbitmq.password=${PASS}
+      - service.session.host=79.174.13.21
+      - service.session.port=8084
+      - service.session.clientId=profile_service
+      - service.session.secret=secret
+      - logging.path=/tmp/app
+    depends_on:
+      - drug-service
+      - profile-service
+    networks:
+      - backend
+
+  session-service:
+    image: ${REGISTRY_LOGIN}/session_service:latest
+    ports:
+      - "8084:8084"
+    volumes:
+      - /var/docker/session_service/logs:/tmp/app
+    environment:
+      - JAVA_OPTIONS=-Xmx150m
+      - spring.datasource.url=jdbc:postgresql://79.174.13.21/session_service?stringtype=unspecified
+      - spring.datasource.username=${LOGIN}
+      - spring.datasource.password=${PASS}
+      - spring.rabbitmq.host=79.174.13.21
+      - spring.rabbitmq.port=5672
+      - spring.rabbitmq.username=${LOGIN}
+      - spring.rabbitmq.password=${PASS}
+      - logging.path=/tmp/app
+    networks:
+      - backend
+
+  statistic-service:
+    image: ${REGISTRY_LOGIN}/statistic_service:latest
+    ports:
+      - "8085:8085"
+    volumes:
+      - /var/docker/statistic_service/logs:/tmp/app
+    environment:
+      - JAVA_OPTIONS=-Xmx150m
+      - spring.datasource.url=jdbc:postgresql://79.174.13.21/statistic_service?stringtype=unspecified
+      - spring.datasource.username=${LOGIN}
+      - spring.datasource.password=${PASS}
+      - spring.rabbitmq.host=79.174.13.21
+      - spring.rabbitmq.port=5672
+      - spring.rabbitmq.username=${LOGIN}
+      - spring.rabbitmq.password=${PASS}
+      - service.session.host=79.174.13.21
+      - service.session.port=8084
+      - service.session.clientId=statistic_service
+      - service.session.secret=secret
+      - service.max-operation-count=30000
+      - logging.path=/tmp/app
+    networks:
+      - backend
+
+networks:
+  backend:
