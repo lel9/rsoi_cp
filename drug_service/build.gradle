@@ -71,3 +71,7 @@ contracts {
     baseClassForTests = 'ru.bmstu.cp.rsoi.drug.BaseTestClass'
     basePackageForTests = 'ru.bmstu.cp.rsoi.drug'
 }
+
+test{
+    maxHeapSize = "256m"
+}
