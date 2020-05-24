@@ -1,18 +1,24 @@
+import org.gradle.api.publish.maven.MavenPublication
+
 buildscript {
     ext {
         springBootVersion = '2.1.0.RELEASE'
+        verifier_version = '2.1.1.RELEASE'
     }
     repositories {
         mavenCentral()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.springframework.cloud:spring-cloud-contract-gradle-plugin:${verifier_version}")
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'spring-cloud-contract'
+apply plugin: 'maven-publish'
 
 group 'rsoi.cp.backend'
 version '1.0.0'
@@ -26,6 +32,12 @@ repositories {
 bootJar {
     baseName = "patient_service"
     version = version
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:${verifier_version}"
+    }
 }
 
 dependencies {
@@ -47,7 +59,10 @@ dependencies {
 
     annotationProcessor 'org.projectlombok:lombok:+'
 
-    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.security:spring-security-test')
+    testCompile("org.springframework.cloud:spring-cloud-starter-contract-verifier")
+    testCompile 'org.springframework.cloud:spring-cloud-contract-stub-runner:2.1.1.RELEASE'
 }
 
 task unpack(type: Copy) {
@@ -55,3 +70,25 @@ task unpack(type: Copy) {
     from(zipTree(tasks.bootJar.outputs.files.singleFile))
     into("build/dependency")
 }
+
+contracts {
+    baseClassForTests = 'ru.bmstu.cp.rsoi.patient.BaseTestClass'
+    basePackageForTests = 'ru.bmstu.cp.rsoi.patient'
+}
+
+test {
+    maxHeapSize = "256m"
+}
+
+publishing {
+    publications {
+        stubs(MavenPublication) {
+            group 'stubs'
+            artifactId "${project.name}"
+            version version
+            artifact verifierStubsJar
+        }
+    }
+}
+
+test.dependsOn(publishStubsPublicationToMavenLocal)

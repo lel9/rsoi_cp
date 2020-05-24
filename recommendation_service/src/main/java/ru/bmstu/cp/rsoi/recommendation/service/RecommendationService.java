@@ -170,7 +170,7 @@ public class RecommendationService {
     }
 
     private Profile callProfileService(Object principal) throws URISyntaxException {
-        URI thirdPartyApi = new URI("http", null, profileServiceHost, profileServicePort, "/api/1.0/private/profile/" + principal + "/displayName", null, null);
+        URI thirdPartyApi = new URI("http", null, profileServiceHost, profileServicePort, "/api/1.0/protected/profile/" + principal, null, null);
         ResponseEntity<Profile> exchange = restTemplate.exchange(thirdPartyApi,
                 HttpMethod.GET, new HttpEntity<>(createHeaders()), Profile.class);
         Profile body = exchange.getBody();

@@ -16,6 +16,7 @@ apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'spring-cloud-contract'
+apply plugin: 'maven-publish'
 
 group 'rsoi.cp.backend'
 version '1.0.0'
@@ -75,3 +76,16 @@ contracts {
 test {
     maxHeapSize = "256m"
 }
+
+publishing {
+    publications {
+        stubs(MavenPublication) {
+            group 'stubs'
+            artifactId "${project.name}"
+            version version
+            artifact verifierStubsJar
+        }
+    }
+}
+
+test.dependsOn(publishStubsPublicationToMavenLocal)
