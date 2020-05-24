@@ -159,5 +159,21 @@ services:
     networks:
       - backend
 
+  gateway:
+    image: ${REGISTRY_LOGIN}/gateway:${BUILD_ID}
+    ports:
+      - "8086:8086"
+    volumes:
+      - /var/docker/gateway/logs:/tmp/app
+    environment:
+      - JAVA_OPTIONS=-Xmx100m
+      - service.session.host=79.174.13.21
+      - service.session.port=8084
+      - service.session.clientId=gateway
+      - service.session.secret=secret
+      - logging.path=/tmp/app
+    networks:
+      - backend
+
 networks:
   backend:
