@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import ru.bmstu.cp.rsoi.drug.exception.DrugAlreadyExistsException;
 import ru.bmstu.cp.rsoi.drug.exception.NoSuchDrugException;
 import ru.bmstu.cp.rsoi.drug.model.GenericResponse;
 
@@ -46,12 +45,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
-    // 409
-    @ExceptionHandler({ DrugAlreadyExistsException.class })
-    public ResponseEntity<Object> handleDrugAlreadyExists(final RuntimeException ex, final WebRequest request) {
-        final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "drug_already_exists");
-        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.CONFLICT, request);
-    }
 
     // 500
     @ExceptionHandler({ Exception.class })
