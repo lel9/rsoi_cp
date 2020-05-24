@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.1.0.RELEASE'
+        springBootVersion = '+'
     }
     repositories {
         mavenCentral()
@@ -32,6 +32,9 @@ dependencies {
     //implementation('org.springframework.boot:spring-boot-starter-security')
     implementation('org.springframework.security.oauth:spring-security-oauth2:2.4.0.RELEASE')
     implementation('org.springframework.cloud:spring-cloud-starter-netflix-zuul:+')
+    compile('javax.xml.bind:jaxb-api:2.3.0')
+    compile('javax.activation:activation:1.1')
+    compile('org.glassfish.jaxb:jaxb-runtime:2.3.0')
 
     testCompile("org.springframework.boot:spring-boot-starter-test")
 }
