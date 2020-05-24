@@ -49,12 +49,13 @@ public class DrugController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Get analogs")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
-    public List<DrugOutShort> getDrugAnalogs(@PathVariable String id) {
+    public ListDrugOut getDrugAnalogs(@PathVariable String id) {
         List<Drug> drugAnalogs = drugService.getDrugAnalogs(id);
-        return drugAnalogs
+        List<DrugOutShort> collect = drugAnalogs
                 .stream()
                 .map(drug -> modelMapper.map(drug, DrugOutShort.class))
                 .collect(Collectors.toList());
+        return new ListDrugOut(collect);
     }
 
     @GetMapping(path = "/public/drug")
