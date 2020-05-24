@@ -1,5 +1,6 @@
 package ru.bmstu.cp.rsoi.patient.service;
 
+import org.bson.types.ObjectId;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -53,9 +54,11 @@ public class PatientService {
         if (cardId != null && patientRepository.findByCardId(cardId).isPresent())
             throw new PatientAlreadyExistsException(cardId);
 
-        in.setId(null);
-        Patient save = patientRepository.save(in);
-        String id = save.getId();
+        String id = ObjectId.get().toString();
+        in.setId(id);
+        if (in.getCardId() == null || in.getCardId().isEmpty())
+            in.setCardId(id);
+        patientRepository.save(in);
 
         try {
             String routingKey = "operation";
@@ -78,6 +81,8 @@ public class PatientService {
         }
 
         in.setId(id);
+        if (in.getCardId() == null || in.getCardId().isEmpty())
+            in.setCardId(id);
         Patient save = patientRepository.save(in);
 
         receptionService.updateReceptions(save);

@@ -33,7 +33,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .cors()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/**/protected/**").hasAnyRole("USER", "EXPERT", "OPERATOR", "ADMIN")
+                .antMatchers("/api/**/protected/**").hasAnyRole("USER", "EXPERT", "OPERATOR", "ADMIN", "INTERNAL_CLIENT")
                 .antMatchers("/api/**/public/**").permitAll()
                 .antMatchers("/api/**/private/**").hasRole("INTERNAL_CLIENT")
                 .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());

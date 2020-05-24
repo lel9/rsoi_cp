@@ -3,6 +3,7 @@ package ru.bmstu.cp.rsoi.profile.web.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ResponseHeader;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,15 +35,6 @@ public class ProfileController {
     public ProfileOut getProfile(@PathVariable String id) {
         Profile profile = profileService.getProfile(id);
         return modelMapper.map(profile, ProfileOut.class);
-    }
-
-    @GetMapping("/private/profile/{id}/displayName")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Get profile by id", response = ProfileOutShort.class)
-    @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
-    public ProfileOutShort getDisplayName(@PathVariable String id) {
-        Profile profile = profileService.getProfile(id);
-        return modelMapper.map(profile, ProfileOutShort.class);
     }
 
     @PutMapping("/protected/profile/{id}")
