@@ -13,33 +13,33 @@ zuul:
   routes:
     drug_service:
       path: /api/1.0/**/drug/**
-      url: http://79.174.13.21:8080/api/1.0
+      url: http://drug-service/api/1.0
 
     patient_service:
       path: /api/1.0/**/patient/**
-      url: http://79.174.13.21:8081/api/1.0
+      url: http://patient-service/api/1.0
 
     recommendation_service:
       path: /api/1.0/**/recommendation/**
-      url: http://79.174.13.21:8082/api/1.0
+      url: http://recommendation-service/api/1.0
 
     profile_service:
       path: /api/1.0/**/profile/**
-      url: http://79.174.13.21:8083/api/1.0
+      url: http://profile-service/api/1.0
 
     session_service:
       path: /oauth/**
-      url: http://79.174.13.21:8084/oauth
+      url: http://session-service/oauth
 
     login:
       path: /login/**
-      url: http://79.174.13.21:8084/login
+      url: http://session-service/login
 
     logout:
       path: /logout/**
-      url: http://79.174.13.21:8084/logout
+      url: http://session-service/logout
 
     registration:
       path: /registration/**
-      url: http://79.174.13.21:8084/registration
+      url: http://session-service/registration
 
