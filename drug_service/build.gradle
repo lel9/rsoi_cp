@@ -72,6 +72,6 @@ contracts {
     basePackageForTests = 'ru.bmstu.cp.rsoi.drug'
 }
 
-test{
+test {
     maxHeapSize = "256m"
 }
