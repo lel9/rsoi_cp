@@ -5,7 +5,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
@@ -16,7 +15,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -27,7 +25,6 @@ import ru.bmstu.cp.rsoi.recommendation.domain.Recommendation;
 import ru.bmstu.cp.rsoi.recommendation.repository.RecommendationRepository;
 import ru.bmstu.cp.rsoi.recommendation.web.controller.RecommendationController;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,7 +35,7 @@ import java.util.List;
 @AutoConfigureMessageVerifier
 @AutoConfigureStubRunner(
         stubsMode = StubRunnerProperties.StubsMode.LOCAL,
-        ids = "stubs:profile_service:+:stubs:8083")
+        ids = "stubs:profile_service:+:stubs:8090")
 @TestPropertySource("classpath:test.properties")
 public abstract class BaseTestClass {
 
