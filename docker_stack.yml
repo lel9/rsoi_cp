@@ -3,7 +3,7 @@ version: '3.2'
 services:
 
   drug-service:
-    image: ${REGISTRY_LOGIN}/drug_service:latest
+    image: ${REGISTRY_LOGIN}/drug_service:${BUILD_ID}
     ports:
       - "8080:8080"
     volumes:
@@ -29,7 +29,7 @@ services:
       - backend
 
   patient-service:
-    image: ${REGISTRY_LOGIN}/patient_service:latest
+    image: ${REGISTRY_LOGIN}/patient_service:${BUILD_ID}
     ports:
       - "8081:8081"
     volumes:
@@ -57,7 +57,7 @@ services:
       - backend
 
   recommendation-service:
-    image: ${REGISTRY_LOGIN}/recommendation_service:latest
+    image: ${REGISTRY_LOGIN}/recommendation_service:${BUILD_ID}
     ports:
       - "8082:8082"
     volumes:
@@ -88,7 +88,7 @@ services:
       - backend
 
   profile-service:
-    image: ${REGISTRY_LOGIN}/profile_service:latest
+    image: ${REGISTRY_LOGIN}/profile_service:${BUILD_ID}
     ports:
       - "8083:8083"
     volumes:
@@ -117,7 +117,7 @@ services:
       - backend
 
   session-service:
-    image: ${REGISTRY_LOGIN}/session_service:latest
+    image: ${REGISTRY_LOGIN}/session_service:${BUILD_ID}
     ports:
       - "8084:8084"
     volumes:
@@ -136,7 +136,7 @@ services:
       - backend
 
   statistic-service:
-    image: ${REGISTRY_LOGIN}/statistic_service:latest
+    image: ${REGISTRY_LOGIN}/statistic_service:${BUILD_ID}
     ports:
       - "8085:8085"
     volumes:
