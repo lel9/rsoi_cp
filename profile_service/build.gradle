@@ -75,7 +75,7 @@ contracts {
 }
 
 test {
-    maxHeapSize = "128m"
+    maxHeapSize = "64m"
 }
 
 publishing {
