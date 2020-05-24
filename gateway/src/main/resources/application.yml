@@ -3,7 +3,7 @@ server:
 
 service:
   session:
-    host: 79.174.13.21
+    host: session-service
     port: 8084
     clientId: gateway
     secret: secret
@@ -13,33 +13,33 @@ zuul:
   routes:
     drug_service:
       path: /api/1.0/**/drug/**
-      url: http://drug-service/api/1.0
+      url: drug-service:8080/api/1.0
 
     patient_service:
       path: /api/1.0/**/patient/**
-      url: http://patient-service/api/1.0
+      url: patient-service:8081/api/1.0
 
     recommendation_service:
       path: /api/1.0/**/recommendation/**
-      url: http://recommendation-service/api/1.0
+      url: recommendation-service:8082/api/1.0
 
     profile_service:
       path: /api/1.0/**/profile/**
-      url: http://profile-service/api/1.0
+      url: profile-service:8083/api/1.0
 
     session_service:
       path: /oauth/**
-      url: http://session-service/oauth
+      url: session-service:8084/oauth
 
     login:
       path: /login/**
-      url: http://session-service/login
+      url: session-service:8084/login
 
     logout:
       path: /logout/**
-      url: http://session-service/logout
+      url: session-service:8084/logout
 
     registration:
       path: /registration/**
-      url: http://session-service/registration
+      url: session-service:8084/registration
 

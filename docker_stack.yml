@@ -20,7 +20,7 @@ services:
       - spring.rabbitmq.port=5672
       - spring.rabbitmq.username=${LOGIN}
       - spring.rabbitmq.password=${PASS}
-      - service.session.host=79.174.13.21
+      - service.session.host=session-service
       - service.session.port=8084
       - service.session.clientId=drug_service
       - service.session.secret=secret
@@ -46,7 +46,7 @@ services:
       - spring.rabbitmq.port=5672
       - spring.rabbitmq.username=${LOGIN}
       - spring.rabbitmq.password=${PASS}
-      - service.session.host=79.174.13.21
+      - service.session.host=session-service
       - service.session.port=8084
       - service.session.clientId=patient_service
       - service.session.secret=secret
@@ -74,11 +74,11 @@ services:
       - spring.rabbitmq.port=5672
       - spring.rabbitmq.username=${LOGIN}
       - spring.rabbitmq.password=${PASS}
-      - service.session.host=79.174.13.21
+      - service.session.host=session-service
       - service.session.port=8084
       - service.session.clientId=recommendation_service
       - service.session.secret=secret
-      - service.profile.host=79.174.13.21
+      - service.profile.host=profile-service
       - service.profile.port=8083
       - logging.path=/tmp/app
     depends_on:
@@ -105,7 +105,7 @@ services:
       - spring.rabbitmq.port=5672
       - spring.rabbitmq.username=${LOGIN}
       - spring.rabbitmq.password=${PASS}
-      - service.session.host=79.174.13.21
+      - service.session.host=session-service
       - service.session.port=8084
       - service.session.clientId=profile_service
       - service.session.secret=secret
@@ -150,7 +150,7 @@ services:
       - spring.rabbitmq.port=5672
       - spring.rabbitmq.username=${LOGIN}
       - spring.rabbitmq.password=${PASS}
-      - service.session.host=79.174.13.21
+      - service.session.host=session-service
       - service.session.port=8084
       - service.session.clientId=statistic_service
       - service.session.secret=secret
@@ -167,7 +167,7 @@ services:
       - /var/docker/gateway/logs:/tmp/app
     environment:
       - JAVA_OPTIONS=-Xmx64m
-      - service.session.host=79.174.13.21
+      - service.session.host=session-service
       - service.session.port=8084
       - service.session.clientId=gateway
       - service.session.secret=secret
