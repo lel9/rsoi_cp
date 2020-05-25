@@ -51,13 +51,13 @@ public abstract class BaseTestClass {
         patient.setId("5ec844100a975a009f2b9195");
         patient.setSex('m');
         patient.setCardId("0000");
-        patient.setBirthday(0L);
+        patient.setBirthday("2020-05-25T16:43:14.144Z");
 
         Patient patient2 = new Patient();
         patient2.setId("5ec815d30a975a009f2b9191");
         patient2.setSex('m');
         patient2.setCardId("9999");
-        patient2.setBirthday(0L);
+        patient2.setBirthday("2020-05-25T16:43:14.144Z");
 
         patientRepository.save(patient);
         patientRepository.save(patient2);
@@ -65,7 +65,7 @@ public abstract class BaseTestClass {
         Reception reception = new Reception();
         reception.setPatient(patient);
         reception.setId("0");
-        reception.setDate(0L);
+        reception.setDate("2020-05-25T16:43:14.144Z");
 
         Diagnosis diagnosis = new Diagnosis();
         diagnosis.setText("string");

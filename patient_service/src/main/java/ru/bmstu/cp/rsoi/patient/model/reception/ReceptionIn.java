@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class ReceptionIn {
 
-    private Long date;
+    private String date;
 
     private StateIn state;
 

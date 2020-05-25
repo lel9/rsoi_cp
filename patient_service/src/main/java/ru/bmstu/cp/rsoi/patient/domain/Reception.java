@@ -17,7 +17,7 @@ public class Reception {
     @DBRef
     private Patient patient;
 
-    private Long date;
+    private String date;
 
     private State state;
 

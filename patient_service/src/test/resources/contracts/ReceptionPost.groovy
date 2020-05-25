@@ -5,7 +5,7 @@ Contract.make {
         method POST()
         url("/api/1.0/protected/patient/5ec815d30a975a009f2b9191/reception") {
             body("{\n" +
-                    "  \"date\": 0,\n" +
+                    "  \"date\": \"2020-05-25T16:43:14.144Z\",\n" +
                     "  \"diagnosis\": {\n" +
                     "    \"text\": \"string\"\n" +
                     "  },\n" +

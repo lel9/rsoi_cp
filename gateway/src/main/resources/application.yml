@@ -3,7 +3,7 @@ server:
 
 service:
   session:
-    host: session-service
+    host: 37.46.134.43
     port: 8084
     clientId: gateway
     secret: secret

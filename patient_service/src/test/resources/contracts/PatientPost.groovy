@@ -7,7 +7,7 @@ Contract.make {
         method POST()
         url("/api/1.0/protected/patient") {
             body("{\n" +
-                    "  \"birthday\": 0,\n" +
+                    "  \"birthday\": \"2020-05-25T16:43:14.144Z\",\n" +
                     "  \"cardId\": \"1111\",\n" +
                     "  \"sex\": \"m\"\n" +
                     "}")

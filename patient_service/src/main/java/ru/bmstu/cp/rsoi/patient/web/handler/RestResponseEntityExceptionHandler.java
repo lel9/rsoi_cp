@@ -16,6 +16,8 @@ import ru.bmstu.cp.rsoi.patient.exception.NoSuchReceptionException;
 import ru.bmstu.cp.rsoi.patient.exception.PatientAlreadyExistsException;
 import ru.bmstu.cp.rsoi.patient.model.GenericResponse;
 
+import java.text.ParseException;
+
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -31,6 +33,12 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
                                                                   final WebRequest request) {
         final BindingResult result = ex.getBindingResult();
         final GenericResponse bodyOfResponse = new GenericResponse(result.getAllErrors(), "invalid_" + result.getObjectName());
+        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler({ParseException.class})
+    public ResponseEntity<Object> handleParseException(final ParseException ex, final WebRequest request) {
+        final GenericResponse bodyOfResponse = new GenericResponse(ex.getMessage(), "invalid_date_format");
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 

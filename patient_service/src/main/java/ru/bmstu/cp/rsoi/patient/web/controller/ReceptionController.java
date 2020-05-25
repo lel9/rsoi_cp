@@ -15,6 +15,7 @@ import ru.bmstu.cp.rsoi.patient.model.reception.Receptions;
 import ru.bmstu.cp.rsoi.patient.service.ReceptionService;
 
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class ReceptionController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add reception")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
-    public String postReception(@PathVariable String pid, @RequestBody @Valid ReceptionIn receptionIn) {
+    public String postReception(@PathVariable String pid, @RequestBody @Valid ReceptionIn receptionIn) throws ParseException {
         Reception map = modelMapper.map(receptionIn, Reception.class);
         return receptionService.postReception(pid, map);
     }
@@ -70,7 +71,7 @@ public class ReceptionController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update reception")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
-    public void putReception(@PathVariable String pid, @RequestBody @Valid ReceptionIn receptionIn, @PathVariable String rid) {
+    public void putReception(@PathVariable String pid, @RequestBody @Valid ReceptionIn receptionIn, @PathVariable String rid) throws ParseException {
         Reception map = modelMapper.map(receptionIn, Reception.class);
         receptionService.putReception(pid, map, rid);
     }

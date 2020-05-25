@@ -13,11 +13,12 @@ import ru.bmstu.cp.rsoi.patient.exception.NoSuchPatientException;
 import ru.bmstu.cp.rsoi.patient.model.OperationOut;
 import ru.bmstu.cp.rsoi.patient.repository.ReceptionRepository;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static ru.bmstu.cp.rsoi.patient.model.OperationOut.getPatientOperation;
 import static ru.bmstu.cp.rsoi.patient.model.OperationOut.getReceptionOperation;
 
 @Service
@@ -77,7 +78,7 @@ public class ReceptionService {
         });
     }
 
-    public String postReception(String patientId, Reception in) {
+    public String postReception(String patientId, Reception in) throws ParseException {
         String id = saveReception(patientId, in, null);
         try {
             String routingKey = "operation";
@@ -90,7 +91,7 @@ public class ReceptionService {
         return id;
     }
 
-    public void putReception(String patientId, Reception in, String id) {
+    public void putReception(String patientId, Reception in, String id) throws ParseException {
         id = saveReception(patientId, in, id);
         try {
             String routingKey = "operation";
@@ -114,7 +115,7 @@ public class ReceptionService {
         }
     }
 
-    private String saveReception(String patientId, Reception reception, String id) {
+    private String saveReception(String patientId, Reception reception, String id) throws ParseException {
         Optional<Patient> patientOptional = patientService.findById(patientId);
         if (!patientOptional.isPresent())
             throw new NoSuchPatientException();
@@ -127,7 +128,7 @@ public class ReceptionService {
         return save.getId();
     }
 
-    private State getStateAccordingToPatient(final Reception reception, final Patient patient) {
+    private State getStateAccordingToPatient(final Reception reception, final Patient patient) throws ParseException {
         State state = reception.getState();
         if (state == null) {
             state = new State();
@@ -135,14 +136,19 @@ public class ReceptionService {
 
         state.setSex(patient.getSex());
 
-        if (patient.getBirthday() != null && reception.getDate() != null) {
-            if (patient.getBirthday() > reception.getDate())
+        if (patient.getBirthday() != null && !patient.getBirthday().isEmpty() &&
+                reception.getDate() != null && !reception.getDate().isEmpty()) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSXXX");
+            Date startDate = sdf.parse(patient.getBirthday());
+            Date endDate = sdf.parse(reception.getDate());
+
+            if (endDate.before(startDate))
                 throw new InvalidReceptionDateException();
 
             Calendar startCalendar = new GregorianCalendar();
-            startCalendar.setTimeInMillis(patient.getBirthday());
+            startCalendar.setTime(startDate);
             Calendar endCalendar = new GregorianCalendar();
-            endCalendar.setTimeInMillis(reception.getDate());
+            endCalendar.setTime(endDate);
 
             int diffYears = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
             int diffMonths = diffYears * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
@@ -154,7 +160,7 @@ public class ReceptionService {
         return state;
     }
 
-    public void updateReceptions(Patient patient) {
+    public void updateReceptions(Patient patient) throws ParseException {
         List<Reception> receptions = this.findByPatient(patient.getId());
         for (Reception reception: receptions) {
             reception.setState(getStateAccordingToPatient(reception, patient));

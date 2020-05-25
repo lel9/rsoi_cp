@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.bmstu.cp.rsoi.patient.domain.Patient;
 import ru.bmstu.cp.rsoi.patient.domain.Reception;
-import ru.bmstu.cp.rsoi.patient.model.patient.ListPatientOut;
 import ru.bmstu.cp.rsoi.patient.model.patient.*;
 import ru.bmstu.cp.rsoi.patient.model.reception.ReceptionOut;
 import ru.bmstu.cp.rsoi.patient.service.PatientService;
@@ -23,6 +22,7 @@ import ru.bmstu.cp.rsoi.patient.web.event.PaginatedResultsRetrievedEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -125,7 +125,7 @@ public class PatientController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Update patient")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
-    public void putPatient(@RequestBody @Valid PatientIn patient, @PathVariable String id) {
+    public void putPatient(@RequestBody @Valid PatientIn patient, @PathVariable String id) throws ParseException {
         Patient map = modelMapper.map(patient, Patient.class);
         patientService.putPatient(map, id);
     }

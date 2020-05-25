@@ -13,7 +13,7 @@ public class PatientWithReceptionsOut {
 
     private String cardId;
 
-    private Long birthday;
+    private String birthday;
 
     private Character sex;
 

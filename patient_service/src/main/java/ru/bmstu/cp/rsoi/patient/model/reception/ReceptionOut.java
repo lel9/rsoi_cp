@@ -10,7 +10,7 @@ public class ReceptionOut {
 
     private String id;
 
-    private Long date;
+    private String date;
 
     private StateOut state;
 

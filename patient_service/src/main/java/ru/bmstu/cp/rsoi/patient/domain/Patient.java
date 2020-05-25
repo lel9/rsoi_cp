@@ -15,7 +15,7 @@ public class Patient implements Serializable {
 
     private String cardId;
 
-    private Long birthday;
+    private String birthday;
 
     private Character sex;
 

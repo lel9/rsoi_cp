@@ -10,7 +10,7 @@ Contract.make {
         body("{\n" +
                 "    \"receptions\": [\n" +
                 "        {\n" +
-                "            \"date\": 0,\n" +
+                "            \"date\": \"2020-05-25T16:43:14.144Z\",\n" +
                 "            \"diagnosis\": {\n" +
                 "            \"text\": \"string\"\n" +
                 "        },\n" +

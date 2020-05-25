@@ -12,6 +12,7 @@ import ru.bmstu.cp.rsoi.patient.exception.PatientAlreadyExistsException;
 import ru.bmstu.cp.rsoi.patient.model.OperationOut;
 import ru.bmstu.cp.rsoi.patient.repository.PatientRepository;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -72,7 +73,7 @@ public class PatientService {
         return id;
     }
 
-    public void putPatient(final Patient in, final String id) {
+    public void putPatient(final Patient in, final String id) throws ParseException {
         String cardId = in.getCardId();
         if (cardId != null) {
             Optional<Patient> byCardId = patientRepository.findByCardId(cardId);
