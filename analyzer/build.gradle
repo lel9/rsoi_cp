@@ -1,0 +1,91 @@
+buildscript {
+    ext {
+        springBootVersion = '2.1.0.RELEASE'
+        verifier_version = '2.1.1.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.springframework.cloud:spring-cloud-contract-gradle-plugin:${verifier_version}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'spring-cloud-contract'
+apply plugin: 'maven-publish'
+
+group 'rsoi.cp.backend'
+version '1.0.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+bootJar {
+    baseName = "analyzer"
+    version = version
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-contract-dependencies:${verifier_version}"
+    }
+}
+
+dependencies {
+
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-security')
+    implementation('org.springframework.security.oauth:spring-security-oauth2:2.4.0.RELEASE')
+    implementation("io.springfox:springfox-swagger2:2.8.0")
+    implementation("io.springfox:springfox-swagger-ui:2.8.0")
+    implementation("org.modelmapper:modelmapper:2.3.5")
+    implementation('org.springframework.boot:spring-boot-starter-amqp')
+
+    compile('javax.xml.bind:jaxb-api:2.3.0')
+    compile('javax.activation:activation:1.1')
+    compile('org.glassfish.jaxb:jaxb-runtime:2.3.0')
+
+    compile group: 'org.projectlombok', name: 'lombok', version: '+'
+
+    annotationProcessor 'org.projectlombok:lombok:+'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.security:spring-security-test')
+    testCompile("org.springframework.cloud:spring-cloud-starter-contract-verifier")
+    testCompile 'org.springframework.cloud:spring-cloud-contract-stub-runner:2.1.1.RELEASE'
+}
+
+task unpack(type: Copy) {
+    dependsOn bootJar
+    from(zipTree(tasks.bootJar.outputs.files.singleFile))
+    into("build/dependency")
+}
+
+contracts {
+    baseClassForTests = 'ru.bmstu.cp.rsoi.analyzer.BaseTestClass'
+    basePackageForTests = 'ru.bmstu.cp.rsoi.analyzer'
+}
+
+test {
+    maxHeapSize = "64m"
+}
+
+publishing {
+    publications {
+        stubs(MavenPublication) {
+            group 'stubs'
+            artifactId "${project.name}"
+            version version
+            artifact verifierStubsJar
+        }
+    }
+}
+
+test.dependsOn(publishStubsPublicationToMavenLocal)
