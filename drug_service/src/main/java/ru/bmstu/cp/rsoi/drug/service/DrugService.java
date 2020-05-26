@@ -68,17 +68,6 @@ public class DrugService {
         return id;
     }
 
-    public List<Drug> getDrugAnalogs(String id) {
-        Optional<Drug> byId = drugRepository.findById(id);
-        if (!byId.isPresent())
-            throw new NoSuchDrugException();
-
-        String activeSubstance = byId.get().getActiveSubstance();
-        List<Drug> byActiveSubstance = drugRepository.findByActiveSubstance(activeSubstance);
-        byActiveSubstance.removeIf(drug -> drug.getId().equals(id));
-        return byActiveSubstance;
-    }
-
     public void patchDrug(Drug drug, String id) {
         Optional<Drug> byId = drugRepository.findById(id);
         if (!byId.isPresent())
@@ -111,5 +100,17 @@ public class DrugService {
 
     public Iterable<Drug> findByIds(List<String> ids) {
         return drugRepository.findAllById(ids);
+    }
+
+    public List<Drug> searchDrugs(String tradeName, String activeSubstance, String form,
+                                  String composition, String description, String group,
+                                  String atx, String pharmacodynamics, String pharmacokinetics,
+                                  String indications, String contraindications, String withCaution,
+                                  String pregnancyAndLactation, String directionForUse, String sideEffects,
+                                  String overdose, String intearction, String specialInstruction,
+                                  String vehicleImpact, String releaseFormVSDosage, String transportationСonditions,
+                                  String storageСonditions, String storageLife, String vacationFromPharmacies,
+                                  String manufacturer, String certificateOwner) {
+        return drugRepository.findByActiveSubstance(activeSubstance);
     }
 }
