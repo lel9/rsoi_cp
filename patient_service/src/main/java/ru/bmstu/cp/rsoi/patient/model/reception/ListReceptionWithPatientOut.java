@@ -10,6 +10,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Receptions {
-    private List<ReceptionOut> receptions = new ArrayList<>();
+public class ListReceptionWithPatientOut {
+    private List<ReceptionWithPatientOut> results = new ArrayList<>();
 }

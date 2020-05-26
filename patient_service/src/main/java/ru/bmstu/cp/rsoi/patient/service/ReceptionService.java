@@ -5,6 +5,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.bmstu.cp.rsoi.patient.domain.Diagnosis;
 import ru.bmstu.cp.rsoi.patient.domain.Patient;
 import ru.bmstu.cp.rsoi.patient.domain.Reception;
 import ru.bmstu.cp.rsoi.patient.domain.State;
@@ -190,5 +191,22 @@ public class ReceptionService {
             return receptions.get(0);
         return null;
 
+    }
+
+    public List<Reception> searchReceptions(Character sex,
+                                            Integer years,
+                                            Integer months,
+                                            String lifeAnamnesis,
+                                            String diseaseAnamnesis,
+                                            String plaints,
+                                            String objectiveInspection,
+                                            String examinationsResults,
+                                            String specialistsConclusions,
+                                            String diagnosisText,
+                                            String dateStart,
+                                            String dateEnd,
+                                            String patientId,
+                                            String drugId) {
+        return receptionRepository.findAll();
     }
 }

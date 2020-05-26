@@ -1,14 +1,12 @@
-package ru.bmstu.cp.rsoi.drug.model;
+package ru.bmstu.cp.rsoi.patient.model.reception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ListDrugOut {
-    private List<DrugOut> results;
+public class PatientIdOnlyOut {
+    private String id;
 }

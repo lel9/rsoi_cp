@@ -45,15 +45,45 @@ public class DrugController {
         return modelMapper.map(drugService.getDrug(id), DrugOut.class);
     }
 
-    @GetMapping("/private/drug/{id}/analogs")
+    @GetMapping("/private/drug/search")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Get analogs")
+    @ApiOperation(value = "Search")
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
-    public ListDrugOut getDrugAnalogs(@PathVariable String id) {
-        List<Drug> drugAnalogs = drugService.getDrugAnalogs(id);
-        List<DrugOutShort> collect = drugAnalogs
+    public ListDrugOut searchDrugs(@RequestParam(required = false) String tradeName,
+                                   @RequestParam(required = false) String activeSubstance,
+                                   @RequestParam(required = false) String form,
+                                   @RequestParam(required = false) String composition,
+                                   @RequestParam(required = false) String description,
+                                   @RequestParam(required = false) String group,
+                                   @RequestParam(required = false) String atx,
+                                   @RequestParam(required = false) String pharmacodynamics,
+                                   @RequestParam(required = false) String pharmacokinetics,
+                                   @RequestParam(required = false) String indications,
+                                   @RequestParam(required = false) String contraindications,
+                                   @RequestParam(required = false) String withCaution,
+                                   @RequestParam(required = false) String pregnancyAndLactation,
+                                   @RequestParam(required = false) String directionForUse,
+                                   @RequestParam(required = false) String sideEffects,
+                                   @RequestParam(required = false) String overdose,
+                                   @RequestParam(required = false) String interaction,
+                                   @RequestParam(required = false) String specialInstruction,
+                                   @RequestParam(required = false) String vehicleImpact,
+                                   @RequestParam(required = false) String releaseFormVSDosage,
+                                   @RequestParam(required = false) String transportationСonditions,
+                                   @RequestParam(required = false) String storageСonditions,
+                                   @RequestParam(required = false) String storageLife,
+                                   @RequestParam(required = false) String vacationFromPharmacies,
+                                   @RequestParam(required = false) String manufacturer,
+                                   @RequestParam(required = false) String certificateOwner) {
+        List<Drug> drugAnalogs = drugService.searchDrugs(tradeName, activeSubstance, form,
+                composition, description, group, atx, pharmacodynamics, pharmacokinetics,
+                indications, contraindications, withCaution, pregnancyAndLactation, directionForUse,
+                sideEffects, overdose, interaction, specialInstruction, vehicleImpact,
+                releaseFormVSDosage, transportationСonditions, storageСonditions, storageLife,
+                vacationFromPharmacies, manufacturer, certificateOwner);
+        List<DrugOut> collect = drugAnalogs
                 .stream()
-                .map(drug -> modelMapper.map(drug, DrugOutShort.class))
+                .map(drug -> modelMapper.map(drug, DrugOut.class))
                 .collect(Collectors.toList());
         return new ListDrugOut(collect);
     }
@@ -91,16 +121,16 @@ public class DrugController {
     @Secured({"ROLE_ADMIN"})
     @GetMapping(path = "/protected/drug/byIds")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Get drugs by ids", response = ListDrugOut.class)
+    @ApiOperation(value = "Get drugs by ids", response = ListDrugOutShort.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
-    public ListDrugOut findDrug(@RequestParam(defaultValue = "", required = true) List<String> ids) {
+    public ListDrugOutShort findDrug(@RequestParam(defaultValue = "", required = true) List<String> ids) {
         List<DrugOutShort> result = new ArrayList<>();
         drugService.findByIds(ids)
                 .forEach(drug -> {
                     DrugOutShort map = modelMapper.map(drug, DrugOutShort.class);
                     result.add(map);
                 });
-        return new ListDrugOut(result);
+        return new ListDrugOutShort(result);
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_ADMIN"})
