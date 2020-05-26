@@ -3,19 +3,12 @@ Contract.make {
     description "get analogs"
     request{
         method GET()
-        url("/api/1.0/private/drug/0/analogs") {
+        url("/api/1.0/private/drug/search") {
         }
     }
     response {
         body("{\n" +
-                "  \"results\": [\n" +
-                "    {\n" +
-                "      \"id\": \"1\",\n" +
-                "      \"tradeName\": \"test\",\n" +
-                "      \"releaseFormVSDosage\": \"string\",\n" +
-                "      \"manufacturer\": \"string\"\n" +
-                "    }\n" +
-                "  ]\n" +
+                "  \"results\": []" +
                 "}")
         status 200
     }
