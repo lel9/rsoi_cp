@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class ReceptionIn {
 
-    private StateOut state;
+    private StateIn state;
 
     private DiagnosisIn diagnosis;
 }

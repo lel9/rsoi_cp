@@ -5,7 +5,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.bmstu.cp.rsoi.patient.domain.Diagnosis;
 import ru.bmstu.cp.rsoi.patient.domain.Patient;
 import ru.bmstu.cp.rsoi.patient.domain.Reception;
 import ru.bmstu.cp.rsoi.patient.domain.State;
@@ -19,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static ru.bmstu.cp.rsoi.patient.model.OperationOut.getReceptionOperation;
 
@@ -137,19 +137,12 @@ public class ReceptionService {
 
         state.setSex(patient.getSex());
 
-        if (patient.getBirthday() != null && !patient.getBirthday().isEmpty() &&
-                reception.getDate() != null && !reception.getDate().isEmpty()) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSXXX");
-            Date startDate = sdf.parse(patient.getBirthday());
-            Date endDate = sdf.parse(reception.getDate());
+        Calendar startCalendar = parseDate(patient.getBirthday());
+        Calendar endCalendar = parseDate(reception.getDate());
 
-            if (endDate.before(startDate))
+        if (startCalendar != null && endCalendar != null) {
+            if (endCalendar.before(startCalendar))
                 throw new InvalidReceptionDateException();
-
-            Calendar startCalendar = new GregorianCalendar();
-            startCalendar.setTime(startDate);
-            Calendar endCalendar = new GregorianCalendar();
-            endCalendar.setTime(endDate);
 
             int diffYears = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
             int diffMonths = diffYears * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
@@ -178,21 +171,6 @@ public class ReceptionService {
         }
     }
 
-    public Reception getLastReception(String pid) {
-        ObjectId objectId;
-        try {
-            objectId = new ObjectId(pid);
-        } catch (Exception ignored) {
-            return null;
-        }
-
-        List<Reception> receptions = receptionRepository.findByPatient(objectId, new Sort(Sort.Direction.DESC, "date"));
-        if (receptions != null && !receptions.isEmpty())
-            return receptions.get(0);
-        return null;
-
-    }
-
     public List<Reception> searchReceptions(Character sex,
                                             Integer years,
                                             Integer months,
@@ -206,7 +184,70 @@ public class ReceptionService {
                                             String dateStart,
                                             String dateEnd,
                                             String patientId,
-                                            String drugId) {
-        return receptionRepository.findAll();
+                                            List<String> drugId) throws ParseException {
+
+        List<Reception> allByDiagnosisText = (diagnosisText != null && !diagnosisText.isEmpty()) ?
+                                                    receptionRepository.findAllByDiagnosisText(diagnosisText) :
+                                                    receptionRepository.findAll();
+        Calendar start = parseDate(dateStart);
+        Calendar end = parseDate(dateEnd);
+        return allByDiagnosisText
+                .stream()
+                .filter(r -> {
+                    if (patientId != null) {
+                        if (r.getPatient() != null) {
+                            return r.getPatient().getId().equals(patientId);
+                        } else
+                            return false;
+                    } else
+                        return true;})
+                .filter(r -> {
+                    try {
+                        Calendar date = parseDate(r.getDate());
+                        return date != null;
+                    } catch (ParseException e) {
+                        return false;
+                    }})
+                .filter(r -> {
+                    if (start != null) {
+                        try {
+                            return !parseDate(r.getDate()).after(start);
+                        } catch (ParseException e) {
+                            return false;
+                        }
+                    } else
+                        return true; })
+                .filter(r -> {
+                    if (end != null) {
+                        try {
+                            return !end.before(parseDate(r.getDate()));
+                        } catch (ParseException e) {
+                            return false;
+                        }
+                    } else
+                        return true; })
+                .filter(r -> {
+                    if (drugId != null && !drugId.isEmpty()) {
+                        for (String di : drugId) {
+                            if (r.getDrugs().stream().noneMatch(d -> d.getId().equals(di))) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    } else
+                        return true;
+                })
+                .collect(Collectors.toList());
+
+    }
+
+    private Calendar parseDate(String date) throws ParseException {
+        if (date == null || date.isEmpty())
+            return null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSXXX");
+        Date parsed = sdf.parse(date);
+        Calendar startCalendar = new GregorianCalendar();
+        startCalendar.setTime(parsed);
+        return startCalendar;
     }
 }

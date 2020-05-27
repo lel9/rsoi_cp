@@ -61,7 +61,7 @@ public class ReceptionController {
                                                      @RequestParam(required = false) String dateStart,
                                                      @RequestParam(required = false) String dateEnd,
                                                      @RequestParam(required = false) String patientId,
-                                                     @RequestParam(required = false) String drugId) {
+                                                     @RequestParam(required = false) List<String> drugId) throws ParseException {
 
         List<Reception> all = receptionService.searchReceptions(sex, years, months,
                 lifeAnamnesis, diseaseAnamnesis, plaints, objectiveInspection, examinationsResults,
