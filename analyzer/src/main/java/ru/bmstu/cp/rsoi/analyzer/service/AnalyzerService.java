@@ -70,22 +70,36 @@ public class AnalyzerService {
 
     public ListSearchResultsOut searchDrugs(ReceptionIn receptionIn) throws URISyntaxException {
 
-        StateOut state = receptionIn.getState();
-        String plaints = null; String objectiveInspection = null; String examinationsResults = null; String specialistsConclusions = null;
+        StateIn state = receptionIn.getState();
+        Integer months = null;
+        Integer years = null;
+        Character sex = null;
+        String lifeAnamnesis = null;
+        String diseaseAnamnesis = null;
+        String plaints = null;
+        String objectiveInspection = null;
+        String examinationsResults = null;
+        String specialistsConclusions = null;
+
         if (state != null) {
+            months = state.getMonths();
+            years = state.getYears();
+            sex = state.getSex();
+            lifeAnamnesis = state.getLifeAnamnesis();
+            diseaseAnamnesis = state.getDiseaseAnamnesis();
             plaints = state.getPlaints();
             objectiveInspection = state.getObjectiveInspection();
             examinationsResults = state.getExaminationsResults();
             specialistsConclusions = state.getSpecialistsConclusions();
         }
         DiagnosisIn diagnosis = receptionIn.getDiagnosis();
-        String diagnonisText = null;
+        String diagnosisText = null;
         if (diagnosis != null) {
-            diagnonisText = diagnosis.getText();
+            diagnosisText = diagnosis.getText();
         }
 
-        List<ReceptionWithPatientOut> receptions = getReceptions(plaints,
-                objectiveInspection, examinationsResults, specialistsConclusions, diagnonisText);
+        List<ReceptionWithPatientOut> receptions = getReceptions(sex, years, months, lifeAnamnesis, diseaseAnamnesis, plaints,
+                objectiveInspection, examinationsResults, specialistsConclusions, diagnosisText);
 
         if (receptions == null)
             return new ListSearchResultsOut(Collections.emptyList());
@@ -170,14 +184,25 @@ public class AnalyzerService {
         }
     }
 
-    private List<ReceptionWithPatientOut> getReceptions(String plaints, String objectiveInspection, String examinationsResults, String specialistsConclusions, String diagnonisText) throws URISyntaxException {
+    private List<ReceptionWithPatientOut> getReceptions(Character sex,
+                                                        Integer years,
+                                                        Integer months,
+                                                        String lifeAnamnesis,
+                                                        String diseaseAnamnesis,
+                                                        String plaints,
+                                                        String objectiveInspection,
+                                                        String examinationsResults,
+                                                        String specialistsConclusions,
+                                                        String diagnosisText) throws URISyntaxException {
         try {
-            return callPatientService(plaints, objectiveInspection, examinationsResults, specialistsConclusions, diagnonisText);
+            return callPatientService(sex, years, months, lifeAnamnesis, diseaseAnamnesis,
+                    plaints, objectiveInspection, examinationsResults, specialistsConclusions, diagnosisText);
         } catch (HttpStatusCodeException ex) {
             if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 TOKEN = getToken();
                 try {
-                    return callPatientService(plaints, objectiveInspection, examinationsResults, specialistsConclusions, diagnonisText);
+                    return callPatientService(sex, years, months, lifeAnamnesis, diseaseAnamnesis,
+                            plaints, objectiveInspection, examinationsResults, specialistsConclusions, diagnosisText);
                 } catch (Exception ex3) {
                     throw new FailureWhenSearchException();
                 }
@@ -193,7 +218,7 @@ public class AnalyzerService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
                 // Add query parameter
                 .queryParam("activeSubstance", activeSubstance);
-        URI thirdPartyApi = builder.buildAndExpand().toUri();
+        URI thirdPartyApi = builder.buildAndExpand().encode().toUri();
 
         ResponseEntity<ListDrugOut> exchange = restTemplate.exchange(thirdPartyApi,
                 HttpMethod.GET, new HttpEntity<>(createHeaders()), ListDrugOut.class);
@@ -203,14 +228,16 @@ public class AnalyzerService {
         return body.getResults();
     }
 
-    private List<ReceptionWithPatientOut> callPatientService(String date, String patientId, String drugId) {
+    private List<ReceptionWithPatientOut> callPatientService(String date,
+                                                             String patientId,
+                                                             String drugId) {
         String url = "http://" + patientServiceHost + ":" + patientServicePort + "/api/1.0/private/reception/search";
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
                 // Add query parameter
                 .queryParam("dateStart", date)
                 .queryParam("patientId", patientId)
                 .queryParam("drugId", drugId);
-        URI thirdPartyApi = builder.buildAndExpand().toUri();
+        URI thirdPartyApi = builder.buildAndExpand().encode().toUri();
 
         ResponseEntity<ListReceptionWithPatientOut> exchange = restTemplate.exchange(thirdPartyApi,
                 HttpMethod.GET, new HttpEntity<>(createHeaders()), ListReceptionWithPatientOut.class);
@@ -220,18 +247,31 @@ public class AnalyzerService {
         return body.getResults();
     }
 
-    private List<ReceptionWithPatientOut> callPatientService(String plaints, String objectiveInspection, String examinationsResults,
-                                                             String specialistsConclusions, String diagnonisText) {
+    private List<ReceptionWithPatientOut> callPatientService(Character sex,
+                                                             Integer years,
+                                                             Integer months,
+                                                             String lifeAnamnesis,
+                                                             String diseaseAnamnesis,
+                                                             String plaints,
+                                                             String objectiveInspection,
+                                                             String examinationsResults,
+                                                             String specialistsConclusions,
+                                                             String diagnosisText) {
         String url = "http://" + patientServiceHost + ":" + patientServicePort + "/api/1.0/private/reception/search";
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
                 // Add query parameter
+                .queryParam("sex", sex)
+                .queryParam("years", years)
+                .queryParam("months", months)
+                .queryParam("lifeAnamnesis", lifeAnamnesis)
+                .queryParam("diseaseAnamnesis", diseaseAnamnesis)
                 .queryParam("plaints", plaints)
                 .queryParam("objectiveInspection", objectiveInspection)
                 .queryParam("examinationsResults", examinationsResults)
                 .queryParam("specialistsConclusions", specialistsConclusions)
-                .queryParam("diagnonisText", diagnonisText);
+                .queryParam("diagnosisText", diagnosisText);
 
-        URI thirdPartyApi = builder.buildAndExpand().toUri();
+        URI thirdPartyApi = builder.buildAndExpand().encode().toUri();
 
         ResponseEntity<ListReceptionWithPatientOut> exchange = restTemplate.exchange(thirdPartyApi,
                 HttpMethod.GET, new HttpEntity<>(createHeaders()), ListReceptionWithPatientOut.class);
