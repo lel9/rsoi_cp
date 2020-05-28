@@ -211,7 +211,8 @@ public class ReceptionService {
                 .filter(r -> {
                     if (start != null) {
                         try {
-                            return !parseDate(r.getDate()).after(start);
+                            Calendar date = parseDate(r.getDate());
+                            return start.before(date) || start.equals(date);
                         } catch (ParseException e) {
                             return false;
                         }
@@ -220,7 +221,8 @@ public class ReceptionService {
                 .filter(r -> {
                     if (end != null) {
                         try {
-                            return !end.before(parseDate(r.getDate()));
+                            Calendar date = parseDate(r.getDate());
+                            return date.before(end) || end.equals(date);
                         } catch (ParseException e) {
                             return false;
                         }
