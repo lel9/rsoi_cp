@@ -20,8 +20,13 @@ public class OperationListener {
 
     @RabbitListener(queues="operation-queue")
     public void receive(OperationIn message) {
-        service.saveOperation(modelMapper.map(message, ru.bmstu.cp.rsoi.statistic.domain.Operation.class));
-        log.log(Level.INFO, "Operation was received: " + message.toString());
+        try {
+            service.saveOperation(modelMapper.map(message, ru.bmstu.cp.rsoi.statistic.domain.Operation.class));
+            log.log(Level.INFO, "Operation was saved: " + message.toString());
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Operation was not saved: " + e.getMessage());
+        }
+
     }
 
 }
