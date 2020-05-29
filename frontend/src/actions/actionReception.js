@@ -35,10 +35,11 @@ export const addReception = (data) => {
       .then(res => {
         dispatch(addReceptionSuccess({id: res.data, date: date, state: state,
            diagnosis: diagnosis, drugs: drugs}));
+        alert('Осмотр успешно добавлен');
       })
       .catch(err => {
-        let error = err.message === 'Network Error' ? err.message : err.response.data.error
-        dispatch(handleError(ADD_RECEPTION, error, addReception, data, true))
+        let error = err.message === 'Network Error' ? err.message : err.response.data
+        dispatch(handleError(ADD_RECEPTION, error, addReception, data))
         dispatch(addReceptionFailure(err.response));
       })
     })
@@ -53,8 +54,8 @@ export const getReception = (id) => {
       dispatch(getReceptionSuccess(res.data));
     })
     .catch(err => {
-      let error = err.message === 'Network Error' ? err.message : err.response.data.error
-      dispatch(handleError(GET_RECEPTION, error, getReception, id, false))
+      let error = err.message === 'Network Error' ? err.message : err.response.data
+      dispatch(handleError(GET_RECEPTION, error, getReception, id))
       dispatch(getReceptionFailure(err.response));
     })
   }
@@ -77,13 +78,13 @@ export const updateReception = (data) => {
         headers: headers
       })
       .then(res => {
-        // console.log(res.data)
         dispatch(updateReceptionSuccess({date: date, diagnosis: diagnosis, drugs: drugs, state: state}));
-        dispatch(getPatientById(pid))
+        dispatch(getPatientById(pid));
+        alert('Осмотр успешно обновлен');
       })
       .catch(err => {
-        let error = err.message === 'Network Error' ? err.message : err.response.data.error
-        dispatch(handleError(UPDATE_RECEPTION, error, updateReception, data, true))
+        let error = err.message === 'Network Error' ? err.message : err.response.data
+        dispatch(handleError(UPDATE_RECEPTION, error, updateReception, data))
         dispatch(updateReceptionFailure(err.response));
       })
     })
@@ -103,10 +104,11 @@ export const deleteReception = (data) => {
       })
       .then(res => {
         dispatch(deleteReceptionSuccess(res.data));
+        alert('Осмотр успешно удален');
       })
       .catch(err => {
-        let error = err.message === 'Network Error' ? err.message : err.response.data.error
-        dispatch(handleError(UPDATE_RECEPTION, error, deleteReception, data, true))
+        let error = err.message === 'Network Error' ? err.message : err.response.data
+        dispatch(handleError(UPDATE_RECEPTION, error, deleteReception, data))
         dispatch(deleteReceptionFailure(err.response));
       })
     })

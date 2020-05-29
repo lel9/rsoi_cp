@@ -2,9 +2,11 @@ import {
   GET_DRUGS,
   GET_DRUG_BY_ID,
   GET_DRUG_BY_IDS,
-  ADD_DRUG
+  ADD_DRUG,
+  DRUGS_CLEAN
  } from  '../constants';
 
+ 
 const initialState = {
   loading: false,
   drugs: null,
@@ -86,6 +88,14 @@ const drugs = function reducer(state = initialState, action) {
           ...state,
           loading: false,
           error: action.payload.error
+        }
+      case DRUGS_CLEAN + '_SUCCESS':
+        return {
+          loading: false,
+          drugs: null,
+          drug: null,
+          error: null,
+          statics: [],
         }
     default:
       return state;

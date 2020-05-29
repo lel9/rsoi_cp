@@ -27,7 +27,7 @@ import {
          ...state,
          loading: false,
          error: null,
-         newUser: action.payload
+         newUser: action.payload,
        }
      case REGISTRATION + '_FAILURE':
        return {

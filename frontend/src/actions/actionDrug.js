@@ -33,10 +33,11 @@ export const addDrug = (data) => {
       }, {headers: headers})
       .then(res => {
         dispatch(addDrugSuccess(res.data));
+        alert('Препарат успешно добавлен');
       })
       .catch(err => {
-        const error = err.message === 'Network Error' ? err.message : err.response.data.error
-        dispatch(handleError(ADD_DRUG, error, addDrug, data, true))
+        const error = err.message === 'Network Error' ? err.message : err.response.data
+        dispatch(handleError(ADD_DRUG, error, addDrug, data))
         dispatch(addDrugFailure(err.response));
       })
     })
@@ -44,7 +45,6 @@ export const addDrug = (data) => {
 }
 
 export const getDrugs = (data) => {
-  console.log(data);
   const { tradeName, page, size } = data;
   return dispatch => {
     dispatch(getDrugsStarted());
@@ -53,8 +53,8 @@ export const getDrugs = (data) => {
       dispatch(getDrugsSuccess(res.data));
     })
     .catch(err => {
-      const error = err.message === 'Network Error' ? err.message : err.response.data.error
-      dispatch(handleError(GET_DRUGS, error, getDrugs, data, false));
+      const error = err.message === 'Network Error' ? err.message : err.response.data
+      dispatch(handleError(GET_DRUGS, error, getDrugs, data));
       dispatch(getDrugsFailure(err.response));
     })
   }
@@ -68,8 +68,8 @@ export const getDrugById = (id) => {
       dispatch(getDrugSuccess(res.data));
     })
     .catch(err => {
-      const error = err.message === 'Network Error' ? err.message : err.response.data.error
-      dispatch(handleError(GET_DRUG_BY_ID, error, getDrugById, id, false));
+      const error = err.message === 'Network Error' ? err.message : err.response.data
+      dispatch(handleError(GET_DRUG_BY_ID, error, getDrugById, id));
       dispatch(getDrugFailure(err.response));
     })
   }
@@ -89,8 +89,8 @@ export const getDrugsByIds = (ids) => {
         dispatch(getDrugsIdsSuccess(res.data));
       })
       .catch(err => {
-        const error = err.message === 'Network Error' ? err.message : err.response.data.error
-        dispatch(handleError(GET_DRUG_BY_IDS, error, getDrugsByIds, ids, false))
+        const error = err.message === 'Network Error' ? err.message : err.response.data
+        dispatch(handleError(GET_DRUG_BY_IDS, error, getDrugsByIds, ids))
         dispatch(getDrugsIdsFailure(err.response));
       })
     })

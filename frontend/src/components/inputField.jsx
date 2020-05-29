@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 const InputField = ({
   className, label, required ,error, tag, func, lel9, disabled, reference,
-  placeholder, ...attrs
+  placeholder, type, ...attrs
  }) => {
   const classes = classNames (
     'inputF',
@@ -31,6 +31,7 @@ const InputField = ({
        >
          <Tag
            placeholder={placeholder}
+           type={type}
            value={lel9}
            ref={reference}
            onChange={func}
@@ -46,29 +47,31 @@ const InputField = ({
 }
 
 InputField.propTypes = {
-  className: PropTypes.string,
-  label: PropTypes.string,
-  error: PropTypes.string,
-  func: PropTypes.func,
-  lel9: PropTypes.string,
-  required: PropTypes.bool,
-  disabled: PropTypes.bool,
-  reference: PropTypes.object,
-  tag: PropTypes.string,
-  placeholder: PropTypes.string,
+    className: PropTypes.string,
+    label: PropTypes.string,
+    error: PropTypes.string,
+    func: PropTypes.func,
+    lel9: PropTypes.string,
+    required: PropTypes.bool,
+    disabled: PropTypes.bool,
+    reference: PropTypes.object,
+    tag: PropTypes.string,
+    placeholder: PropTypes.string,
+    type: PropTypes.string
 }
 
 InputField.defaultProps = {
-  className: '',
-  label: '',
-  error: '',
-  func: () => {},
-  lel9: '',
-  required: false,
-  disabled: false,
-  reference: null,
-  tag: 'textarea',
-  placeholder: ''
+    className: '',
+    label: '',
+    error: '',
+    func: () => {},
+    lel9: '',
+    required: false,
+    disabled: false,
+    reference: null,
+    tag: 'textarea',
+    placeholder: '',
+    type: ''
 }
 
 export default InputField;

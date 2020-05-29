@@ -175,5 +175,52 @@ services:
     networks:
       - backend
 
+  analyzer-service:
+    image: ${REGISTRY_LOGIN}/analyzer:latest
+    ports:
+      - "8087:8087"
+    volumes:
+      - /var/docker/analyzer/logs:/tmp/app
+    environment:
+      - JAVA_OPTIONS=-Xmx100m
+      - spring.rabbitmq.host=79.174.13.21
+      - spring.rabbitmq.port=5672
+      - spring.rabbitmq.username=${LOGIN}
+      - spring.rabbitmq.password=${PASS}
+      - service.session.host=37.46.134.43
+      - service.session.port=8084
+      - service.session.clientId=analyzer
+      - service.session.secret=secret
+      - service.drug.host=37.46.134.43
+      - service.drug.port=8080
+      - service.patient.host=37.46.134.43
+      - service.patient.port=8081
+      - logging.path=/tmp/app
+    depends_on:
+      - drug-service
+      - patient-service
+    networks:
+      - backend
+
+
+  frontend:
+    image: ${REGISTRY_LOGIN}/frontend:latest
+    ports:
+      - "80:80"
+    volumes:
+      - /var/docker/nginx/logs:/var/log/nginx
+    depends_on:
+      - drug-service
+      - patient-service
+      - profile-service
+      - session-service
+      - statistic-service
+      - analyzer-service
+      - recommendation-service
+    networks:
+      - backend
+      - frontend
+
 networks:
   backend:
+  frontend:

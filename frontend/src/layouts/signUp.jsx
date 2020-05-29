@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Button } from  'antd';
 import { connect } from 'react-redux';
-import { sessionService } from 'redux-react-session';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { registration } from '../actions/actionSession';
 import InputField from '../components/inputField';
+import Portal from '../components/portal';
 import getHistory from '../modules/history';
 
 const Elements = ({obj, classN, actionOnChange}) => obj.map((element, index) => (
@@ -17,6 +17,7 @@ const Elements = ({obj, classN, actionOnChange}) => obj.map((element, index) => 
     lel9={element.lel9}
     reference={element.ref}
     tag='input'
+    type={element.type}
   />
 ))
 
@@ -30,6 +31,7 @@ class SignUp extends Component{
       color: '#0fc5c5',
       blue: '#3c97e4',
       isEmpty: false,
+      errorS: '',
     }
     this.usernameRef = React.createRef();
     this.passwordRef = React.createRef();
@@ -65,7 +67,10 @@ class SignUp extends Component{
         isEmpty: true
       })
     } else {
-      this.props.registration(username, password)
+      this.props.registration(username, password);
+      this.setState({
+        isEmpty: false
+      })
     }
   }
 
@@ -91,46 +96,65 @@ class SignUp extends Component{
     getHistory().push('/sign-up');
   }
 
+  handleOnClickSignIn = () => {
+    getHistory().push('/sign-in');
+  }
+
+  componentDidUpdate = (prevProps) => {
+    if (this.props.errorS !== prevProps.errorS) {
+      if(this.props.errorS) {
+        this.setState({
+          errorS: this.props.errorS.data.error
+        })
+      }
+    }
+  }
+
+
   render () {
-    const { username, password, color, isEmpty } = this.state;
-    const { error } = this.props;
-    console.log(error);
+    const { username, password, color, isEmpty, errorS } = this.state;
 
     const Parametres1 = [
       {lel9: username, label: "Логин", ref: this.usernameRef},
-      {lel9: password, label: "Пароль", ref: this.passwordRef}
+      {lel9: password, label: "Пароль", type: "password", ref: this.passwordRef}
     ];
 
     return(
-      <div className="signUp" onClick={this.handleClickOutside} >
-        <div className="signUp-wrapper" ref={this.portalRef}>
-          <div className="signUp-close" onClick={this.handleOnClickClose}>
-            <FontAwesomeIcon icon={faTimes} size="lg"/>
-          </div>
-          <p className="signUp-tittle">РЕГИСТРАЦИЯ</p>
-          {error ?
-            <p className="signUp-userExist">{error.data.error_description}</p>
-            :
-            isEmpty ?
-            <p className="signUp-emptyField">Заполните все поля</p>
-            :
-            null
-          }
+      <Portal>
+        <div className="signUp" onClick={this.handleClickOutside} >
+          <div className="signUp-wrapper" ref={this.portalRef}>
+            <div className="signUp-close" onClick={this.handleOnClickClose}>
+              <FontAwesomeIcon icon={faTimes} size="lg"/>
+            </div>
+            <p className="signUp-tittle">РЕГИСТРАЦИЯ</p>
 
-          <Elements obj={Parametres1} actionOnChange={this.handleOnChange} classN="signUp"/>
-          <Button style={{background: color}}
-            onMouseDown={this.handleOnMouseDown}
-            onMouseUp={this.handleOnMouseUp}
-            onClick={this.handleOnClick}
+            <Elements obj={Parametres1} actionOnChange={this.handleOnChange} classN="signUp"/>
+            {errorS !== '' &&
+            <p className="signUp-userExist">Пользователь с таким именем уже существует</p>
+            }
+            {isEmpty &&
+            <p className="signUp-emptyField">Заполните все поля</p>
+            }
+            <Button style={{background: color}}
+              onMouseDown={this.handleOnMouseDown}
+              onMouseUp={this.handleOnMouseUp}
+              onClick={this.handleOnClick}
+              >
+              Зарегистрироваться
+            </Button>
+            <div
+                onClick={this.handleOnClickSignIn}
+                className="signUp-signIn"
             >
-            ЗАРЕГИСТРИРОВАТЬСЯ
-          </Button>
+              Вход
+            </div>
+          </div>
         </div>
-      </div>
+      </Portal>
     )
   }
 }
 
 export default connect(state => ({
-  error: state.sessions.error
+  errorS: state.sessions.error
 }), { registration })(SignUp)

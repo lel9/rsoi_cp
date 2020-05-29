@@ -6,10 +6,11 @@ import getHistory from '../modules/history';
 import InputField from '../components/inputField' ;
 
 import { changePath } from '../actions/actionPath.js';
+import dayjs from "dayjs";
 
 class AddPatient extends Component {
   state = {
-    birthday: 0,
+    birthday: '',
     cardId: '',
     sex: '',
     error: null
@@ -25,7 +26,7 @@ class AddPatient extends Component {
 
   handleOnChangeDate = (date) => {
     this.setState({
-      birthday: new Date(date).getTime()
+      birthday: dayjs(date).format()
     })
   }
 
@@ -37,7 +38,6 @@ class AddPatient extends Component {
   }
   componentDidMount = () => {
     this.props.changePath(getHistory().location.pathname);
-    this.props.setPath(getHistory().location.pathname);
     getHistory().push(`/all-patients/add-patient`)
   }
 
@@ -72,11 +72,8 @@ class AddPatient extends Component {
              <Radio value={"f"}>женский</Radio>
            </Radio.Group>
           </div>
-          {error &&
-            <div className="emptyField addDrug-emptyField">{error.data.error_description}</div>
-          }
           <InputField
-            label="Номер карты"
+            label="Идентификатор"
             className="addPatient"
             func={this.handleOnChange}
             lel9={this.state.cardId}
@@ -84,6 +81,9 @@ class AddPatient extends Component {
             tag="input"
           />
         </div>
+        {error &&
+        <div className="emptyField addPatient-emptyField">{error.data.error_description}</div>
+        }
         <div className="addPatient__footer">
             <Button onClick={this.handleOnSubmit}>Сохранить</Button>
         </div>

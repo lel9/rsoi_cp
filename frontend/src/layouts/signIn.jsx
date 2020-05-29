@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { Button } from  'antd';
 import { connect } from 'react-redux';
-import { sessionService } from 'redux-react-session';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { authorization, logout } from '../actions/actionSession';
 import InputField from '../components/inputField';
 import getHistory from '../modules/history';
+import Portal from '../components/portal';
 
 const Elements = ({obj, classN, actionOnChange}) => obj.map((element, index) => (
   <InputField
@@ -17,6 +17,7 @@ const Elements = ({obj, classN, actionOnChange}) => obj.map((element, index) => 
     lel9={element.lel9}
     reference={element.ref}
     tag='input'
+    type={element.type}
   />
 ))
 
@@ -29,6 +30,7 @@ class SignIn extends Component{
       green: '#0fc5c5',
       color: '#0fc5c5',
       blue: '#3c97e4',
+      errorS: '',
     }
     this.usernameRef = React.createRef();
     this.passwordRef = React.createRef();
@@ -88,42 +90,56 @@ class SignIn extends Component{
     getHistory().push('/sign-up');
   }
 
+  componentDidUpdate = (prevProps) => {
+    if (this.props.errorS !== prevProps.errorS) {
+      if(this.props.errorS) {
+        this.setState({
+          errorS: this.props.errorS.data.error
+        })
+      }
+    }
+  }
 
   render () {
-    const { username, password, color } = this.state;
+    const { username, password, color, errorS } = this.state;
 
     const Parametres1 = [
       {lel9: username, label: "Логин", ref: this.usernameRef},
-      {lel9: password, label: "Пароль", ref: this.passwordRef}
+      {lel9: password, label: "Пароль", type: "password", ref: this.passwordRef}
     ];
 
     return(
-      <div className="signIn" onClick={this.handleClickOutside}>
-        <div className="signIn-wrapper" ref={this.portalRef}>
-          <div className="signIn-close" onClick={this.handleOnClickClose}>
-            <FontAwesomeIcon icon={faTimes} size="lg"/>
-          </div>
-          <div className="signIn-tittle">ВХОД</div>
-          <Elements obj={Parametres1} actionOnChange={this.handleOnChange} classN="SignIn"/>
-          <Button style={{background: color}}
-            onMouseDown={this.handleOnMouseDown}
-            onMouseUp={this.handleOnMouseUp}
-            onClick={this.handleOnClick}
-            >
-            ВХОД
-          </Button>
-          <div
-            onClick={this.handleOnClickSignUp}
-            className="signIn-signUp"
-            >
-            Регистрация
+      <Portal>
+        <div className="signIn" onClick={this.handleClickOutside}>
+          <div className="signIn-wrapper" ref={this.portalRef}>
+            <div className="signIn-close" onClick={this.handleOnClickClose}>
+              <FontAwesomeIcon icon={faTimes} size="lg"/>
+            </div>
+            <div className="signIn-tittle">ВХОД</div>
+            <Elements obj={Parametres1} actionOnChange={this.handleOnChange} classN="SignIn"/>
+            {errorS !== '' &&
+            <p className="signIn-wrongData">Неверное имя пользователя или пароль</p>
+            }
+            <Button style={{background: color}}
+              onMouseDown={this.handleOnMouseDown}
+              onMouseUp={this.handleOnMouseUp}
+              onClick={this.handleOnClick}
+              >
+              Войти
+            </Button>
+            <div
+              onClick={this.handleOnClickSignUp}
+              className="signIn-signUp"
+              >
+              Регистрация
+            </div>
           </div>
         </div>
-      </div>
+      </Portal>
     )
   }
 }
 
 export default connect(state => ({
-
+  errorS: state.sessions.error,
 }), { authorization, logout })(SignIn)

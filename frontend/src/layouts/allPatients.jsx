@@ -17,13 +17,11 @@ class AllPatients extends Component {
     totalPages: 0,
     totalElements: 0,
     patients: [],
-    data: [],
-    isDisabledGet: false,
-    isDisabledPost: false,
+    data: []
   }
 
   handleOnClickPagination = (currentView, pageSize) => {
-    this.props.getPatients('', currentView - 1, 15);
+    this.props.getPatients({cardId: '', page: currentView - 1, size: 7});
     this.setState({
       currentView: currentView,
     })
@@ -42,33 +40,16 @@ class AllPatients extends Component {
         data: this.props.patients.results,
       })
     }
-
   }
 
   componentDidMount = () => {
-    this.props.getPatients({cardId: '', page: 0, size: 15});
+    this.props.getPatients({cardId: '', page: 0, size: 7});
     this.props.changePath(getHistory().location.pathname);
-    this.props.setPath(getHistory().location.pathname);
-    let isDisabledGet = false;
-    let isDisabledPost = false;
-    if(Object.keys(this.props.role).length) {
-      isDisabledGet = (this.props.role.authorities.includes('ROLE_ADMIN')
-      || this.props.role.authorities.includes('ROLE_OPERATOR')
-      || this.props.role.authorities.includes('ROLE_EXPERT'));
-
-      isDisabledPost = (this.props.role.authorities.includes('ROLE_ADMIN')
-      || this.props.role.authorities.includes('ROLE_OPERATOR'));
-    }
-    this.setState({
-      isDisabledGet,
-      isDisabledPost
-    })
   }
 
   handleOnClickAdd = () => {
     getHistory().push('/all-patients/add-patient');
   }
-
 
   handleOnSearch = (value) => {
     const { data, patients } = this.state;
@@ -77,9 +58,8 @@ class AllPatients extends Component {
         patients: data
       })
     }
-    this.props.getPatients({cardId: value, page: 0, size: 15});
+    this.props.getPatients({cardId: value, page: 0, size: 7});
   }
-
 
   handleOnChange = ({target}) => {
     const { patients } = this.state;
@@ -91,7 +71,15 @@ class AllPatients extends Component {
   }
 
   render() {
-    const { currentView, totalElements, data, error, isDisabledGet, isDisabledPost } = this.state;
+    const { currentView, totalElements, data, error } = this.state;
+    let isDisabledGet = false, isDisabledPost = false;
+    if (Object.keys(this.props.role) !== '{}' && this.props.role.authorities !== undefined) {
+      isDisabledGet = (this.props.role.authorities.includes('ROLE_ADMIN')
+      || this.props.role.authorities.includes('ROLE_OPERATOR')
+      || this.props.role.authorities.includes('ROLE_EXPERT'));
+      isDisabledPost = (this.props.role.authorities.includes('ROLE_ADMIN')
+          || this.props.role.authorities.includes('ROLE_OPERATOR'));
+    }
     return (
       <div className="allPatients">
         { isDisabledGet ?
@@ -103,10 +91,10 @@ class AllPatients extends Component {
           <Fragment>
             <div className="allPatients__leftSide">
               <Search
-                placeholder="input search text"
+                placeholder="Введите идентификатор"
                 onSearch={this.handleOnSearch}
                 onChange={this.handleOnChange}
-                style={{ width: 200 }}
+                style={{ width: 450 }}
               />
               <List
                 itemLayout="horizontal"
@@ -121,15 +109,18 @@ class AllPatients extends Component {
                       ]}
                       description={
                         <Fragment>
-                          <div>Дата рождения: {dayjs.unix(item.birthday/1000).format('DD/MM/YYYY')}</div>
-                          <div>Пол: {item.sex === 'm' ? 'Мужской' : 'Женский'}</div>
+                          {item.birthday !== null && item.birthday !== '' ?
+                              <div>Дата рождения: {dayjs(item.birthday).format('DD/MM/YYYY')}</div>
+                              : <div>Дата рождения: не указана</div>
+                          }
+                          <div>Пол: {item.sex === 'f' ? 'Женский' : this.sex === 'm' ? 'Мужской' : 'не указан'}</div>
                         </Fragment>
                       }
                     />
                   </List.Item>
                 )}
               />
-            <Pagination defaultPageSize={15} pageSize={15} defaultCurrent={1}
+            <Pagination defaultPageSize={7} pageSize={7} defaultCurrent={1}
                 total={totalElements} onChange={this.handleOnClickPagination}
                 current={currentView}
               />
@@ -141,9 +132,7 @@ class AllPatients extends Component {
             </div>
           </Fragment>
           :
-          <div className="noPermition allPatients__noPermition">
-            вы лошара, идите вон
-          </div>
+          null
         }
       </div>
     )

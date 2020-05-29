@@ -3,11 +3,13 @@ export const ADD_DRUG = 'ADD_DRUG';
 export const GET_DRUGS = 'GET_DRUGS';
 export const GET_DRUG_BY_ID = 'GET_DRUG_BY_ID';
 export const GET_DRUG_BY_IDS = 'GET_DRUG_BY_IDS';
+export const DRUGS_CLEAN = 'DRUGS_CLEAN';
 ////////////////////////////////////////////////////////////////////////////////
 export const ADD_COMMENT = 'ADD_COMMENT';
 export const GET_COMMENTS = 'GET_COMMENTS';
 export const UPDATE_COMMENT = 'UPDATE_COMMENT';
 export const DELETE_COMMENT = 'DELETE_COMMENT';
+export const COMMENTS_CLEAN = 'COMMENTS_CLEAN';
 ////////////////////////////////////////////////////////////////////////////////
 export const ADD_PATIENT = 'ADD_PATIENT';
 export const GET_PATIENTS = 'GET_PATIENTS';
@@ -15,13 +17,16 @@ export const GET_PATIENT_BY_ID = 'GET_PATIENT_BY_ID';
 export const GET_PATIENT_BY_IDS = 'GET_PATIENT_BY_IDS';
 export const UPDATE_PATIENT = 'UPDATE_PATIENT';
 export const DELETE_PATIENT = 'DELETE_PATIENT';
+export const PATIENTS_CLEAN = 'PATIENTS_CLEAN';
 ////////////////////////////////////////////////////////////////////////////////
 export const ADD_RECEPTION = 'ADD_RECEPTION';
 export const GET_RECEPTION = 'GET_RECEPTION';
 export const UPDATE_RECEPTION = 'UPDATE_RECEPTION';
 export const DELETE_RECEPTION = 'DELETE_RECEPTION';
+export const RECEPTIONS_CLEAN = 'RECEPTIONS_CLEAN';
 ////////////////////////////////////////////////////////////////////////////////
 export const CHANGE_PATH = 'CHANGE_PATH';
+export const PATH_CLEAN = 'PATH_CLEAN';
 ////////////////////////////////////////////////////////////////////////////////
 export const SESSION_LOGOUT = 'SESSION_LOGOUT';
 export const SESSION_AUTHORIZATION = 'SESSION_AUTHORIZATION';
@@ -32,22 +37,26 @@ export const NETWORK_ERROR = 'NETWORK_ERROR';
 ////////////////////////////////////////////////////////////////////////////////
 export const GET_PROFILE_BY_ID = 'GET_PROFILE_BY_ID';
 export const PUT_PROFILE = 'PUT_PROFILE';
+export const PROFILE_CLEAN = 'PROFILE_CLEAN';
 ////////////////////////////////////////////////////////////////////////////////
 export const GET_STATISTICS = 'GET_STATISTICS';
-////////////////////////////////////////////////////////////////////////////////
 export const GET_USER_BY_IDS = 'GET_USER_BY_IDS';
+export const STATISTICS_CLEAN = 'STATISTICS_CLEAN';
 ////////////////////////////////////////////////////////////////////////////////
-export const drugsPublic = 'http://79.174.13.21:8080/api/1.0/public/drug';
-export const drugsProtected = 'http://79.174.13.21:8080/api/1.0/protected/drug';
-export const patientsPublic = 'http://79.174.13.21:8081/api/1.0/public/patient';
-export const patientsProtected = 'http://79.174.13.21:8081/api/1.0/protected/patient';
-export const commentsPublic = 'http://79.174.13.21:8082/api/1.0/public/recommendation/';
-export const commentsProtected = 'http://79.174.13.21:8082/api/1.0/protected/recommendation/';
-export const profileProtected = 'http://79.174.13.21:8083/api/1.0/protected/profile/'
-export const profilePrivate = 'http://79.174.13.21:8083/api/1.0/protected/profile/'
-export const oauthURL = 'http://79.174.13.21:8084/oauth/';
-export const registrationURL = 'http://79.174.13.21:8084/';
-export const statisticsProtected = 'http://79.174.13.21:8085/api/1.0/protected/statistic';
+export const POST_RECOMMENDATIONS = 'POST_RECOMENDATIONS';
+////////////////////////////////////////////////////////////////////////////////
+export const drugsPublic = 'http://37.46.134.43:8080/api/1.0/public/drug';
+export const drugsProtected = 'http://37.46.134.43:8080/api/1.0/protected/drug';
+export const patientsPublic = 'http://37.46.134.43:8081/api/1.0/public/patient';
+export const patientsProtected = 'http://37.46.134.43:8081/api/1.0/protected/patient';
+export const commentsPublic = 'http://37.46.134.43:8082/api/1.0/public/recommendation/';
+export const commentsProtected = 'http://37.46.134.43:8082/api/1.0/protected/recommendation/';
+export const profileProtected = 'http://37.46.134.43:8083/api/1.0/protected/profile/'
+export const oauthURL = 'http://37.46.134.43:8084/oauth/';
+export const registrationURL = 'http://37.46.134.43:8084/';
+export const statisticsProtected = 'http://37.46.134.43:8085/api/1.0/protected/statistic';
+export const recommendationsPublic = 'http://37.46.134.43:8087/api/1.0/public/analyzer';
+
 ////////////////////////////////////////////////////////////////////////////////
 export const grant_types = {
   'password': 'password',
