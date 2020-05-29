@@ -14,8 +14,10 @@ import ru.bmstu.cp.rsoi.patient.model.OperationOut;
 import ru.bmstu.cp.rsoi.patient.repository.ReceptionRepository;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -137,15 +139,15 @@ public class ReceptionService {
 
         state.setSex(patient.getSex());
 
-        Calendar startCalendar = parseDate(patient.getBirthday());
-        Calendar endCalendar = parseDate(reception.getDate());
+        OffsetDateTime startCalendar = parseDate(patient.getBirthday());
+        OffsetDateTime endCalendar = parseDate(reception.getDate());
 
         if (startCalendar != null && endCalendar != null) {
-            if (endCalendar.before(startCalendar))
+            if (endCalendar.isBefore(startCalendar))
                 throw new InvalidReceptionDateException();
 
-            int diffYears = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
-            int diffMonths = diffYears * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
+            int diffYears = endCalendar.getYear() - startCalendar.getYear();
+            int diffMonths = diffYears * 12 + endCalendar.getMonthValue() - startCalendar.getMonthValue();
 
             state.setYears(diffMonths / 12);
             state.setMonths(diffMonths % 12);
@@ -184,13 +186,13 @@ public class ReceptionService {
                                             String dateStart,
                                             String dateEnd,
                                             String patientId,
-                                            List<String> drugId) throws ParseException {
+                                            List<String> drugId) {
 
         List<Reception> allByDiagnosisText = (diagnosisText != null && !diagnosisText.isEmpty()) ?
                                                     receptionRepository.findAllByDiagnosisText(diagnosisText) :
                                                     receptionRepository.findAll();
-        Calendar start = parseDate(dateStart);
-        Calendar end = parseDate(dateEnd);
+        OffsetDateTime start = parseDate(dateStart);
+        OffsetDateTime end = parseDate(dateEnd);
         return allByDiagnosisText
                 .stream()
                 .filter(r -> {
@@ -202,30 +204,19 @@ public class ReceptionService {
                     } else
                         return true;})
                 .filter(r -> {
-                    try {
-                        Calendar date = parseDate(r.getDate());
-                        return date != null;
-                    } catch (ParseException e) {
-                        return false;
-                    }})
+                    OffsetDateTime date = parseDate(r.getDate());
+                    return date != null;
+                })
                 .filter(r -> {
                     if (start != null) {
-                        try {
-                            Calendar date = parseDate(r.getDate());
-                            return start.before(date) || start.equals(date);
-                        } catch (ParseException e) {
-                            return false;
-                        }
+                        OffsetDateTime date = parseDate(r.getDate());
+                        return start.isBefore(date) || start.isEqual(date);
                     } else
                         return true; })
                 .filter(r -> {
                     if (end != null) {
-                        try {
-                            Calendar date = parseDate(r.getDate());
-                            return date.before(end) || end.equals(date);
-                        } catch (ParseException e) {
-                            return false;
-                        }
+                        OffsetDateTime date = parseDate(r.getDate());
+                        return date.isBefore(end) || end.isEqual(date);
                     } else
                         return true; })
                 .filter(r -> {
@@ -243,13 +234,9 @@ public class ReceptionService {
 
     }
 
-    private Calendar parseDate(String date) throws ParseException {
+    private OffsetDateTime parseDate(String date) {
         if (date == null || date.isEmpty())
             return null;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSXXX");
-        Date parsed = sdf.parse(date);
-        Calendar startCalendar = new GregorianCalendar();
-        startCalendar.setTime(parsed);
-        return startCalendar;
+        return OffsetDateTime.parse(date);
     }
 }
