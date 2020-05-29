@@ -25,6 +25,11 @@ services:
       - service.session.clientId=drug_service
       - service.session.secret=secret
       - logging.path=/tmp/app
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
     networks:
       - backend
 
@@ -53,6 +58,11 @@ services:
       - logging.path=/tmp/app
     depends_on:
       - drug-service
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
     networks:
       - backend
 
@@ -84,6 +94,11 @@ services:
     depends_on:
       - drug-service
       - profile-service
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
     networks:
       - backend
 
@@ -113,6 +128,11 @@ services:
     depends_on:
       - drug-service
       - profile-service
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
     networks:
       - backend
 
@@ -132,6 +152,11 @@ services:
       - spring.rabbitmq.username=${LOGIN}
       - spring.rabbitmq.password=${PASS}
       - logging.path=/tmp/app
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
     networks:
       - backend
 
@@ -156,6 +181,11 @@ services:
       - service.session.secret=secret
       - service.max-operation-count=30000
       - logging.path=/tmp/app
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
     networks:
       - backend
 
@@ -172,6 +202,11 @@ services:
       - service.session.clientId=gateway
       - service.session.secret=secret
       - logging.path=/tmp/app
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
     networks:
       - backend
 
@@ -199,6 +234,11 @@ services:
     depends_on:
       - drug-service
       - patient-service
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
     networks:
       - backend
 
@@ -217,6 +257,11 @@ services:
       - statistic-service
       - analyzer-service
       - recommendation-service
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
     networks:
       - backend
       - frontend

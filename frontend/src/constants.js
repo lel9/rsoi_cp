@@ -51,7 +51,7 @@ export const patientsPublic = 'http://37.46.134.43:8081/api/1.0/public/patient';
 export const patientsProtected = 'http://37.46.134.43:8081/api/1.0/protected/patient';
 export const commentsPublic = 'http://37.46.134.43:8082/api/1.0/public/recommendation/';
 export const commentsProtected = 'http://37.46.134.43:8082/api/1.0/protected/recommendation/';
-export const profileProtected = 'http://37.46.134.43:8083/api/1.0/protected/profile/'
+export const profileProtected = 'http://37.46.134.43:8083/api/1.0/protected/profile/';
 export const oauthURL = 'http://37.46.134.43:8084/oauth/';
 export const registrationURL = 'http://37.46.134.43:8084/';
 export const statisticsProtected = 'http://37.46.134.43:8085/api/1.0/protected/statistic';
@@ -61,37 +61,9 @@ export const recommendationsPublic = 'http://37.46.134.43:8087/api/1.0/public/an
 export const grant_types = {
   'password': 'password',
   'refresh_token': 'refresh_token',
-}
-////////////////////////////////////////////////////////////////////////////////
-// export const drugRusToEngl = {
-//   'Действующее вещество': 'activeSubstance',
-//   'Описание': 'composition',
-//   'Состав': 'description',
-//   'Фармакотерапевтическая группа': 'group',
-//   'АТХ': 'atx',
-//   'Показания к применению': 'indications',
-//   'Противопоказания': 'contraindications',
-//   'Побочные эффекты': 'sideEffects',
-//   'Передозировка': 'overdose',
-//   'Форма выпуска/дозировка': 'releaseFormVSDosage',
-//   'Производитель': 'manufacturer',
-//   'Фармакодинамика': 'pharmacodynamics',
-//   'Фармакокинетика': 'pharmacokinetics',
-//   'С осторожностью': 'withCaution',
-//   'Применение при беременности и в период грудного вскармливания': 'pregnancyAndLactation',
-//   'Условия транспортирования': 'transportationСonditions',
-//   'Условия хранения': 'storageСonditions',
-//   'Срок годности': 'storageLife',
-//   'Торговое наименование': 'tradeName',
-//   'Владелец регистрационного удостоверения': 'certificateOwner',
-//   'взаимодействие с другими лекарственными средствами': 'interaction',
-//   'Лекарственная форма': 'form',
-//   'Влияние на способность управлять транспортными средствами и механизмами': 'vehicleImpact',
-//   'Условия отпуска': 'vacationFromPharmacies',
-//   'Способ применения и дозы': 'directionForUse',
-//   'Особые указания': 'specialInstruction'
-// }
+};
 
+////////////////////////////////////////////////////////////////////////////////
 export const drugEnglToRus  = {
   'activeSubstance':'Действующее вещество',
   'composition':'Описание',
@@ -119,4 +91,4 @@ export const drugEnglToRus  = {
   'vacationFromPharmacies':'Условия отпуска',
   'directionForUse':'Способ применения и дозы',
   'specialInstruction':'Особые указания'
-}
+};

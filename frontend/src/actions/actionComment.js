@@ -41,7 +41,7 @@ export const addComment = (data) => {
       })
     })
   }
-}
+};
 
 export const getComments = (data) => {
   const { id, page, size } = data

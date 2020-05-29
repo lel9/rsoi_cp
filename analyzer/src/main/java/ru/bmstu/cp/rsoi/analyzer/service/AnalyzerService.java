@@ -106,6 +106,15 @@ public class AnalyzerService {
 
         List<SearchResult> results = new ArrayList<>();
         for (ReceptionWithPatientOut reception : receptions) {
+
+            String pid = reception.getPatient().getId();
+            if (pid == null || pid.isEmpty())
+                continue;
+
+            String date = reception.getDate();
+            if (date == null || date.isEmpty())
+                continue;
+
             for (DrugOut drugOut : reception.getDrugs()) {
 
                 boolean alreadyInclude = false;
@@ -118,8 +127,7 @@ public class AnalyzerService {
                 }
 
                 if (!alreadyInclude) {
-                    String pid = reception.getPatient().getId();
-                    List<ReceptionOut> outs = getOutcomes(reception.getDate(), pid, drugOut.getId())
+                    List<ReceptionOut> outs = getOutcomes(date, pid, drugOut.getId())
                             .stream()
                             .map(outcome -> modelMapper.map(outcome, ReceptionOut.class))
                             .collect(Collectors.toList());
