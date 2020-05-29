@@ -3,6 +3,7 @@ import { Select, Button, Tabs, Radio } from 'antd';
 import getHistory from '../modules/history';
 import InputField from '../components/inputField';
 import { changePath } from '../actions/actionPath.js';
+import { addRecommendation } from '../actions/actionRecommendation';
 import { connect } from 'react-redux';
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -30,16 +31,11 @@ const genOption = (val1, val2) => {
 
 class DrugSelection extends Component {
   state = {
-    sex: '',
-    lel9_1_1: '',
-    lel9_1_2: '',
-    lel9_1_3: '',
-    lel9_1_4: '',
-    lel9_1_5: '',
-    lel9_2_1: '',
-    lel9_2_2: '',
-    lel9_2_3: '',
-    lel9_2_4: '',
+    plaints: '',
+    objectiveInspection: '',
+    examinationsResults: '',
+    specialistsConclusions: '',
+    text : '',
   }
 
   handleOnClickSex = (value) => {
@@ -49,78 +45,90 @@ class DrugSelection extends Component {
     })
   }
 
+  handleOnChangePlaints = (e) => {
+    this.setState({
+      plaints: e.target.value
+    })
+  }
+  handleOnChangeObjectiveInspection = (e) => {
+    this.setState({
+      objectiveInspection: e.target.value
+    })
+  }
+  handleOnChangeExaminationsResults = (e) => {
+    this.setState({
+      examinationsResults: e.target.value
+    })
+  }
+  handleOnChangeSpecialistsConclusions = (e) => {
+    this.setState({
+      specialistsConclusions: e.target.value
+    })
+  }
+  handleOnChangeDiagnosis = (e) => {
+    this.setState({
+      text: e.target.value
+    })
+  }
+
   componentDidMount = () => {
-    // console.log(this.props);
     this.props.changePath(getHistory().location.pathname);
-    this.props.setPath(getHistory().location.pathname);
+    // this.props.setPath(getHistory().location.pathname);
   }
   handleOnSubmit = () => {
-    getHistory().push('/select-drug/recomendation')
+    const data = this.state;
+    const { text } = this.state;
+    const diagnosis = { text };
+    delete data["text"]
+    this.props.addRecommendation({diagnosis: diagnosis, state: data});
+  }
+
+  componentDidUpdate = (prevProps) => {
+    if (this.props.recommendation !== prevProps.recommendation) {
+      getHistory().push(`/select-drug/recommendation`)
+    }
   }
 
   render() {
+    const { plaints, objectiveInspection, examinationsResults,
+       specialistsConclusions, text } = this.state;
     const years = genOption(1, 200);
     const month = genOption(1, 12);
+
     const Parametres1 = [
-      {lel9: this.state.lel9_1_3, actionOnChange: this.handleOnChange1_3, label: "Ананмез жизни", className: "page1",
-          id: "", error: ""},
-      {lel9: this.state.lel9_1_4, actionOnChange: this.handleOnChange1_4, label: "Анамнез заболевания", className: "page1",
-         id: "", error: ""}
+      {lel9: plaints, label: "Жалобы",
+        actionOnChange: this.handleOnChangePlaints},
+      {lel9: objectiveInspection, label: "Объективный осмотр",
+        actionOnChange: this.handleOnChangeObjectiveInspection},
+      {lel9: examinationsResults, label: "Результаты исследований",
+        actionOnChange: this.handleOnChangeExaminationsResults},
+      {lel9: specialistsConclusions, label: "Заключения специалистов",
+        actionOnChange: this.handleOnChangeSpecialistsConclusions},
        ];
+
     const Parametres2 = [
-      {lel9: this.state.lel9_2_1 ,actionOnChange: this.handleOnChange2_1, label: "Жалобы", className: "page1",
-          id: "", error: ""},
-      {lel9: this.state.lel9_2_2, actionOnChange: this.handleOnChange2_2, label: "Объективный осмотр", className: "page1",
-         id: "", error: ""},
-      {lel9: this.state.lel9_2_3, actionOnChange: this.handleOnChange2_3, label: "Результаты исследований", className: "page1",
-          id: "", error: ""},
-      {lel9: this.state.lel9_2_4, actionOnChange: this.handleOnChange2_4, label: "Заключения специалистов", className: "page1",
-         id: "", error: ""},
-    ];
-    const Parametres3 = [
-      {lel9: this.state.lel9_1_5, actionOnChange: this.handleOnChange1_5, label: "Диагноз", className: "page1",
-          id: "", error: ""},
+      {lel9: text, label: "Диагноз",
+        actionOnChange: this.handleOnChangeDiagnosis}
        ];
+
     return (
       <div className="drugSelection">
         <Tabs defaultActiveKey="1" onChange={null}>
-          <TabPane tab="Анамнез" key="1">
-            <div className="drugSelection__sex">
-              <Radio.Group onChange={this.onChange} value={this.state.value}>
-               <Radio value={"мужской"}>мужской</Radio>
-               <Radio value={"женский"}>женский</Radio>
-             </Radio.Group>
-            </div>
-            <div className="drugSelection__age">
-              <label>Возрат</label>
-              <div className="drugSelection__years">
-                <Select defaultValue="1" style={{ width: 70 }} onChange={null}>
-                  {years}
-                </Select>
-                <label>лет</label>
-              </div>
-              <div className="drugSelection__month">
-                <Select defaultValue="1" style={{ width: 70 }} onChange={null}>
-                  {month}
-                </Select>
-                <label>мес</label>
-              </div>
-            </div>
+          <TabPane tab="Текущее состояние" key="1">
               <Elements obj={Parametres1}/>
           </TabPane>
-          <TabPane tab="Текущее состояние" key="2">
+          <TabPane tab="Диагноз" key="2">
             <Elements obj={Parametres2}/>
-          </TabPane>
-          <TabPane tab="Диагноз" key="3">
-            <Elements obj={Parametres3}/>
           </TabPane>
         </Tabs>
         <Button onClick={this.handleOnSubmit}>
-          Поиск препаратов
+          Подбор препаратов
         </Button>
       </div>
     )
   }
 }
 
-export default connect(() => ({}), { changePath })(DrugSelection);
+export default connect(state => ({
+  recommendation: state.recommendations.recommendation
+}), { addRecommendation, changePath })(DrugSelection);

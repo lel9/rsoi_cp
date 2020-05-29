@@ -3,6 +3,7 @@ import {
   GET_DRUG_BY_IDS,
   GET_PATIENT_BY_IDS,
   GET_USER_BY_IDS,
+  STATISTICS_CLEAN
  } from  '../constants';
 
 const initialState = {
@@ -93,6 +94,16 @@ const statistics = function reducer(state = initialState, action) {
         ...state,
         loading: false,
         error: action.payload.error
+      }
+    case STATISTICS_CLEAN + '_SUCCESS':
+      return {
+        loading: false,
+        statistics: [],
+        ids: [],
+        error: null,
+        entity: '',
+        dateStart: 0,
+        dateEnd: 0
       }
     default:
       return state;

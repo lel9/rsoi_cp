@@ -44,8 +44,8 @@ export const getStatistics = (data) => {
         } else {
           dispatch(getUsersIdsFailure(err.response));
         }
-        const error = err.message === 'Network Error' ? err.message : err.response.data.error
-        dispatch(handleError(GET_STATISTICS, error, getStatistics, data, true))
+        const error = err.message === 'Network Error' ? err.message : err.response.data
+        dispatch(handleError(GET_STATISTICS, error, getStatistics, data))
       })
     })
   }

@@ -1,8 +1,9 @@
 import React, { Component, Fragment } from 'react';
-import { Table, Tag, Space } from 'antd';
+import { Table } from 'antd';
 import { connect } from 'react-redux';
-import { Select, TimePicker, DatePicker, Tabs, Menu, Dropdown, Button } from 'antd';
+import { Select, DatePicker, Button } from 'antd';
 import { getStatistics } from '../actions/actionStatistics';
+import { changePath } from '../actions/actionPath.js';
 import getHistory from '../modules/history';
 import dayjs from 'dayjs';
 
@@ -11,99 +12,155 @@ const { RangePicker } = DatePicker;
 
 const columns1 = [
   {
-    title: 'Препарат (наименование, форма выпуска/дозировка, производитель)',
-    dataIndex: 'tradeName',
-    key: 'tradeName',
+    title: 'Препарат (торг. наименование, форма выпуска/дозировка, производитель)',
+    colName: 'drug',
+    dataIndex: 'data',
+    key: 'data',
+    fields: ['tradeName', 'releaseFormVSDosage', 'manufacturer'],
+    render: (data = []) => (
+        <Fragment>
+          {data.map((elem, index) => {
+              return (
+                    <p key={index} className="statistics__list-drug-info">{elem}</p>
+              )
+            })
+          }
+        </Fragment>
+    )
   },
   {
     title: 'Просмотрено',
     dataIndex: 'Watched',
     key: 'Watched',
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => a.Watched - b.Watched,
   },
   {
-    title: 'Добавлено',
-    dataIndex: 'Added',
-    key: 'Added',
-  },
-  {
-    title: 'Обновлено',
-    dataIndex: 'Updated',
-    key: 'Updated',
+    title: 'Удалено',
+    dataIndex: 'Removed',
+    key: 'Removed',
   },
   {
     title: 'Добавлено рекомендаций',
     dataIndex: 'childCreateCount',
     key: 'childCreateCount',
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => a.childCreateCount - b.childCreateCount,
   },
   {
     title: 'Обновлено рекомендаций',
     dataIndex: 'childUpdateCount',
     key: 'childUpdateCount',
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => a.childUpdateCount - b.childUpdateCount,
   },
   {
     title: 'Удалено рекомендаций',
     dataIndex: 'childDeleteCount',
     key: 'childDeleteCount',
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => a.childDeleteCount - b.childDeleteCount,
   },
 ]
 const columns2 = [
   {
-    title: 'Пациент (№ карты/ИБ, пол, дата рождения)',
-    dataIndex: 'cardId',
-    key: 'cardId',
+    title: 'Пациент (идентификатор, дата рождения, пол)',
+    colName: 'patient',
+    dataIndex: 'data',
+    key: 'data',
+    fields: ['cardId', 'birthday', 'sex'],
+    render: (data) => (
+        <Fragment>
+          {
+            data.map((elem, index) => {
+              return (
+                    <p key={index} className="statistics__list-drug-info">{elem}</p>
+              )
+            })
+          }
+        </Fragment>
+    )
   },
   {
     title: 'Просмотрено',
     dataIndex: 'Watched',
     key: 'Watched',
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => a.Watched - b.Watched,
   },
   {
-    title: 'Добавлено',
-    dataIndex: 'Added',
-    key: 'Added',
-  },
-  {
-    title: 'Обновлено',
-    dataIndex: 'Updated',
-    key: 'Updated',
+    title: 'Удалено',
+    dataIndex: 'Removed',
+    key: 'Removed',
   },
   {
     title: 'Добавлено осмотров',
     dataIndex: 'childCreateCount',
     key: 'childCreateCount',
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => a.childCreateCount - b.childCreateCount,
   },
   {
     title: 'Обновлено осмотров',
     dataIndex: 'childUpdateCount',
     key: 'childUpdateCount',
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => a.childUpdateCount - b.childUpdateCount,
   },
   {
     title: 'Удалено осмотров',
     dataIndex: 'childDeleteCount',
     key: 'childDeleteCount',
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => a.childDeleteCount - b.childDeleteCount,
   },
 ]
+const columns3 = [
+  {
+    title: 'Пользователи',
+    colName: 'user',
+    dataIndex: 'data',
+    key: 'data',
+    fields: ['entityId'],
+    render: (data) => (
+        <>
+          {
+            data.map((elem, index) => {
+              return (
+                  <p key={index} className="statistics__list-user-info">{elem}</p>
+              )
+            })
+          }
+        </>
+    )
+  },
+  {
+    title: 'Просмотрено',
+    dataIndex: 'Watched',
+    key: 'Watched',
+    defaultSortOrder: 'descend',
+    sorter: (a, b) => a.Watched - b.Watched,
+  },
+]
+
 const columns = {
   drug: columns1,
   patient: columns2,
-  user: [{
-      title: 'Пользователи',
-      dataIndex: 'cardId',
-      key: 'cardId',
-    }]
+  user: columns3
 }
 
+
 const translate = {
-  'user': 'пользователей',
-  'drug': 'лекарств',
-  'patient': 'пациентов',
+  'user': 'пользователями',
+  'drug': 'препаратами и рекомендациями',
+  'patient': 'пациентами и осмотрами',
 }
 
 class Statistics extends Component {
   state = {
     dateStart: 0,
     dateEnd: 0,
-    entity: '',
+    entity: 'drug',
     statistics: [],
     childTotalUpdateCount: 0,
     childTotalDeleteCount: 0,
@@ -115,51 +172,119 @@ class Statistics extends Component {
     errMessage: null,
     entitiesStatistic: [],
     fill: [],
+    isDisabled: true,
   }
 
   componentDidMount = () => {
-    this.props.setPath(getHistory().location.pathname);
+    // this.props.setPath(getHistory().location.pathname
+    this.props.changePath(getHistory().location.pathname);
   }
 
   componentDidUpdate = (prevProps) => {
     const { entity } = this.props;
+    let fill = [];
     if (prevProps.statistics !== this.props.statistics) {
+      let results;
       if (entity !== 'user') {
+        results = this.props.statistics.results;
         this.setState({
           ...this.props.ids.data,
           statistics: this.props.statistics.results,
         })
       } else {
+        results = this.props.statistics.data;
         this.setState({
           ...this.props.statistics.data,
         })
       }
-      const fill = this.fillData(this.props.ids.data.entitiesStatistic,
-        this.props.statistics.results, columns[entity]);
-      console.log(this.state);
+      fill = this.fillData(this.props.ids.data.entitiesStatistic,
+        results, columns[entity]);
+        console.log(fill);
       this.setState({
         fill
       })
     }
+
+    if (this.props.role !== prevProps.role) {
+      let isDisabled = false;
+      if(Object.keys(this.props.role).length) {
+        isDisabled = this.props.role.authorities.includes('ROLE_ADMIN');
+      }
+      this.setState({
+        isDisabled
+      })
+    }
+  }
+
+  shouldComponentUpdate = (nextProps, nextState) => {
+    if (nextProps.statistics !== this.props.statistics) {
+      return true;
+    }
+    if (this.props.role !== nextProps.role) {
+      return true;
+    }
+    if (this.props.entity !== nextProps.entity) {
+      return true;
+    }
+    if (this.props.dateStart !== nextProps.dateStart) {
+      return true;
+    }
+    if (this.props.dateEnd !== nextProps.dateEnd) {
+      return true;
+    }
+    if (this.props.statistics !== nextProps.statistics) {
+      return true;
+    }
+    if (this.state.isDisabled !== nextState.isDisabled) {
+      return true;
+    }
+    if (this.state.fill !== nextState.fill) {
+      return true;
+    }
+    if (this.state.childTotalCreateCount !== nextState.childTotalCreateCount) {
+      return true;
+    }
+    if (this.state.childTotalDeleteCount !== nextState.childTotalDeleteCount) {
+      return true;
+    }
+    if (this.state.childTotalUpdateCount !== nextState.childTotalUpdateCount) {
+      return true;
+    }
+    if (this.props.dateStart !== nextProps.dateStart) {
+      return true;
+    }
+    if (this.props.dateEnd !== nextProps.dateEnd) {
+      return true;
+    }
+    return false;
   }
 
   fillData = (entitiesStatistic, statistics, columns) => {
     let rows = [];
+    if (columns[0].colName === "user") {
+      statistics = statistics.entitiesStatistic;
+    }
     entitiesStatistic.map((element, index) => {
-       const row = {
+      const data = columns[0].fields.map((element, index1) => {
+        const statisticsElement = Object(statistics[index])[element];
+        if (element === "birthday")
+          return statisticsElement !== null && statisticsElement !== '' ? dayjs(statisticsElement).format('DD/MM/YYYY') : 'дата рождения не указана';
+        else if (element === "sex")
+          return statisticsElement === 'f' ? 'Женский' : statisticsElement === 'm' ? 'Мужской': 'пол не указан';
+        return statisticsElement;
+      });
+      const row = {
         'key': index,
-        [columns[0].key]: Object(statistics[index])[columns[0].key],
+        'data': data,
         'Watched': element.readCount,
-        'Added': element.createCount,
-        'Updated': element.updateCount,
-        'Removed': element.deleteCount,
       };
-      if (columns.length > 1) {
-        row[columns[4].key] = element.childCreateCount;
-        row[columns[5].key] = element.childUpdateCount;
-        row[columns[6].key] = element.childDeleteCount;
+      if (columns[0].colName === "patient" || columns[0].colName === "drug") {
+        row[columns[2].key] = element.childCreateCount;
+        row[columns[3].key] = element.childUpdateCount;
+        row[columns[4].key] = element.childDeleteCount;
       }
       rows = rows.concat(row)
+      return null;
     })
     return rows;
   }
@@ -167,13 +292,13 @@ class Statistics extends Component {
   handleOnChangeRangePicker = (value, dateString) => {
     if (dateString[0] !== '' && dateString[1] !== '') {
       const dateStart = new Date(value[0]).getTime();
-      const dateEnd = new Date(value[1]).getTime()
+      const dateEnd = new Date(value[1]).getTime();
       this.setState({
         dateStart,
         dateEnd
       })
     }
-  }
+  };
 
   handleOnClickShow = () => {
     const { dateStart, dateEnd, entity } = this.state;
@@ -189,55 +314,59 @@ class Statistics extends Component {
   }
 
   render() {
-    const { fill } = this.state;
+    const { fill, isDisabled } = this.state;
     const { entity } = this.props;
     const { ids, dateStart, dateEnd } = this.props;
-    console.log(dateStart, dateEnd);
     return (
       <div className="statistics">
-        <div className="statistics__header">
-          <div className="statistics__header-rangePicker">
-            <label>Интервал времени</label>
-            <RangePicker showTime onChange={this.handleOnChangeRangePicker}/>
-          </div>
-          <div className="statistics__header-select">
-            <label>Тип</label>
-            <Select defaultValue="" style={{ width: 300 }} onChange={this.handleOnChangeSelect}>
-              <Option value="drug">Препараты и рекомендации</Option>
-              <Option value="patient">Пациенты и осмотры</Option>
-              <Option value="user">Пользователи</Option>
-            </Select>
-          </div>
-        </div>
-        <div className="statistics__content">
-          <Button  type="primary" onClick={this.handleOnClickShow}>Показать</Button>
-            { entity !== '' ? ids.data.entitiesStatistic.length ?
-                <Fragment>
-                  <div className="statistics__content-table">
-                  <Table dataSource={fill} columns={columns[entity]} />
-                  </div>
-                  <div className="statistics__content-conclusion">
-                  </div>
-                </Fragment>
-              :
-                <div className="statistics__content-empty">
-                  Данные отсутствуют для <span>{` ${translate[entity]} `}</span>
-                  интервала <br/> от
-                  {' ' + dayjs.unix(dateStart/1000).format('DD/MM/YYYY HH:mm:ss')}
-                  <br/> по
-                  {' ' + dayjs.unix(dateEnd/1000).format('DD/MM/YYYY HH:mm:ss')}
-                </div>
-              :
-                null
-            }
-        </div>
-
+        {isDisabled ?
+          <Fragment>
+            <div className="statistics__header">
+              <div className="statistics__header-rangePicker">
+                <label>Интервал времени</label>
+                <RangePicker showTime onChange={this.handleOnChangeRangePicker}/>
+              </div>
+              <div className="statistics__header-select">
+                <label>Сущность</label>
+                <Select defaultValue="drug" style={{ width: 300 }} onChange={this.handleOnChangeSelect}>
+                  <Option value="drug">Препараты и рекомендации</Option>
+                  <Option value="patient">Пациенты и осмотры</Option>
+                  <Option value="user">Пользователи</Option>
+                </Select>
+              </div>
+            </div>
+            <div className="statistics__footer">
+              <Button onClick={this.handleOnClickShow}>Просмотреть</Button>
+            </div>
+            <div className="statistics__content">
+                { entity !== '' ? ids.data.entitiesStatistic.length ?
+                    <Fragment>
+                      <div className="statistics__content-table">
+                      <Table dataSource={fill} columns={columns[entity]} size="middle"/>
+                      </div>
+                      <div className="statistics__content-conclusion">
+                      </div>
+                    </Fragment>
+                  :
+                    <div className="statistics__content-empty">
+                      Нет операций над <span>{` ${translate[entity]} `}</span>
+                      в интервале <br/> с
+                      {' ' + dayjs.unix(dateStart/1000).format('DD/MM/YYYY HH:mm:ss')}
+                      <br/> по
+                      {' ' + dayjs.unix(dateEnd/1000).format('DD/MM/YYYY HH:mm:ss')}
+                    </div>
+                  :
+                    null
+                }
+            </div>
+          </Fragment>
+          :
+          null
+        }
       </div>
     )
   }
 }
-// {dayjs.unix((date + time)/1000).format('HH:mm:ss')}
-
 
 export default connect((state => ({
   statistics: state.statistics.statistics,
@@ -245,4 +374,5 @@ export default connect((state => ({
   entity: state.statistics.entity,
   dateStart: state.statistics.dateStart,
   dateEnd: state.statistics.dateEnd,
-})), { getStatistics })(Statistics);
+  role: state.sessionReducer.user,
+})), { changePath, getStatistics })(Statistics);

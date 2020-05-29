@@ -3,7 +3,7 @@
 html {
   width: 100%;
   height: 100%;
-  overflow: auto;
+  overflow: hidden;
 }
 
 body {
@@ -20,11 +20,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-#root, .App {
+.body, #root, .App {
   width: 100%;
   height: 100%;
   min-width: 1272px;
-  overflow: auto;
+  overflow: hidden;
 }
 
 p {
@@ -56,14 +56,21 @@ p {
   background: white;
   border: none;
   resize: none;
-  min-height: 20px;
-  overflow: scroll;
+  min-height: 100px;
+  overflow: auto;
 }
 
 .noData {
   font-size: 24px;
   height: 100%;
   width: 100%;
+  text-align: center;
+}
+
+.emptyField {
+  font-size: 16px;
+  color: #ff1919;
+  white-space: pre-line;
 }
 
 .App .header .ant-menu {
@@ -72,7 +79,7 @@ p {
   justify-content: flex-end;
 }
 .App .body {
-  overflow: auto;
+  overflow: hidden;
   flex-direction: row;
   display: flex;
   height: calc(100% - 42px);
@@ -117,12 +124,12 @@ p {
 .inputF__wrapper {
   margin-bottom: 20px;
 }
-.inputF__wrapper label {
+.inputF__wrapper .inputF__label {
   font-size: 14px;
 }
-.inputF__wrapper p {
-  font-size: 12px;
-  color: #c7b110;
+.inputF__wrapper .inputF__required {
+  font-size: 13px;
+  color: #a99500;
 }
 
 .profile {
@@ -135,6 +142,20 @@ p {
   flex-direction: column;
   position: relative;
 }
+.profile .emptyField {
+  margin-bottom: 20px;
+}
+.profile .profile__nonAuthenticated {
+  text-align: center;
+}
+.profile .inputF__wrapper {
+  display: grid;
+  width: 70%;
+  grid-template-columns: 200px calc(100% - 200px);
+}
+.profile .inputF__wrapper input {
+  width: 100%;
+}
 
 .statistics {
   padding: 30px 20px;
@@ -142,10 +163,9 @@ p {
   width: 80%;
   height: 100%;
   margin: 0 auto;
-  display: flex;
   min-height: 100%;
-  flex-direction: column;
   position: relative;
+  display: table;
 }
 .statistics .statistics__header .statistics__header-rangePicker, .statistics .statistics__header .statistics__header-select {
   display: grid;
@@ -171,6 +191,9 @@ p {
 .statistics .statistics__content .statistics__content-empty span {
   color: #7270b9;
 }
+.statistics .statistics__footer {
+  margin-bottom: 20px;
+}
 
 .addPatient {
   padding: 30px 20px;
@@ -190,9 +213,13 @@ p {
 .addPatient .addPatient__content .inputF input {
   width: 100%;
 }
+.addPatient .emptyField {
+  margin-bottom: 20px;
+}
 
 .addDrug {
   padding-top: 30px;
+  padding-bottom: 30px;
   background: white;
   width: 80%;
   margin: 0 auto;
@@ -200,6 +227,9 @@ p {
   min-height: 100%;
   flex-direction: column;
   position: relative;
+}
+.addDrug .emptyField {
+  text-align: center;
 }
 .addDrug .addDrug__pagination {
   margin-bottom: 40px;
@@ -236,7 +266,6 @@ p {
 }
 
 .reception {
-  height: 100%;
   background: white;
   width: 80%;
   margin: 0 auto;
@@ -253,6 +282,7 @@ p {
   width: 200px;
 }
 .reception .reception__header .reception__header-center {
+  margin: 0 auto;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -275,17 +305,40 @@ p {
   width: 100%;
   height: calc(100% - 32px - 30px);
 }
-.reception .reception__content .reception__content-sex, .reception .reception__content .reception__content-brth {
+.reception .reception__content .reception__invalidDate {
+  text-align: center;
+  color: red;
+  font-size: 16px;
+  margin-top: 5px;
+}
+.reception .reception__content .reception__content-sex {
   display: grid;
   grid-gap: 20px;
   grid-template-columns: 100px calc(100% - 100px - 20px);
   margin-bottom: 20px;
 }
+.reception .reception__content .reception__content-brth {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: 100px 100px 100px;
+  margin-bottom: 20px;
+}
+.reception .reception__content .reception__content-brth .reception__years label, .reception .reception__content .reception__content-brth .reception__month label {
+  margin-left: 10px;
+}
+.reception .reception__content .reception__content-drugs {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: 100px calc(100% - 100px - 20px);
+}
+.reception .reception__content .reception__content-drugs .reception__content-drugsTittle {
+  padding-top: 10px;
+}
 
 .instruction {
   display: grid;
-  grid-template-columns: 65% 33%;
-  grid-gap: 2%;
+  grid-template-columns: 65% 32%;
+  grid-gap: 3%;
   background: white;
   width: 80%;
   margin: 0 auto;
@@ -305,6 +358,31 @@ p {
   padding-left: 15px;
   margin-left: 20px;
   text-align: justify;
+}
+.instruction .instruction__comments {
+  height: 1350px;
+  position: relative;
+}
+.instruction .instruction__comments .instruction__comments-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.65);
+}
+.instruction .instruction__comments .instruction__comments-add .inputF__wrapper {
+  margin-bottom: 10px;
+}
+.instruction .instruction__comments .instruction__comments-list {
+  margin-top: 20px;
+  overflow: auto;
+  height: calc(100% - 108px - 20px);
+}
+.instruction .instruction__comments .instruction__comments-list .title__name {
+  margin-right: 5px;
+  font-size: 16px;
+}
+.instruction .instruction__comments .instruction__comments-list .title__time {
+  font-size: 13px;
 }
 
 .recomendations {
@@ -414,6 +492,9 @@ p {
 .allDrugs .allDrugs__leftSide .allDrugs__ist-item {
   color: black;
 }
+.allDrugs .allDrugs__leftSide .allDrugs__description-1 label, .allDrugs .allDrugs__leftSide .allDrugs__description-2 label {
+  margin-right: 5px;
+}
 
 .allPatients {
   display: flex;
@@ -427,6 +508,15 @@ p {
 }
 .allPatients .allPatients__leftSide {
   width: 500px;
+}
+.allPatients .allPatients__leftSide .ant-list {
+  margin-top: 20px;
+  width: 90%;
+}
+.allPatients .allPatients__leftSide .ant-pagination {
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 50px;
 }
 
 #portal {
@@ -444,12 +534,18 @@ p {
 }
 #portal .signIn .signIn-wrapper {
   position: relative;
-  padding-top: 85px;
+  padding-top: 80px;
   width: 450px;
-  height: 300px;
+  height: 320px;
   margin: 0 auto;
   background: #2846e0;
   background: radial-gradient(circle, #2846e0 38%, #3d6fe2 99%);
+}
+#portal .signIn .signIn-wrapper .signIn-wrongData {
+  color: white;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 5px;
 }
 #portal .signIn .signIn-wrapper .signIn-tittle {
   position: absolute;
@@ -468,7 +564,7 @@ p {
   fill: #ffffffd6;
 }
 #portal .signIn .signIn-wrapper .signIn-signUp {
-  width: 95px;
+  width: 80px;
   margin: 0 auto;
   color: #ffffffd6;
   margin-top: 25px;
@@ -511,12 +607,18 @@ p {
 }
 #portal .signUp .signUp-wrapper {
   position: relative;
-  padding-top: 85px;
+  padding-top: 80px;
   width: 450px;
-  height: 300px;
+  height: 320px;
   margin: 0 auto;
   background: #2846e0;
   background: radial-gradient(circle, #2846e0 38%, #3d6fe2 99%);
+}
+#portal .signUp .signUp-wrapper .signUp-userExist, #portal .signUp .signUp-wrapper .signUp-emptyField {
+  color: white;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 2px;
 }
 #portal .signUp .signUp-wrapper .signUp-tittle {
   position: absolute;
@@ -534,8 +636,8 @@ p {
 #portal .signUp .signUp-wrapper .signUp-close path {
   fill: #ffffffd6;
 }
-#portal .signUp .signUp-wrapper .signUp-signUp {
-  width: 95px;
+#portal .signUp .signUp-wrapper .signUp-signIn {
+  width: 30px;
   margin: 0 auto;
   color: #ffffffd6;
   margin-top: 25px;

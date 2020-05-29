@@ -15,6 +15,7 @@ const Elements = ({obj, classN, actionOnChange}) => obj.map((element, index) => 
     func={actionOnChange}
     lel9={element.lel9}
     reference={element.ref}
+    required={element.required}
   />
 ))
 
@@ -131,7 +132,7 @@ class AddDrug extends Component {
 
   componentDidMount = () => {
     this.props.changePath(getHistory().location.pathname);
-    this.props.setPath(getHistory().location.pathname);
+    // this.props.setPath(getHistory().location.pathname);
     getHistory().push(`/all-drugs/add-drug/1`)
     this.setState({
       currentView: +window.location.pathname.split('/')[3] - 1,
@@ -166,16 +167,48 @@ class AddDrug extends Component {
   handleOnSubmit = () => {
     let data = this.state;
     delete data["currentView"];
+    getHistory().push(`/all-drugs/add-drug/1`)
     this.props.addDrug(data);
     this.setState({
-      currentView: 0
+      currentView: 0,
     })
   }
 
   componentDidUpdate = (prevProps) => {
-    if(this.props.error !== prevProps.error) {
+    console.log(this.props.error);
+    if (this.props.error !== prevProps.error && !this.props.error) {
       this.setState({
-        error: this.props.error
+        tradeName: '',
+        activeSubstance: '',
+        group: '',
+        atx: '',
+        form: '',
+        composition: '',
+        description: '',
+        pharmacodynamics: '',
+        pharmacokinetics: '',
+        indications: '',
+        contraindications: '',
+        withCaution: '',
+        pregnancyAndLactation: '',
+        directionForUse: '',
+        sideEffects: '',
+        overdose: '',
+        interaction: '',
+        specialInstruction: '',
+        vehicleImpact: '',
+        releaseFormVSDosage: '',
+        transportationСonditions: '',
+        storageСonditions: '',
+        storageLife: '',
+        vacationFromPharmacies: '',
+        manufacturer: '',
+        certificateOwner: '',
+      })
+    }
+    if (this.props.error !== prevProps.error) {
+      this.setState({
+        error: this.props.error,
       })
     }
   }
@@ -191,7 +224,7 @@ class AddDrug extends Component {
       certificateOwner, error
      } = this.state;
      const Parametres1 = [
-       {lel9: tradeName, label: "Торговое наименование", ref: this.tradeNameRef},
+       {lel9: tradeName, label: "Торговое наименование", ref: this.tradeNameRef, required: true},
        {lel9: activeSubstance, label: "Действующее вещество", ref: this.activeSubstanceRef},
        {lel9: form, label: "Лекарственная форма", ref: this.formRef},
        {lel9: composition, label: "Состав", ref: this.compositionRef},

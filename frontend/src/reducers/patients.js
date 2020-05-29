@@ -8,6 +8,8 @@ import {
   GET_RECEPTION,
   UPDATE_RECEPTION,
   DELETE_RECEPTION,
+  RECEPTIONS_CLEAN,
+  PATIENTS_CLEAN,
  } from  '../constants';
 
 const initialState = {
@@ -151,6 +153,20 @@ const patients = function reducer(state = initialState, action) {
           ...state,
           loading: false,
           error: action.payload.error
+        }
+      case RECEPTIONS_CLEAN + '_SUCCESS':
+        return {
+          loading: false,
+          reception: null,
+          receptions: [],
+          error: null
+        }
+      case PATIENTS_CLEAN + '_SUCCESS':
+        return {
+          loading: false,
+          patients: null,
+          patient: null,
+          error: null
         }
     default:
       return state;

@@ -10,6 +10,7 @@ import InputField from '../components/inputField' ;
 import { Button, List } from 'antd';
 import dayjs from 'dayjs';
 import { changePath } from '../actions/actionPath.js';
+import { commentsClean } from "../actions/actionSession";
 
 class Instruction extends Component {
   state = {
@@ -19,25 +20,20 @@ class Instruction extends Component {
     textComment: '',
     error: '',
     role: ['USER'],
-    isDisabledPost: true,
     emptyProfile: null,
+    pagination: 0,
   }
 
   componentDidMount = () => {
     this.props.changePath(getHistory().location.pathname);
-    this.props.setPath(getHistory().location.pathname);
+
     const id = this.props.match.params.id;
-    let isDisabledPost = true;
-    if(Object.keys(this.props.role).length) {
-      isDisabledPost = this.props.role.authorities.includes('ROLE_ADMIN')
-      || this.props.role.authorities.includes('ROLE_EXPERT')
-    }
     this.props.getDrugById(id);
-    this.props.getComments({id: id, page: 0, size: 15});
+    this.props.commentsClean();
+    this.props.getComments({id: id, page: 0, size: 20});
     this.setState({
       id,
-      role: this.props.role.authorities,
-      isDisabledPost
+      role: this.props.role.authorities
     })
   }
 
@@ -49,7 +45,7 @@ class Instruction extends Component {
     }
     if(this.props.comments !== prevProps.comments) {
       this.setState({
-        comments: this.props.comments.results
+        comments: this.props.results
       })
     }
     if(this.props.error !== prevProps.error) {
@@ -95,38 +91,56 @@ class Instruction extends Component {
     })
   }
 
+  handleOnScroll = (e) => {
+    const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
+    const { pagination, id } = this.state;
+    const { comments } = this.props;
+    if (bottom && comments.totalPages !== pagination + 1) {
+      this.props.getComments({id: id, page: pagination + 1, size: 20});
+      this.setState({
+        pagination: pagination + 1,
+      })
+    }
+  }
+
   render() {
-    const {drug, comments, textComment, error, role,
-       isDisabledPost, emptyProfile } = this.state;
-    // const { role } = this.props;
-    // console.log(isDisabledPost);
+    const {drug, comments, textComment, error,
+       emptyProfile } = this.state;
+    const { authenticated } = this.props;
     const data = this.getInstruction(drug);
+    let isDisabledPost = true;
+    if (Object.keys(this.props.role) !== '{}' && this.props.role.authorities !== undefined) {
+      isDisabledPost = this.props.role.authorities.includes('ROLE_ADMIN')
+          || this.props.role.authorities.includes('ROLE_EXPERT')
+    }
     return (
       <div className="instruction">
         <Tree obj={data}/>
         { error === 'Network Error' ?
           <div className="Network-Error allDrugs__Network-Error">
-            Сервис комментариев временно недоступен
+            Сервис лекарственных рекомендаций временно недоступен
           </div>
           :
           <div className="instruction__comments">
             {emptyProfile && emptyProfile.error === 'no_profile' &&
               <div className="emptyField instruction-emptyField">{emptyProfile.error_description}</div>
             }
-
-            {isDisabledPost &&
+            <p className="instruction__comments-title">Экспертные рекомендации</p>
+            {isDisabledPost && authenticated &&
               <div className="instruction__comments-add">
                 <InputField lel9={textComment} className="instruction"
                   func={this.handleOnChange}
                 />
+                <div className="instruction__comments-add-footer">
                 <Button
                   onClick={this.handleOnClick}
                  >
                    Добавить
                  </Button>
+                </div>
               </div>
             }
-            <div className="instruction__comments-list">
+            <div className="instruction__comments-list" onScroll={this.handleOnScroll}>
               <List
                 itemLayout="horizontal"
                 dataSource={comments}
@@ -135,10 +149,12 @@ class Instruction extends Component {
                     <List.Item.Meta
                       title={item.text}
                       description={
+                        <div>
+                          <p className="title__time">{dayjs.unix(item.date/1000).format('DD/MM/YYYY')}</p>
                         <Link className="title" key={index} to={`/profile/${item.author.id}`}>
                           <span className="title__name">{item.author.displayName}</span>
-                          <span className="title__time">{dayjs.unix(item.date/1000).format('DD/MM/YYYY')}</span>
                         </Link>
+                        </div>
                       }
                     />
                   </List.Item>
@@ -155,8 +171,10 @@ class Instruction extends Component {
 export default connect(state => ({
   drug: state.drugs.drug,
   comments: state.comments.comments,
-  errroComments: state.comments.error,
+  errorComments: state.comments.error,
   error: state.sessions.error,
   role: state.sessionReducer.user,
-  emptyProfile: state.comments.error
-}), {getDrugById, getDrugs, addComment, getComments, changePath})(Instruction);
+  emptyProfile: state.comments.error,
+  results: state.comments.results,
+  authenticated: state.sessionReducer.authenticated,
+}), {getDrugById, getDrugs, addComment, getComments, changePath, commentsClean})(Instruction);

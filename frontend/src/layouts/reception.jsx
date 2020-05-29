@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
-import { Select, TimePicker, DatePicker, Tabs, Menu, Dropdown, Button } from 'antd';
+import { Select, DatePicker, Tabs, Menu, Dropdown, Button, List } from 'antd';
+import { Link } from "react-router-dom";
 import getHistory from '../modules/history';
 import InputField from '../components/inputField';
 import { connect } from 'react-redux';
@@ -8,11 +9,12 @@ import { getDrugs } from '../actions/actionDrug';
 import { addReception, updateReception, deleteReception } from '../actions/actionReception';
 import dayjs from 'dayjs'
 import { changePath } from '../actions/actionPath.js';
+import { drugEnglToRus } from '../constants';
 
 const { Option } =  Select;
 const { TabPane } = Tabs;
 
-
+window.dayjs = dayjs;
 
 const Elements = ({obj, classN}) => obj.map((element, index) => (
   <InputField
@@ -41,8 +43,7 @@ class Reception extends Component {
     specialistsConclusions: '',
     text: '', //// diagnosis
     drugs: [],
-    date: new Date().getTime(),
-    time: new Date().getTime(),
+    date: '',
     disabled: true,
     type: 'read',
     pid: '',
@@ -56,14 +57,14 @@ class Reception extends Component {
     drugsSelect: [],
     upLoad: false,
     sex: '',
-    birthday: 0,
-    isDisabled: false,
+    years: null,
+    months: null,
   }
 
   timer = () => {
     let { timer, isSearch, searchV } = this.state;
     if (isSearch && timer > 0.3) {
-      this.props.getDrugs(searchV, 0, 15);
+      this.props.getDrugs({tradeName: searchV, page: 0, size: 7});
       this.setState({
         isSearch: false,
       })
@@ -77,22 +78,13 @@ class Reception extends Component {
 
   componentDidMount = () => {
     this.props.changePath(getHistory().location.pathname);
-    this.props.setPath(getHistory().location.pathname);
-    // console.log(this.props.getPath);
+    // this.props.setPath(getHistory().location.pathname);
     const pid = this.props.match.params.id;
     this.intervalId = setInterval(this.timer, 100);
     this.props.getPatientById(pid);
-    console.log('hello');
-    let isDisabled = false;
-    if(Object.keys(this.props.role).length) {
-      isDisabled = (this.props.role.authorities.includes('ROLE_ADMIN')
-      || this.props.role.authorities.includes('ROLE_OPERATOR'));
-    }
     this.setState({
       pid,
-      isDisabled,
     })
-
   }
 
   componentWillUnmount = () => {
@@ -101,22 +93,32 @@ class Reception extends Component {
 
   componentDidUpdate = (prevProps) => {
     if (this.props.patient !== prevProps.patient) {
+      this.setState({
+        sexP: this.props.patient.sex,
+        birthdayP: this.props.patient.birthday,
+        cardIdP: this.props.patient.cardId,
+      })
       if (this.props.receptions.length) {
         this.setState({
           ...this.props.receptions.slice(-1)[0].state,
           rid: this.props.receptions.slice(-1)[0].id,
-          birthday: this.props.patient.birthday,
-          sex: this.props.patient.sex,
+          text: this.props.receptions.slice(-1)[0].diagnosis.text,
           date: this.props.receptions.slice(-1)[0].date,
           lengthReceptions: this.props.receptions.length,
           currentView: this.props.receptions.length,
+          drugs: this.props.receptions.slice(-1)[0].drugs,
+          type: 'read',
         })
       }
     }
     if (this.props.reception !== prevProps.reception) {
       if(this.state.type === 'new') {
         this.setState({
-          rid: this.props.reception.data
+          lengthReceptions: this.props.receptions.length,
+          currentView: this.props.receptions.length,
+          type: 'read',
+          rid: this.props.reception.data,
+          disabled: true
         })
       }
     }
@@ -127,10 +129,6 @@ class Reception extends Component {
     }
   }
 
-  handleMenuClick = (e) => {
-    console.log('click', e);
-  }
-
   handleOnClickNew = (e) => {
     const { lengthReceptions } = this.state;
     this.setState({
@@ -138,6 +136,7 @@ class Reception extends Component {
       disabled: false,
       lengthReceptions: lengthReceptions + 1,
       currentView: lengthReceptions + 1,
+      date: '',
     })
   }
 
@@ -152,16 +151,20 @@ class Reception extends Component {
     const { rid, pid, lengthReceptions } = this.state;
     this.props.deleteReception({pid: pid, rid: rid});
     if(lengthReceptions > 1) {
-    this.setState({
-      ...this.props.receptions.slice(lengthReceptions - 2)[0].state,
-      rid: this.props.receptions.slice(lengthReceptions - 2)[0].id,
-      date: this.props.receptions.slice(lengthReceptions - 2)[0].date,
-      currentView: lengthReceptions - 1,
-      lengthReceptions: lengthReceptions - 1,
-      type: 'read',
-    })
+      this.setState({
+        ...this.props.receptions.slice(lengthReceptions - 2)[0].state,
+        rid: this.props.receptions.slice(lengthReceptions - 2)[0].id,
+        text: this.props.receptions.slice(lengthReceptions - 2)[0].diagnosis.text,
+        date: this.props.receptions.slice(lengthReceptions - 2)[0].date,
+        drugs: this.props.receptions.slice(lengthReceptions - 2)[0].drugs,
+        currentView: lengthReceptions - 1,
+        lengthReceptions: lengthReceptions - 1,
+        type: 'read',
+      })
     } else {
       this.setState({
+        years: 0,
+        months: 0,
         lifeAnamnesis: '',
         diseaseAnamnesis: '',
         plaints: '',
@@ -170,8 +173,7 @@ class Reception extends Component {
         specialistsConclusions: '',
         text: '',
         drugs: [],
-        date: new Date().getTime(),
-        time: new Date().getTime(),
+        date: '',
         lengthReceptions: 0,
         type: 'read',
         currentView: 0,
@@ -223,68 +225,74 @@ class Reception extends Component {
 
   handleOnSubmit = () => {
     const state = this.state;
-    const { pid, type, text, date, rid, time} = this.state;
-    const drugs = [] //
-    const diagnosis = { text }
+    const { pid, type, text, date, rid, drugs } = this.state;
+    delete state['lengthReceptions'];
+    const diagnosis = { text };
     if (type === 'new') {
-      this.props.addReception({id: pid, date: date + time, diagnosis: diagnosis, drugs: drugs, state: state})
+      this.props.addReception({id: pid, date: date, diagnosis: diagnosis, drugs: drugs, state: state})
     }
     if (type === 'edit') {
-      this.props.updateReception({pid: pid, rid: rid, date: date + time, diagnosis: diagnosis, drugs: drugs, state: state})
+      this.props.updateReception({pid: pid, rid: rid, date: date, diagnosis: diagnosis, drugs: drugs, state: state});
+      this.setState({
+        disabled: true
+      })
     }
-    this.setState({
-      type: 'read',
-      disabled: true,
-    })
-  }
+  };
 
-  handleOnChangeDate = (date, dateString) => {
-    const dateParts = dateString.split('/');
+  handleOnChangeDate = (date) => {
     this.setState({
-      date: new Date(dateParts[2], dateParts[1], dateParts[0]).getTime()
+      date: date !== null && date !== '' ? dayjs(date).format() : ''
     })
-  }
-
-  handleOnChangeT = (time, timeString) => {
-    const timeParts = timeString.split(':');
-    this.setState({
-      time: new Date(1970, 0, 0 , timeParts[0], timeParts[1], timeParts[2], 97200000).getTime()
-    })
-  }
+  };
 
   handleOnClickPrev = () => {
     let { currentView } = this.state;
-    const isEnabledPaginationPrev = currentView > 1 ? true : false;
-    currentView = currentView - 1
+    const isEnabledPaginationPrev = currentView > 1;
+    currentView = currentView - 1;
     if (isEnabledPaginationPrev) {
       this.setState({
         ...this.props.receptions.slice(currentView - 1)[0].state,
         rid: this.props.receptions.slice(currentView - 1)[0].id,
         date: this.props.receptions.slice(currentView - 1)[0].date,
+        drugs: this.props.receptions.slice(currentView - 1)[0].drugs,
         currentView: currentView,
         type: 'read',
+        disabled: true,
       })
     }
-  }
+  };
 
   handleOnClickNext = () => {
     let { currentView, lengthReceptions } = this.state;
-    const isEnabledPaginationNext = currentView < lengthReceptions ? true : false;
-    currentView = currentView + 1
+    const isEnabledPaginationNext = currentView < lengthReceptions;
+    currentView = currentView + 1;
     if (isEnabledPaginationNext) {
       this.setState({
         ...this.props.receptions.slice(currentView - 1)[0].state,
         rid: this.props.receptions.slice(currentView - 1)[0].id,
         date: this.props.receptions.slice(currentView - 1)[0].date,
+        drugs: this.props.receptions.slice(currentView - 1)[0].drugs,
         currentView: currentView,
         type: 'read',
+        disabled: true,
       })
     }
   }
 
-  handleOnChangeSelect = (value) => {
-    console.log('change');
-    console.log(value);
+  handleOnChangeSelect = (value, obj) => {
+    const drugs = [];
+    obj.map((element, index) => {
+       drugs.push({
+         id: element.id,
+         tradeName: element.value,
+         manufacturer: element.manufacturer,
+         releaseFormVSDosage: element.releaseformvsdosage
+       })
+       return null;
+    })
+    this.setState({
+      drugs
+    })
   }
 
   handleOnSearch = (searchV) => {
@@ -308,30 +316,49 @@ class Reception extends Component {
   }
 
   render() {
-    const { receptions } = this.props;
     const {
       disabled, lifeAnamnesis, diseaseAnamnesis, plaints, objectiveInspection,
-      examinationsResults, specialistsConclusions, text, type, date, isDisabled,
-      time, lengthReceptions, currentView, drugsSelect, birthday, sex
+      examinationsResults, specialistsConclusions, text, type, date, lengthReceptions,
+      currentView, sex, years, months, sexP, birthdayP, cardIdP
     } = this.state;
+    let { drugs, drugsSelect } = this.state;
+    const { error } = this.props;
 
-    const isDisabledMenu = lengthReceptions ? false : true;
-    const isEnabledPaginationPrev = currentView > 1 ? true : false;
-    const isEnabledPaginationNext = currentView < lengthReceptions ? true : false;
+    let isDisabledGet = false;
+    let isDisabledPost = false;
+    if (Object.keys(this.props.role) !== '{}' && this.props.role.authorities !== undefined) {
+      isDisabledGet = (this.props.role.authorities.includes('ROLE_ADMIN')
+          || this.props.role.authorities.includes('ROLE_OPERATOR')
+          || this.props.role.authorities.includes('ROLE_EXPERT'));
+      isDisabledPost = (this.props.role.authorities.includes('ROLE_ADMIN')
+          || this.props.role.authorities.includes('ROLE_OPERATOR'));
+    }
+
+    const defaultValue = drugs.map((el, i) => { return el.tradeName});
+    drugsSelect = drugs.concat(drugsSelect);
+    drugsSelect = drugsSelect.filter((element, index, self) =>
+      index === self.findIndex((el) => (
+        el.id === element.id && el.tradeName === element.tradeName
+      ))
+    )
+
+    const isDisabledMenu = !lengthReceptions;
+    const isEnabledPaginationPrev = currentView > 1;
+    const isEnabledPaginationNext = currentView < lengthReceptions;
 
     const menu = (
-      <Menu onClick={this.handleMenuClick}>
+      <Menu>
         <Menu.Item key="1" onClick={this.handleOnClickEdit} disabled={isDisabledMenu}>
-          Редактировать
+          Редактировать осмотр
         </Menu.Item>
         <Menu.Item key="2" onClick={this.handleOnClickRemove} disabled={isDisabledMenu}>
-          Удалить
+          Удалить осмотр
         </Menu.Item>
       </Menu>
     );
 
     const Parametres1 = [
-      {disabled: disabled, lel9: lifeAnamnesis, label: "Анаnnмез жизни",
+      {disabled: disabled, lel9: lifeAnamnesis, label: "Анамнез жизни",
         actionOnChange: this.handleOnChangeLifeAnamnesis},
       {disabled: disabled, lel9: diseaseAnamnesis, label: "Анамнез заболевания",
         actionOnChange: this.handleOnChangeDiseaseAnamnesis}
@@ -355,98 +382,193 @@ class Reception extends Component {
 
     return(
       <div className="reception">
-        { isDisabled ?
+        { isDisabledGet ?
           <Fragment>
             <div className="reception__header">
+              <div className="reception__header-data">
+                <div className="reception__header-sex">
+                  <p>Пол</p>
+                  <label>
+                    {sexP === 'f' ? 'Женский' : this.sex === 'm' ? 'Мужской' : 'не указан'}
+                  </label>
+                </div>
+                <div className="reception__header-birthday">
+                  <p>Дата рождения</p>
+                  <label>
+                    {birthdayP ? dayjs(birthdayP).format('DD/MM/YYYY') : 'не указана'}
+                  </label>
+                </div>
+                <div className="reception__header-pid">
+                  <p>Идентификатор</p>
+                  <label>
+                    {cardIdP}
+                  </label>
+                </div>
+              </div>
               <div className="reception__header-center">
-                {receptions.length ?
-                  type === 'new' ?
+                {type === 'new' ?
+                    <DatePicker showTime onChange={this.handleOnChangeDate} format={'DD/MM/YYYY HH:mm'} />
+                  :
+                  lengthReceptions ?
                     <Fragment>
-                      <DatePicker onChange={this.handleOnChangeDate} format={'DD/MM/YYYY'} />
-                      <TimePicker onChange={this.handleOnChangeT}/>
-                    </Fragment>
-                    :
-                    <Fragment>
+                      {disabled &&
                       <i className="fa fa-angle-double-left fa-1x" aria-hidden="true"
-                        onClick={this.handleOnClickPrev}
-                        style={ isEnabledPaginationPrev ? { cursor: 'pointer', color: 'black' } : { cursor: 'default', color: '#bdbcbc' } }
+                         onClick={this.handleOnClickPrev}
+                         style={isEnabledPaginationPrev ? {cursor: 'pointer', color: 'black'} : {
+                           cursor: 'default',
+                           color: '#bdbcbc'
+                         }}
                       />
-                      <label className="reception__date">{dayjs.unix(date/1000).format('DD/MM/YYYY')}</label>
-                      <label className="reception__time">{dayjs.unix((date + time)/1000).format('HH:mm:ss')}</label>
+                      }
+                      <label className="reception__date">{date === null || date === '' ? 'Дата не указана' : dayjs(date).format('DD/MM/YYYY HH:mm')}</label>
+                      {disabled &&
                       <i className="fa fa-angle-double-right fa-1x" aria-hidden="true"
                         onClick={this.handleOnClickNext}
-                        style={isEnabledPaginationNext ? { cursor: 'pointer', color: 'black' } : { cursor: 'default', color: '#bdbcbc' } }
-                      />
+                        style={isEnabledPaginationNext ? {cursor: 'pointer', color: 'black'} : {cursor: 'default', color: '#bdbcbc'}}
+                        />
+                      }
                     </Fragment>
                   :
                   null
                 }
               </div>
               <div className="reception__header-rightSide">
-                { type === 'read' ?
+                {isDisabledPost &&
+                    <Fragment>
+                {type === 'read' ?
                   <Dropdown.Button onClick={this.handleOnClickNew} overlay={menu}>
-                    Новый
+                  Добавить осмотр
                   </Dropdown.Button>
                   :
                   <Button onClick={this.handleOnSubmit}>Сохранить</Button>
                 }
+                    </Fragment>
+                }
               </div>
             </div>
-            <div className="reception__content">
-              <Tabs defaultActiveKey={'2'} onChange={null}>
-                <TabPane tab="Анамнез" key="1">
-                  <div className="reception__content-sex">
-                    <p>Пол</p>
-                    <label>
-                      {sex === 'm' ? 'Мужской' : 'Женский'}
-                    </label>
-                  </div>
-                  <div className="reception__content-brth">
-                    <p>Возраст</p>
-                    <label>
-                      {dayjs.unix(birthday/1000).format('DD/MM/YYYY')}
-                    </label>
-                  </div>
-                  <Elements obj={Parametres1} classN="reception"/>
-                </TabPane>
-                <TabPane tab="Текущее состояние" key="2">
-                  <Elements obj={Parametres2} classN="reception"/>
-                </TabPane>
-                <TabPane tab="Диагноз" key="3">
-                  <Elements obj={Parametres3} classN="reception"/>
-                    <Select
-                      mode="multiple"
-                      style={{ width: '100%' }}
-                      onChange={this.handleOnChangeSelect}
-                      onSearch={this.handleOnSearch}
-                    >
-                    {drugsSelect.map((item, index) => (
-                        <Option key={item.tradeName}>{item.tradeName}</Option>
-                    ))}
-                    </Select>
-                </TabPane>
-              </Tabs>
-              {receptions.length?
-                null
-                :
-                <div className="noData reception__noData">Нет осмотров</div>
-              }
-            </div>
+            {lengthReceptions || type === 'new' ?
+              <div className="reception__content">
+                {error && error.data.error === "invalid_reception_date" &&
+                  <div className="reception__invalidDate">{error.data.error_description}</div>
+                }
+                <Tabs defaultActiveKey={'2'} onChange={null}>
+                  <TabPane tab="Анамнез" key="1">
+                    <div className="reception__content-sex">
+                      <p>Пол</p>
+                      <label>
+                        {sex === 'f' ? 'Женский' : this.sex === 'm' ? 'Мужской' : 'не указан'}
+                      </label>
+                    </div>
+
+                    <div className="reception__content-brth">
+                      <label>Возраcт</label>
+                      {years !== null && months !== null ?
+                          <Fragment>
+                            <p className="reception__years">
+                              {years}
+                              <label>лет</label>
+                            </p>
+                            <p className="reception__month">
+                              {months}
+                              <label>мес</label>
+                            </p>
+                          </Fragment>
+                          : <p className="reception__no-age">не указан</p>
+                      }
+                    </div>
+                    <Elements obj={Parametres1} classN="reception"/>
+                  </TabPane>
+                  <TabPane tab="Текущее состояние" key="2">
+                    <Elements obj={Parametres2} classN="reception"/>
+                  </TabPane>
+                  <TabPane tab="Диагноз и назначения" key="3">
+                    <Elements obj={Parametres3} classN="reception"/>
+                    { type !== 'read' ?
+                        <div className="reception__content-drugs-read">
+                          <span className="reception__content-drugsTittle">Назначения</span>
+                      <Select
+                        mode="multiple"
+                        style={{ width: '100%' }}
+                        onChange={this.handleOnChangeSelect}
+                        onSearch={this.handleOnSearch}
+                        defaultValue={defaultValue}
+                      >
+                      {drugsSelect.map((item, index) => (
+                          <Option key={item.tradeName} id={item.id}
+                            manufacturer = {item.manufacturer}
+                            releaseformvsdosage = {item.releaseFormVSDosage}
+                            >
+                            <p>{item.tradeName}</p>
+                            <p>{item.releaseFormVSDosage}</p>
+                            <p>{item.manufacturer}</p>
+                          </Option>
+                      ))}
+                      </Select>
+                        </div>
+
+                      :
+
+                      <div className="reception__content-drugs">
+                        <span className="reception__content-drugsTittle">Назначения</span>
+                        <List
+                          itemLayout="horizontal"
+                          dataSource={drugs}
+                          renderItem={(item, index) => (
+                            <List.Item key={index}>
+                              <List.Item.Meta key={index}
+                                title={[
+                                  <Link key={index} to={`/all-drugs/instruction/${item.id}`}>
+                                    {item.tradeName}
+                                  </Link>
+                                ]}
+                                description={[
+                                  <div className="allDrugs__description" key={index}>
+                                    <div className="allDrugs__description-1">
+                                      <label className="allDrugs__description-tittle">
+                                        {drugEnglToRus["releaseFormVSDosage"]}
+                                      </label>
+                                      <span className="allDrugs__description-text">
+                                        {item.releaseFormVSDosage}
+                                      </span>
+                                    </div>
+                                    <div className="allDrugs__description-2">
+                                      <label className="allDrugs__description-tittle">
+                                        {drugEnglToRus["manufacturer"]}
+                                      </label>
+                                      <span className="allDrugs__description-text">
+                                        {item.manufacturer}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ]}
+                              />
+                            </List.Item>
+                          )}
+                        />
+                      </div>
+                    }
+                  </TabPane>
+                </Tabs>
+              </div>
+              :
+              <div className="noData reception__noData">Нет осмотров</div>
+            }
           </Fragment>
           :
-          <div className="noPermition reception__noPermition">
-            вы лошара, идите вон
-          </div>
+          null
         }
       </div>
     )
   }
 }
 
+
+
 export default connect(state => ({
   patient: state.patients.patient,
   reception: state.patients.reception,
   receptions: state.patients.receptions,
   drugs: state.drugs.drugs,
-  role: state.sessionReducer.user
+  role: state.sessionReducer.user,
+  error: state.patients.error
 }), { getPatientById, addReception, updateReception, deleteReception, getDrugs, changePath})(Reception);

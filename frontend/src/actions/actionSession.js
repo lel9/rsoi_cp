@@ -5,10 +5,19 @@ import {
   SESSION_CHECK,
   REGISTRATION,
   NETWORK_ERROR,
+  COMMENTS_CLEAN,
+  DRUGS_CLEAN,
+  PATIENTS_CLEAN,
+  RECEPTIONS_CLEAN,
+  PATH_CLEAN,
+  PROFILE_CLEAN,
+  STATISTICS_CLEAN,
   oauthURL,
   registrationURL,
   grant_types
 } from '../constants';
+
+
 
 import axios from 'axios';
 import { sessionService } from 'redux-react-session';
@@ -46,7 +55,7 @@ export const authorization = (username, password) => {
       //     token_type: "bearer",
       // })
       .then (() => {
-        getHistory().push('/pewpew');
+        getHistory().push('/all-drugs');
       });
     })
     .catch(err => {
@@ -77,10 +86,12 @@ export const logout = () => {
     dispatch(logoutSuccess())
     sessionService.deleteSession();
     sessionService.deleteUser();
+    getHistory().push('/');
+    dispatch(cleanAll());
   }
 }
 
-export const refreshToken = (refresh_token, func, data, flag) => {
+export const refreshToken = (refresh_token, func, data) => {
   const bodyFormData = new FormData();
   bodyFormData.set('refresh_token', refresh_token);
   bodyFormData.set('grant_type', grant_types['refresh_token']);
@@ -96,18 +107,17 @@ export const refreshToken = (refresh_token, func, data, flag) => {
       dispatch(refreshSuccess(res.data));
       console.log('refresh_token', res.data);
       sessionService.saveSession(res.data).then(() => {
-        if(flag) {
-          dispatch(func(data));
-        }
+        dispatch(func(data));
       })
       // sessionService.saveUser(res.data)
     })
     .catch(err => {
       dispatch(refreshFailure(err.response));
-      // dispatch(logoutSuccess())
-      // sessionService.deleteSession();
-      // sessionService.deleteUser();
-      // getHistory().push('/sign-in');
+      dispatch(logoutSuccess())
+      sessionService.deleteSession();
+      sessionService.deleteUser();
+      getHistory().push('/sign-in');
+      dispatch(cleanAll());
     })
   }
 }
@@ -125,6 +135,7 @@ export const checkToken = (access_token) => {
     })
     .then(res => {
       dispatch(checkSuccess(res.data));
+      console.log(res.data);
       sessionService.saveUser(res.data)
       .then (() => {
         // getHistory().push('/pewpew');
@@ -136,20 +147,38 @@ export const checkToken = (access_token) => {
   }
 }
 
-export const handleError = (dst, err, func, data, flag) => {
+export const handleError = (dst, err, func, data) => {
   return dispatch => {
+    console.log(err);
     sessionService.loadSession().then(session => {
-      switch (err) {
-        case 'invalid_token':
-          dispatch(refreshToken(session.refresh_token, func, data, flag));
-          // dispatch(func(data))
-          break;
-        case 'Network Error':
-          dispatch(error(dst, err));
-          break;
-        default:
+      if (err === 'Network Error') {
+        dispatch(error(dst, err.error));
+        alert('Сервис временно недоступен');
+      }
+      else {
+        switch (err.error) {
+          case 'invalid_token':
+            dispatch(refreshToken(session.refresh_token, func, data));
+            break;
+          default:
+            alert(err.error_description);
+            break;
+        }
       }
     });
+  }
+}
+
+
+export const cleanAll = () => {
+  return dispatch => {
+    dispatch(commentsClean());
+    dispatch(drugsClean());
+    dispatch(patientsClean());
+    dispatch(receptionsClean());
+    dispatch(pathClean());
+    dispatch(profileClean());
+    dispatch(statisticsClean());
   }
 }
 
@@ -236,4 +265,34 @@ const authorizationFailure = error => ({
   payload: {
     error
   }
+})
+
+
+////////////////////////////////////////////////////////////////////////////////
+export const commentsClean = () => ({
+  type: COMMENTS_CLEAN + '_SUCCESS',
+})
+////////////////////////////////////////////////////////////////////////////////
+const drugsClean = () => ({
+  type: DRUGS_CLEAN + '_SUCCESS',
+})
+////////////////////////////////////////////////////////////////////////////////
+const patientsClean = () => ({
+  type: PATIENTS_CLEAN + '_SUCCESS',
+})
+////////////////////////////////////////////////////////////////////////////////
+const receptionsClean = () => ({
+  type: RECEPTIONS_CLEAN + '_SUCCESS',
+})
+////////////////////////////////////////////////////////////////////////////////
+const pathClean = () => ({
+  type: PATH_CLEAN + '_SUCCESS',
+})
+////////////////////////////////////////////////////////////////////////////////
+const profileClean = () => ({
+  type: PROFILE_CLEAN + '_SUCCESS',
+})
+////////////////////////////////////////////////////////////////////////////////
+const statisticsClean = () => ({
+  type: STATISTICS_CLEAN + '_SUCCESS',
 })

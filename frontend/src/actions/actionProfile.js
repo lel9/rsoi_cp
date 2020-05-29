@@ -2,7 +2,6 @@ import {
   GET_PROFILE_BY_ID,
   PUT_PROFILE,
   profileProtected,
-  profilePrivate
  } from  '../constants';
 
  // export <key>=<value> // env
@@ -29,10 +28,11 @@ export const updateProfile = (data) => {
       }, {headers: headers})
       .then(res => {
         dispatch(updateProfileSuccess(res.data));
+        alert('Профиль успешно изменился')
       })
       .catch(err => {
-        let error = err.message === 'Network Error' ? err.message : err.response.data.error
-        dispatch(handleError(PUT_PROFILE, error, updateProfile, data, true))
+        let error = err.message === 'Network Error' ? err.message : err.response.data
+        dispatch(handleError(PUT_PROFILE, error, updateProfile, data))
         dispatch(updateProfileFailure(err.response));
       })
     })
@@ -53,8 +53,8 @@ export const getProfileProtected = (id) => {
         dispatch(getProfileProtectedSuccess(res.data));
       })
       .catch(err => {
-        let error = err.message === 'Network Error' ? err.message : err.response.data.error
-        dispatch(handleError(GET_PROFILE_BY_ID, error, getProfileProtected, id, false))
+        let error = err.message === 'Network Error' ? err.message : err.response.data
+        dispatch(handleError(GET_PROFILE_BY_ID, error, getProfileProtected, id))
         dispatch(getProfileProtectedFailure(err.response));
       })
     })

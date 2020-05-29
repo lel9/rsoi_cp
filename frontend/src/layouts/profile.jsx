@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Button } from 'antd';
 import InputField from '../components/inputField' ;
 import { updateProfile, getProfileProtected } from '../actions/actionProfile';
-import { sessionService } from 'redux-react-session';
+import { changePath } from '../actions/actionPath.js';
+import getHistory from '../modules/history';
 
 const Elements = ({obj, classN, actionOnChange}) => obj.map((element, index) => (
   <InputField
@@ -15,6 +16,7 @@ const Elements = ({obj, classN, actionOnChange}) => obj.map((element, index) => 
     reference={element.ref}
     tag="input"
     required={true}
+    disabled={element.disabled}
   />
 ))
 
@@ -25,7 +27,8 @@ class Profile extends Component {
     profession: '',
     disabled: true,
     id: '',
-  }
+    error: null,
+  };
 
   displayNameRef = React.createRef();
   organizationRef = React.createRef();
@@ -40,19 +43,35 @@ class Profile extends Component {
   }
 
   componentDidMount = () => {
+    console.log('hello');
     const id = this.props.match.params.id;
+    console.log(id);
     this.props.getProfileProtected(id)
+    this.props.changePath(getHistory().location.pathname);
+    // this.props.setPath(getHistory().location.pathname);
     this.setState({
       id,
     })
   }
 
   componentDidUpdate = (prevProps) => {
-    if(this.props.profile != prevProps.profile) {
+    if (this.props.location !== prevProps.location) {
+      const id = this.props.location.pathname.split('/').slice(-1)[0];
+      this.props.changePath(getHistory().location.pathname);
+      this.props.getProfileProtected(id)
+    }
+    if (this.props.profile !== prevProps.profile) {
       this.setState({
         ...this.props.profile
       })
     }
+    if(this.props.error !== prevProps.error) {
+        if (this.props.error && this.props.error.data.error === 'invalid_profileIn') {
+          this.setState({
+            error: this.props.error
+          })
+        }
+      }
   }
 
   handleOnClickSave = () => {
@@ -61,7 +80,9 @@ class Profile extends Component {
   }
 
   render() {
-    const { displayName, organization, profession, disabled, userName } = this.state;
+    const { displayName, organization, profession, id, error } = this.state;
+    const { authenticated } = this.props;
+    const disabled = id === this.props.user.user_name ? false : true;
 
     const Parametres = [
       {disabled: disabled, lel9: displayName, label: "ФИО", ref: this.displayNameRef},
@@ -71,14 +92,31 @@ class Profile extends Component {
 
     return (
       <div className="profile">
-        <Elements obj={Parametres} actionOnChange={this.handleOnChange} classN="profile"/>
-        <Button onClick={this.handleOnClickSave}>Сохранить</Button>
+        { authenticated ?
+          <Fragment>
+            <Elements obj={Parametres} actionOnChange={this.handleOnChange} classN="profile"/>
+            { !disabled &&
+            <div className="profile__footer">
+              {error &&
+              <div className="emptyField prifile-emptyField">{error.data.error_description}</div>
+              }
+              <Button onClick={this.handleOnClickSave}>Сохранить</Button>
+            </div>
+            }
+          </Fragment>
+          :
+          <div className="profile__nonAuthenticated">Авторизуйтесь для просмотра этой страницы</div>
+        }
+
       </div>
     )
   }
 }
 
 export default connect(state => ({
+  authenticated: state.sessionReducer.authenticated,
   profile: state.profile.profile,
   user: state.sessionReducer.user,
-}), { updateProfile, getProfileProtected })(Profile);
+  path: state.path.path,
+  error: state.profile.error
+}), { changePath, updateProfile, getProfileProtected })(Profile);

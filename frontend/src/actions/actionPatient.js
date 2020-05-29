@@ -15,8 +15,6 @@ import { sessionService } from 'redux-react-session';
 export const addPatient = (data) => {
   return dispatch => {
     sessionService.loadSession().then(session => {
-      console.log(data);
-      console.log(session.access_token);
       const headers = {
         Authorization: `Bearer ${session.access_token}`
       }
@@ -25,13 +23,12 @@ export const addPatient = (data) => {
         ...data
       }, {headers: headers})
       .then(res => {
-        console.log('good');
         dispatch(addPatientSuccess(res.data));
+        alert('Пациент успешно добавлен');
       })
       .catch(err => {
-        console.log('bad');
-        let error = err.message === 'Network Error' ? err.message : err.response.data.error
-        dispatch(handleError(ADD_PATIENT, error, addPatient, data, true ))
+        let error = err.message === 'Network Error' ? err.message : err.response.data
+        dispatch(handleError(ADD_PATIENT, error, addPatient, data))
         dispatch(addPatientFailure(err.response));
       })
     })
@@ -52,8 +49,8 @@ export const getPatients = (data) => {
        dispatch(getPatientsSuccess(res.data));
      })
      .catch(err => {
-       const error = err.message === 'Network Error' ? err.message : err.response.data.error
-       dispatch(handleError(GET_PATIENTS, error, getPatients, data, false))
+       const error = err.message === 'Network Error' ? err.message : err.response.data
+       dispatch(handleError(GET_PATIENTS, error, getPatients, data))
        dispatch(getPatientsFailure(err.response));
      })
    })
@@ -74,8 +71,8 @@ export const getPatientById = (id) => {
         dispatch(getPatientSuccess(res.data));
       })
       .catch(err => {
-        let error = err.message === 'Network Error' ? err.message : err.response.data.error
-        dispatch(handleError(GET_PATIENT_BY_ID, error, getPatientById, id, false ))
+        let error = err.message === 'Network Error' ? err.message : err.response.data
+        dispatch(handleError(GET_PATIENT_BY_ID, error, getPatientById, id))
         dispatch(getPatientFailure(err.response));
       })
     })
@@ -93,11 +90,13 @@ export const getPatientsByIds = (ids) => {
         headers: headers
       })
       .then(res => {
+        //res.data
+        console.log(res.data);
         dispatch(getPatientsIdsSuccess(res.data));
       })
       .catch(err => {
-        const error = err.message === 'Network Error' ? err.message : err.response.data.error
-        dispatch(handleError(GET_PATIENT_BY_IDS, error, getPatientsByIds, ids, false))
+        const error = err.message === 'Network Error' ? err.message : err.response.data
+        dispatch(handleError(GET_PATIENT_BY_IDS, error, getPatientsByIds, ids))
         dispatch(getPatientsIdsFailure(err.response));
       })
     })

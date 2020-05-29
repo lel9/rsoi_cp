@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { Input } from 'antd';
 import { Link } from "react-router-dom";
-import { sessionService } from 'redux-react-session';
 import { List, Button, Pagination } from 'antd';
 
 import getHistory from '../modules/history';
@@ -21,12 +20,11 @@ class AllDrugs extends Component {
     drugs: [],
     data: [],
     errorS: '',
-    isDisabled: true,
     role: ['USER'],
   }
 
   handleOnClickPagination = (currentView, pageSize) => {
-    this.props.getDrugs('', currentView - 1, 15);
+    this.props.getDrugs({tradeName: '', page: currentView - 1, size: 7});
     this.setState({
       currentView: currentView,
     })
@@ -34,17 +32,8 @@ class AllDrugs extends Component {
 
   componentDidMount = () => {
     this.props.changePath(getHistory().location.pathname);
-    this.props.setPath(getHistory().location.pathname);
-    this.props.getDrugs({tradeName: '', page: 0, size: 15});
-    let isDisabled = true;
-    if(Object.keys(this.props.role).length) {
-      isDisabled = this.props.role.authorities.includes('ROLE_ADMIN')
-      || this.props.role.authorities.includes('ROLE_OPERATOR')
-    }
-    this.setState({
-      role: this.props.role.authorities,
-      isDisabled
-    })
+    // this.props.setPath(getHistory().location.pathname);
+    this.props.getDrugs({tradeName: '', page: 0, size: 7});
   }
 
   componentDidUpdate = (prevProps) => {
@@ -67,11 +56,6 @@ class AllDrugs extends Component {
         })
       }
     }
-    if (this.props.errorD !== prevProps.errorD) {
-      this.setState({
-        errorD: this.props.errorD.err
-      })
-    }
   }
 
   handleOnClickAdd = () => {
@@ -89,7 +73,7 @@ class AllDrugs extends Component {
         drugs: data
       })
     }
-    this.props.getDrugs({tradeName: value, page: 0, size: 15});
+    this.props.getDrugs({tradeName: value, page: 0, size: 7});
   }
 
 
@@ -103,7 +87,13 @@ class AllDrugs extends Component {
   }
 
   render() {
-    const { currentView, totalElements, data, errorS, errorD, isDisabled } = this.state;
+    const { currentView, totalElements, data, errorS } = this.state;
+    const { authenticated } = this.props;
+    let isDisabled = false;
+    if (Object.keys(this.props.role) !== '{}' && this.props.role.authorities !== undefined) {
+      isDisabled = (this.props.role.authorities.includes('ROLE_ADMIN')
+          || this.props.role.authorities.includes('ROLE_OPERATOR'));
+    }
     return (
       <div className="allDrugs">
         { errorS === 'Network Error' ?
@@ -114,10 +104,10 @@ class AllDrugs extends Component {
           <Fragment>
             <div className="allDrugs__leftSide">
               <Search
-                placeholder="input search text"
+                placeholder="Введите торговое наименование"
                 onSearch={this.handleOnSearch}
                 onChange={this.handleOnChange}
-                style={{ width: 200 }}
+                style={{ width: 450 }}
               />
               <List
                 itemLayout="horizontal"
@@ -134,7 +124,7 @@ class AllDrugs extends Component {
                         <div className="allDrugs__description" key={index}>
                           <div className="allDrugs__description-1">
                             <label className="allDrugs__description-tittle">
-                              {drugEnglToRus["releaseFormVSDosage"]}
+                              {drugEnglToRus["releaseFormVSDosage"]}:
                             </label>
                             <span className="allDrugs__description-text">
                               {item.releaseFormVSDosage}
@@ -142,7 +132,7 @@ class AllDrugs extends Component {
                           </div>
                           <div className="allDrugs__description-2">
                             <label className="allDrugs__description-tittle">
-                              {drugEnglToRus["manufacturer"]}
+                              {drugEnglToRus["manufacturer"]}:
                             </label>
                             <span className="allDrugs__description-text">
                               {item.manufacturer}
@@ -154,24 +144,26 @@ class AllDrugs extends Component {
                   </List.Item>
                 )}
               />
-              <Pagination defaultPageSize={15} pageSize={15} defaultCurrent={1}
+              <Pagination defaultPageSize={7} pageSize={7} defaultCurrent={1}
                   total={totalElements} onChange={this.handleOnClickPagination}
                   current={currentView}
               />
             </div>
-            <div className="allDrugs__rightSide">
-              {isDisabled ?
-                <Button
-                  onClick={this.handleOnClickAdd}
-                >
-                  Добавить
-                </Button>
-                :
-                <div className="noPermition allDrugs__noPermition">
-                  вы лошара, идите вон
-                </div>
-              }
-            </div>
+            {authenticated &&
+              <div className="allDrugs__rightSide">
+                {isDisabled ?
+                  <Button
+                    onClick={this.handleOnClickAdd}
+                  >
+                    Добавить
+                  </Button>
+                  :
+                  <div className="noPermition allDrugs__noPermition">
+                  </div>
+                }
+              </div>
+            }
+
           </Fragment>
         }
       </div>
@@ -183,5 +175,5 @@ export default connect(state => ({
   drugs: state.drugs.drugs,
   errorS: state.sessions.error,
   role: state.sessionReducer.user,
-  errorD: state.drugs.error
+  authenticated: state.sessionReducer.authenticated,
 }),{getDrugs, changePath})(AllDrugs);

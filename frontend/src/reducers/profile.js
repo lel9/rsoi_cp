@@ -1,6 +1,7 @@
 import {
   GET_PROFILE_BY_ID,
-  PUT_PROFILE
+  PUT_PROFILE,
+  PROFILE_CLEAN
  } from  '../constants';
 
 const initialState = {
@@ -47,6 +48,15 @@ const drugs = function reducer(state = initialState, action) {
           loading: false,
           error: action.payload.error
         }
+      case PROFILE_CLEAN + '_SUCCESS':
+        return {
+          loading: false,
+          profile: null,
+          error: null
+        }
+
+
+
     default:
       return state;
   }

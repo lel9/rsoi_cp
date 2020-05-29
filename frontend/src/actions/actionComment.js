@@ -32,15 +32,16 @@ export const addComment = (data) => {
       .then(res => {
         dispatch(addCommentSuccess(res.data));
         dispatch(getComments({id: id, page: 0, size: 15}));
+        alert('Рекомендация успешно добавлена');
       })
       .catch(err => {
-        let error = err.message === 'Network Error' ? err.message : err.response.data.error
-        dispatch(handleError(ADD_COMMENT, error, addComment, data, true))
+        let error = err.message === 'Network Error' ? err.message : err.response.data
+        dispatch(handleError(ADD_COMMENT, error, addComment, data))
         dispatch(addCommentFailure(err.response));
       })
     })
   }
-}
+};
 
 export const getComments = (data) => {
   const { id, page, size } = data
@@ -54,11 +55,11 @@ export const getComments = (data) => {
       }
     })
     .then(res => {
-      dispatch(getCommentsSuccess(res.data));
+      dispatch(getCommentsSuccess(res.data, id));
     })
     .catch(err => {
-      let error = err.message === 'Network Error' ? err.message : err.response.data.error
-      dispatch(handleError(ADD_COMMENT, error, getComments, data, false))
+      let error = err.message === 'Network Error' ? err.message : err.response.data
+      dispatch(handleError(ADD_COMMENT, error, getComments, data))
       dispatch(getCommentsFailure(err.response));
     })
   }
@@ -88,11 +89,12 @@ const getCommentsStarted = () => ({
   type: GET_COMMENTS + '_STARTED',
 })
 
-const getCommentsSuccess = data => ({
+const getCommentsSuccess = (data, id) => ({
   type: GET_COMMENTS + '_SUCCESS',
   payload: {
     ...data
-  }
+  },
+  id: id
 })
 
 const getCommentsFailure = error => ({
