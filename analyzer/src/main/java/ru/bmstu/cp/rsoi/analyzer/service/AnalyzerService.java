@@ -21,9 +21,12 @@ import ru.bmstu.cp.rsoi.analyzer.model.reception.ReceptionWithPatientOut;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -105,44 +108,91 @@ public class AnalyzerService {
             return new ListSearchResultsOut(Collections.emptyList());
 
         List<SearchResult> results = new ArrayList<>();
-        for (ReceptionWithPatientOut reception : receptions) {
+        List<ReceptionWithPatientOut> collect = receptions.stream().filter(r -> {
+            try {
+                return parseDate(r.getDate()) != null && r.getPatient() != null && r.getPatient().getId() != null;
+            } catch (DateTimeParseException e) {
+                return false;
+            }
+        }).collect(Collectors.toList());
 
-            String pid = reception.getPatient().getId();
-            if (pid == null || pid.isEmpty())
-                continue;
+        List<ReceptionWithPatientOut> newList = new ArrayList<>();
+        for (ReceptionWithPatientOut r: collect) {
+            for (DrugOut d: r.getDrugs()) {
+                ArrayList<DrugOut> drug = new ArrayList<>();
+                drug.add(d);
+                newList.add(new ReceptionWithPatientOut(
+                        r.getId(), r.getPatient(), r.getDate(), r.getState(), r.getDiagnosis(), drug
+                ));
+            }
+        }
 
-            String date = reception.getDate();
-            if (date == null || date.isEmpty())
-                continue;
-
-            for (DrugOut drugOut : reception.getDrugs()) {
-
-                boolean alreadyInclude = false;
-                for (SearchResult result : results) {
-                    String drug = drugOut.getId();
-                    if (result.getDrug().get(0).getId().equals(drug)) {
-                        alreadyInclude = true;
-                        break;
-                    }
+        Map<DrugOut, List<ReceptionWithPatientOut>> map = newList.stream().collect(Collectors.groupingBy(r -> r.getDrugs().get(0)));
+        for (Map.Entry<DrugOut, List<ReceptionWithPatientOut>> entry : map.entrySet()) {
+            DrugOut key = entry.getKey();
+            List<ReceptionWithPatientOut> value = entry.getValue();
+            Map<String, List<ReceptionWithPatientOut>> patients = value.stream().collect(Collectors.groupingBy(r -> r.getPatient().getId()));
+            List<ReceptionWithPatientOut> outcomes = new ArrayList<>();
+            String pid = null;
+            for (Map.Entry<String, List<ReceptionWithPatientOut>> p : patients.entrySet()) {
+                if (p.getValue().size() > outcomes.size()) {
+                    outcomes = p.getValue();
+                    pid = p.getKey();
                 }
-
-                if (!alreadyInclude) {
-                    List<ReceptionOut> outs = getOutcomes(date, pid, drugOut.getId())
-                            .stream()
-                            .map(outcome -> modelMapper.map(outcome, ReceptionOut.class))
-                            .collect(Collectors.toList());
-
-                    List<DrugOutShort> drugsOuts = new ArrayList<>();
-                    drugsOuts.add(modelMapper.map(drugOut, DrugOutShort.class));
-                    List<DrugOutShort> analogs = getAnalogs(drugOut.getActiveSubstance())
+            }
+            if (pid != null) {
+                List<DrugOutShort> drugsOuts = new ArrayList<>();
+                drugsOuts.add(modelMapper.map(key, DrugOutShort.class));
+                List<DrugOutShort> analogs = getAnalogs(key.getActiveSubstance())
                             .stream()
                             .map(analog -> modelMapper.map(analog, DrugOutShort.class))
                             .collect(Collectors.toList());
                     drugsOuts.addAll(analogs);
-                    results.add(new SearchResult(pid, drugsOuts, outs));
-                }
+                List<ReceptionOut> outs = outcomes
+                            .stream()
+                            .map(outcome -> modelMapper.map(outcome, ReceptionOut.class))
+                            .collect(Collectors.toList());
+                results.add(new SearchResult(pid, drugsOuts, outs));
             }
         }
+//        for (ReceptionWithPatientOut reception : receptions) {
+//
+//            String pid = reception.getPatient().getId();
+//            if (pid == null || pid.isEmpty())
+//                continue;
+//
+//            String date = reception.getDate();
+//            if (date == null || date.isEmpty())
+//                continue;
+//
+//            for (DrugOut drugOut : reception.getDrugs()) {
+//
+//                boolean alreadyInclude = false;
+//                for (SearchResult result : results) {
+//                    String drug = drugOut.getId();
+//                    if (result.getDrug().get(0).getId().equals(drug)) {
+//                        alreadyInclude = true;
+//                        break;
+//                    }
+//                }
+//
+//                if (!alreadyInclude) {
+//                    List<ReceptionOut> outs = getOutcomes(date, pid, drugOut.getId())
+//                            .stream()
+//                            .map(outcome -> modelMapper.map(outcome, ReceptionOut.class))
+//                            .collect(Collectors.toList());
+//
+//                    List<DrugOutShort> drugsOuts = new ArrayList<>();
+//                    drugsOuts.add(modelMapper.map(drugOut, DrugOutShort.class));
+//                    List<DrugOutShort> analogs = getAnalogs(drugOut.getActiveSubstance())
+//                            .stream()
+//                            .map(analog -> modelMapper.map(analog, DrugOutShort.class))
+//                            .collect(Collectors.toList());
+//                    drugsOuts.addAll(analogs);
+//                    results.add(new SearchResult(pid, drugsOuts, outs));
+//                }
+//            }
+//        }
 
         try {
             String routingKey = "operation";
@@ -318,5 +368,11 @@ public class AnalyzerService {
             String authHeader = "Bearer " + TOKEN.getAccess_token();
             set("Authorization", authHeader);
         }};
+    }
+
+    private OffsetDateTime parseDate(String date) {
+        if (date == null || date.isEmpty())
+            return null;
+        return OffsetDateTime.parse(date);
     }
 }
