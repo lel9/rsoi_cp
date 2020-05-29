@@ -1,6 +1,8 @@
 package ru.bmstu.cp.rsoi.session
 
 import org.modelmapper.ModelMapper
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
+import org.springframework.amqp.support.converter.MessageConverter
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
@@ -12,6 +14,11 @@ class Application {
     @Bean
     fun modelMapper(): ModelMapper? {
         return ModelMapper()
+    }
+
+    @Bean
+    fun jsonMessageConverter(): MessageConverter? {
+        return Jackson2JsonMessageConverter()
     }
 }
 
