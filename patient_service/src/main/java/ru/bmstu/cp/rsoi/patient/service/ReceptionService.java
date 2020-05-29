@@ -15,6 +15,7 @@ import ru.bmstu.cp.rsoi.patient.repository.ReceptionRepository;
 
 import java.text.ParseException;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -191,8 +192,16 @@ public class ReceptionService {
         List<Reception> allByDiagnosisText = (diagnosisText != null && !diagnosisText.isEmpty()) ?
                                                     receptionRepository.findAllByDiagnosisText(diagnosisText) :
                                                     receptionRepository.findAll();
-        OffsetDateTime start = parseDate(dateStart);
-        OffsetDateTime end = parseDate(dateEnd);
+        OffsetDateTime start;
+        OffsetDateTime end;
+        try {
+            start = parseDate(dateStart);
+            end = parseDate(dateEnd);
+        } catch (DateTimeParseException e) {
+            log.log(Level.SEVERE, e.getMessage());
+            return allByDiagnosisText;
+        }
+
         return allByDiagnosisText
                 .stream()
                 .filter(r -> {
@@ -204,8 +213,13 @@ public class ReceptionService {
                     } else
                         return true;})
                 .filter(r -> {
-                    OffsetDateTime date = parseDate(r.getDate());
-                    return date != null;
+                    try {
+                        OffsetDateTime date = parseDate(r.getDate());
+                        return date != null;
+                    } catch (DateTimeParseException e) {
+                        log.log(Level.SEVERE, e.getMessage());
+                        return false;
+                    }
                 })
                 .filter(r -> {
                     if (start != null) {
