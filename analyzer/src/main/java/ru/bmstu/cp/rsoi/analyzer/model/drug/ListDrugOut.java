@@ -1,4 +1,4 @@
-package ru.bmstu.cp.rsoi.drug.model;
+package ru.bmstu.cp.rsoi.analyzer.model.drug;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

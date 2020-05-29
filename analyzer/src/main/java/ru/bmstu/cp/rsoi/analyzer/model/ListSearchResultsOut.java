@@ -1,4 +1,4 @@
-package ru.bmstu.cp.rsoi.drug.model;
+package ru.bmstu.cp.rsoi.analyzer.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ListDrugOut {
-    private List<DrugOut> results;
+public class ListSearchResultsOut {
+    private List<SearchResult> results;
 }

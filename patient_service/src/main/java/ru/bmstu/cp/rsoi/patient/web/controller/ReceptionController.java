@@ -9,9 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import ru.bmstu.cp.rsoi.patient.domain.Reception;
-import ru.bmstu.cp.rsoi.patient.model.reception.ReceptionIn;
-import ru.bmstu.cp.rsoi.patient.model.reception.ReceptionOut;
-import ru.bmstu.cp.rsoi.patient.model.reception.Receptions;
+import ru.bmstu.cp.rsoi.patient.model.reception.*;
 import ru.bmstu.cp.rsoi.patient.service.ReceptionService;
 
 import javax.validation.Valid;
@@ -32,9 +30,9 @@ public class ReceptionController {
 
     @GetMapping("/public/patient/{pid}/reception")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Get receptions by id", response = Receptions.class)
+    @ApiOperation(value = "Get receptions by id", response = ListReceptionOut.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
-    public Receptions getReceptions(@PathVariable String pid) {
+    public ListReceptionOut getReceptions(@PathVariable String pid) {
         List<Reception> all = receptionService.findByPatientOrdered(pid);
 
         List<ReceptionOut> list = new ArrayList<>();
@@ -43,17 +41,39 @@ public class ReceptionController {
             list.add(map);
         });
 
-        return new Receptions(list);
+        return new ListReceptionOut(list);
     }
 
-    @Secured({"ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})
-    @GetMapping("/protected/patient/{pid}/reception/last")
+    @GetMapping("/private/reception/search")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Get last reception")
+    @ApiOperation(value = "Get by all parameters", response = ListReceptionWithPatientOut.class)
     @ApiImplicitParam(name = "Authorization", value = "Access Token", required = false, paramType = "header", dataTypeClass = String.class, example = "Bearer access_token")
-    public ReceptionOut getLastReception(@PathVariable String pid) {
-        Reception lastReception = receptionService.getLastReception(pid);
-        return modelMapper.map(lastReception, ReceptionOut.class);
+    public ListReceptionWithPatientOut getReceptions(@RequestParam(required = false) Character sex,
+                                                     @RequestParam(required = false) Integer years,
+                                                     @RequestParam(required = false) Integer months,
+                                                     @RequestParam(required = false) String lifeAnamnesis,
+                                                     @RequestParam(required = false) String diseaseAnamnesis,
+                                                     @RequestParam(required = false) String plaints,
+                                                     @RequestParam(required = false) String objectiveInspection,
+                                                     @RequestParam(required = false) String examinationsResults,
+                                                     @RequestParam(required = false) String specialistsConclusions,
+                                                     @RequestParam(required = false) String diagnosisText,
+                                                     @RequestParam(required = false) String dateStart,
+                                                     @RequestParam(required = false) String dateEnd,
+                                                     @RequestParam(required = false) String patientId,
+                                                     @RequestParam(required = false) List<String> drugId) throws ParseException {
+
+        List<Reception> all = receptionService.searchReceptions(sex, years, months,
+                lifeAnamnesis, diseaseAnamnesis, plaints, objectiveInspection, examinationsResults,
+                specialistsConclusions, diagnosisText, dateStart, dateEnd, patientId, drugId);
+
+        List<ReceptionWithPatientOut> list = new ArrayList<>();
+        all.forEach(r -> {
+            ReceptionWithPatientOut map = modelMapper.map(r, ReceptionWithPatientOut.class);
+            list.add(map);
+        });
+
+        return new ListReceptionWithPatientOut(list);
     }
 
     @Secured({"ROLE_OPERATOR", "ROLE_EXPERT", "ROLE_ADMIN"})

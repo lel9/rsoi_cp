@@ -1,4 +1,4 @@
-package ru.bmstu.cp.rsoi.patient.config;
+package ru.bmstu.cp.rsoi.analyzer.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 @Configuration
 public class WebConfig {
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurerAdapter() {
@@ -19,4 +20,3 @@ public class WebConfig {
         };
     }
 }
-

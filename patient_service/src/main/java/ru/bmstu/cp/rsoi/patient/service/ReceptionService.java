@@ -14,10 +14,14 @@ import ru.bmstu.cp.rsoi.patient.model.OperationOut;
 import ru.bmstu.cp.rsoi.patient.repository.ReceptionRepository;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static ru.bmstu.cp.rsoi.patient.model.OperationOut.getReceptionOperation;
 
@@ -136,22 +140,15 @@ public class ReceptionService {
 
         state.setSex(patient.getSex());
 
-        if (patient.getBirthday() != null && !patient.getBirthday().isEmpty() &&
-                reception.getDate() != null && !reception.getDate().isEmpty()) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSXXX");
-            Date startDate = sdf.parse(patient.getBirthday());
-            Date endDate = sdf.parse(reception.getDate());
+        OffsetDateTime startCalendar = parseDate(patient.getBirthday());
+        OffsetDateTime endCalendar = parseDate(reception.getDate());
 
-            if (endDate.before(startDate))
+        if (startCalendar != null && endCalendar != null) {
+            if (endCalendar.isBefore(startCalendar))
                 throw new InvalidReceptionDateException();
 
-            Calendar startCalendar = new GregorianCalendar();
-            startCalendar.setTime(startDate);
-            Calendar endCalendar = new GregorianCalendar();
-            endCalendar.setTime(endDate);
-
-            int diffYears = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
-            int diffMonths = diffYears * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
+            int diffYears = endCalendar.getYear() - startCalendar.getYear();
+            int diffMonths = diffYears * 12 + endCalendar.getMonthValue() - startCalendar.getMonthValue();
 
             state.setYears(diffMonths / 12);
             state.setMonths(diffMonths % 12);
@@ -177,18 +174,83 @@ public class ReceptionService {
         }
     }
 
-    public Reception getLastReception(String pid) {
-        ObjectId objectId;
+    public List<Reception> searchReceptions(Character sex,
+                                            Integer years,
+                                            Integer months,
+                                            String lifeAnamnesis,
+                                            String diseaseAnamnesis,
+                                            String plaints,
+                                            String objectiveInspection,
+                                            String examinationsResults,
+                                            String specialistsConclusions,
+                                            String diagnosisText,
+                                            String dateStart,
+                                            String dateEnd,
+                                            String patientId,
+                                            List<String> drugId) {
+
+        List<Reception> allByDiagnosisText = (diagnosisText != null && !diagnosisText.isEmpty()) ?
+                                                    receptionRepository.findAllByDiagnosisText(diagnosisText) :
+                                                    receptionRepository.findAll();
+        OffsetDateTime start;
+        OffsetDateTime end;
         try {
-            objectId = new ObjectId(pid);
-        } catch (Exception ignored) {
-            return null;
+            start = parseDate(dateStart);
+            end = parseDate(dateEnd);
+        } catch (DateTimeParseException e) {
+            log.log(Level.SEVERE, e.getMessage());
+            return allByDiagnosisText;
         }
 
-        List<Reception> receptions = receptionRepository.findByPatient(objectId, new Sort(Sort.Direction.DESC, "date"));
-        if (receptions != null && !receptions.isEmpty())
-            return receptions.get(0);
-        return null;
+        return allByDiagnosisText
+                .stream()
+                .filter(r -> {
+                    if (patientId != null) {
+                        if (r.getPatient() != null) {
+                            return r.getPatient().getId().equals(patientId);
+                        } else
+                            return false;
+                    } else
+                        return true;})
+                .filter(r -> {
+                    try {
+                        OffsetDateTime date = parseDate(r.getDate());
+                        return date != null;
+                    } catch (DateTimeParseException e) {
+                        log.log(Level.SEVERE, e.getMessage());
+                        return false;
+                    }
+                })
+                .filter(r -> {
+                    if (start != null) {
+                        OffsetDateTime date = parseDate(r.getDate());
+                        return start.isBefore(date) || start.isEqual(date);
+                    } else
+                        return true; })
+                .filter(r -> {
+                    if (end != null) {
+                        OffsetDateTime date = parseDate(r.getDate());
+                        return date.isBefore(end) || end.isEqual(date);
+                    } else
+                        return true; })
+                .filter(r -> {
+                    if (drugId != null && !drugId.isEmpty()) {
+                        for (String di : drugId) {
+                            if (r.getDrugs().stream().noneMatch(d -> d.getId().equals(di))) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    } else
+                        return true;
+                })
+                .collect(Collectors.toList());
 
+    }
+
+    private OffsetDateTime parseDate(String date) {
+        if (date == null || date.isEmpty())
+            return null;
+        return OffsetDateTime.parse(date);
     }
 }

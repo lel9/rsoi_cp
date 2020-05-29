@@ -8,7 +8,7 @@ public final class PatientAlreadyExistsException extends AppException {
 
     @Override
     public String getMessage() {
-        return "Пациент с номером карты " + cardId + " уже существует";
+        return "Пациент с идентификатором " + cardId + " уже существует";
     }
 
 }

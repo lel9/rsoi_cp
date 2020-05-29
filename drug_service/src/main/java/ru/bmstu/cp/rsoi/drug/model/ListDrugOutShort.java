@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ListDrugOut {
-    private List<DrugOut> results;
+public class ListDrugOutShort {
+    private List<DrugOutShort> results;
 }
