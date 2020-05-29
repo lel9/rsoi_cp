@@ -249,6 +249,15 @@ services:
       - "80:80"
     volumes:
       - /var/docker/nginx/logs:/var/log/nginx
+    environment:
+      - api_host=37.46.134.43
+      - drug_port=8080
+      - patient_port=8081
+      - recommendation_port=8082
+      - profile_port=8083
+      - session_port=8084
+      - statistic_port=8085
+      - analyzer_port=8087
     depends_on:
       - drug-service
       - patient-service

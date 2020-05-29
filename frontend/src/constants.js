@@ -45,17 +45,17 @@ export const STATISTICS_CLEAN = 'STATISTICS_CLEAN';
 ////////////////////////////////////////////////////////////////////////////////
 export const POST_RECOMMENDATIONS = 'POST_RECOMENDATIONS';
 ////////////////////////////////////////////////////////////////////////////////
-export const drugsPublic = 'http://37.46.134.43:8080/api/1.0/public/drug';
-export const drugsProtected = 'http://37.46.134.43:8080/api/1.0/protected/drug';
-export const patientsPublic = 'http://37.46.134.43:8081/api/1.0/public/patient';
-export const patientsProtected = 'http://37.46.134.43:8081/api/1.0/protected/patient';
-export const commentsPublic = 'http://37.46.134.43:8082/api/1.0/public/recommendation/';
-export const commentsProtected = 'http://37.46.134.43:8082/api/1.0/protected/recommendation/';
-export const profileProtected = 'http://37.46.134.43:8083/api/1.0/protected/profile/';
-export const oauthURL = 'http://37.46.134.43:8084/oauth/';
-export const registrationURL = 'http://37.46.134.43:8084/';
-export const statisticsProtected = 'http://37.46.134.43:8085/api/1.0/protected/statistic';
-export const recommendationsPublic = 'http://37.46.134.43:8087/api/1.0/public/analyzer';
+export const drugsPublic = 'http://' + process.env.api_host + ':' + process.env.drug_port + '/api/1.0/public/drug';
+export const drugsProtected = 'http://' + process.env.api_host + ':' + process.env.drug_port + '/api/1.0/protected/drug';
+export const patientsPublic = 'http://' + process.env.api_host + ':' + process.env.patient_port + '/api/1.0/public/patient';
+export const patientsProtected = 'http://' + process.env.api_host + ':' + process.env.patient_port + '/api/1.0/protected/patient';
+export const commentsPublic = 'http://' + process.env.api_host + ':' + process.env.recommendation_port + '/api/1.0/public/recommendation/';
+export const commentsProtected = 'http://' + process.env.api_host + ':' + process.env.recommendation_port + '/api/1.0/protected/recommendation/';
+export const profileProtected = 'http://' + process.env.api_host + ':' + process.env.profile_port + '/api/1.0/protected/profile/';
+export const oauthURL = 'http://' + process.env.api_host + ':' + process.env.session_port + '/oauth/';
+export const registrationURL = 'http://' + process.env.api_host + ':' + process.env.session_port + '/registration/user';
+export const statisticsProtected = 'http://' + process.env.api_host + ':' + process.env.statistic_port + '/api/1.0/protected/statistic';
+export const recommendationsPublic = 'http://' + process.env.api_host + ':' + process.env.analyzer_port + '/api/1.0/public/analyzer';
 
 ////////////////////////////////////////////////////////////////////////////////
 export const grant_types = {
@@ -85,7 +85,7 @@ export const drugEnglToRus  = {
   'storageLife':'Срок годности',
   'tradeName':'Торговое наименование',
   'certificateOwner':'Владелец регистрационного удостоверения',
-  'interaction':'взаимодействие с другими лекарственными средствами',
+  'interaction':'Взаимодействие с другими лекарственными средствами',
   'form':'Лекарственная форма',
   'vehicleImpact':'Влияние на способность управлять транспортными средствами и механизмами',
   'vacationFromPharmacies':'Условия отпуска',
