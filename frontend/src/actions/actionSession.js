@@ -67,7 +67,7 @@ export const authorization = (username, password) => {
 export const registration = (username, password) => {
   return dispatch => {
     dispatch(registrationStarted());
-    axios.post(registrationURL + 'registration/user', {
+    axios.post(registrationURL, {
       username,
       password
     })
