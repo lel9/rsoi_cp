@@ -255,7 +255,8 @@ class Reception extends Component {
         rid: this.props.receptions.slice(currentView - 1)[0].id,
         date: this.props.receptions.slice(currentView - 1)[0].date,
         drugs: this.props.receptions.slice(currentView - 1)[0].drugs,
-        currentView: currentView,
+        text: this.props.receptions.slice(currentView - 1)[0].diagnosis.text,
+        currentView,
         type: 'read',
         disabled: true,
       })
@@ -272,7 +273,8 @@ class Reception extends Component {
         rid: this.props.receptions.slice(currentView - 1)[0].id,
         date: this.props.receptions.slice(currentView - 1)[0].date,
         drugs: this.props.receptions.slice(currentView - 1)[0].drugs,
-        currentView: currentView,
+        text: this.props.receptions.slice(currentView - 1)[0].diagnosis.text,
+        currentView,
         type: 'read',
         disabled: true,
       })

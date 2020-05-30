@@ -70,6 +70,9 @@ class App extends Component {
     if (nextState.current !== this.state.current) {
       return true;
     }
+    if (nextProps.path !== this.props.path) {
+      return true;
+    }
     return false;
   }
 
@@ -78,7 +81,7 @@ class App extends Component {
       let isDisabledPatients = true;
       let isDisabledStatistics = true;
       let id = '';
-      if(Object.keys(this.props.user) !== "{}") {
+      if(Object.keys(this.props.user).length) {
         isDisabledPatients = !(this.props.user.authorities.includes('ROLE_ADMIN')
         || this.props.user.authorities.includes('ROLE_OPERATOR')
         || this.props.user.authorities.includes('ROLE_EXPERT'));
@@ -90,6 +93,13 @@ class App extends Component {
         isDisabledStatistics,
         id
       })
+    }
+    if (this.props.path !== prevProps.path) {
+      if (this.props.path !== '') {
+        this.setState({
+          current: this.props.path.path.split('/')[1]
+        })
+      }
     }
   }
 

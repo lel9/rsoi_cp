@@ -1,75 +1,100 @@
 import React, {Component, Fragment} from 'react';
-import { TimePicker, DatePicker, List, Button, Pagination } from 'antd';
-import { Select, Tabs, Menu, Dropdown } from 'antd';
-import getHistory from '../modules/history';
-import { changePath } from '../actions/actionPath.js';
-import { drugEnglToRus } from '../constants';
-import moment from 'moment';
+import { Link } from "react-router-dom";
 import { connect } from 'react-redux';
-const dateFormat = 'DD/MM/YYYY';
+import dayjs from 'dayjs'
+import getHistory from '../modules/history';
+import { changePath } from '../actions/actionPath';
+import { drugEnglToRus } from '../constants';
+import { recommendationClean } from '../actions/actionSession';
 
 class Drugs extends Component {
   state = {
     show: false,
     drugs: [],
-    data: []
+    data: [],
+    current: -1
   }
 
   componentDidMount = () => {
     const { drugs } = this.props;
     this.setState({
       drugs,
-      // data: drugs
     })
   }
 
+  componentDidUpdate = (prevProps) => {
+    if (prevProps.current !== this.props.current) {
+      this.setState({
+        current: +this.props.current,
+      })
+    }
+  }
+
+  handleOnClick = (e) => {
+    this.props.func(e.target.dataset['index'])
+  }
+
+  handleOnClickLink = () => {
+    this.props.clean()
+  }
+
   render() {
-    const { drugs, show, index } = this.state;
-    const data = drugs.length ? show ? drugs : [drugs[0]] : [];
+    const { drugs, current } = this.state;
+    const { indexP } = this.props;
+    const data = drugs.length ? drugs.splice(1, drugs.length - 1) : [];
+    const analogies = data.map((element, index) => (
+      <span key={index} className="recomendation__analogies">
+        <Link to={`/all-drugs/instruction/${element.id}`} onClick={this.handleOnClickLink}>
+          {element.tradeName}
+        </Link>
+      </span>
+    ))
     return (
       <Fragment>
-        <div className="recomendation__drug-list" data-index={index}>
-          <List
-            itemLayout="horizontal"
-            dataSource={data}
-            renderItem={(item, index) => (
-              <List.Item key={index} data-index={index}>
-                <List.Item.Meta key={index}
-                  title={[
-                    <label data-index={index} key={index}>{item.tradeName}</label>
-                  ]}
-                  description={[
-                    <div data-index={index} className="recommendation__description" key={index}>
-                      <div data-index={index} className="recommendation__description-1">
-                        <label data-index={index} className="recommendation__description-tittle">
-                          {drugEnglToRus["releaseFormVSDosage"]}:
-                        </label>
-                        <span data-index={index} className="recommendation__description-text">
-                          {item.releaseFormVSDosage}
-                        </span>
-                      </div>
-                      <div data-index={index} className="recommendation__description-2">
-                        <label data-index={index} className="recommendation__description-tittle">
-                          {drugEnglToRus["manufacturer"]}:
-                        </label>
-                        <span data-index={index} className="recommendation__description-text">
-                          {item.manufacturer}
-                        </span>
-                      </div>
-                    </div>
-                  ]}
-                />
-              </List.Item>
-            )}
-          />
+        <div className="recomendation__drug-list" data-index={indexP} >
+          {drugs.length !== 0 &&
+            <Fragment>
+              <div className="recomendation__drug-tittle">
+                <label data-index={indexP} >
+                  {drugs[0].tradeName}
+                </label>
+              </div>
+              <div className="recomendation__description">
+                <div className="allDrugs__description-1">
+                  <label className="allDrugs__description-tittle">
+                    {drugEnglToRus["releaseFormVSDosage"]}:
+                  </label>
+                  <span className="allDrugs__description-text">
+                    {drugs[0].releaseFormVSDosage}
+                  </span>
+                </div>
+                <div className="allDrugs__description-2">
+                  <label className="allDrugs__description-tittle">
+                    {drugEnglToRus["manufacturer"]}:
+                  </label>
+                  <span className="allDrugs__description-text">
+                    {drugs[0].manufacturer}
+                  </span>
+                </div>
+                <div className="allDrugs__description-3">
+                  <label className="allDrugs__description-tittle">
+                    Аналоги:
+                  </label>
+                  <span className="allDrugs__description-text">
+                    {analogies}
+                  </span>
+                </div>
+              </div>
+            </Fragment>
+          }
         </div>
-        <div className="recomendation__drug-showAll" data-index={index}
-          onClick={() => this.setState({show: !this.state.show})}
+        <div className="recomendation__drug-showAll" data-index={indexP}
+          onClick={this.handleOnClick}
           >
-          {show ?
-            "Скрыть препараты"
+          {current === indexP ?
+            "Скрыть осмотр"
             :
-            "Показать полгостью"
+            "Показать осмотр"
           }
         </div>
       </Fragment>
@@ -97,28 +122,60 @@ class Outcomes extends Component {
         noData: false,
         date: outcomes[0].date,
         ...outcomes[0].state,
-        length: outcomes.length
+        length: outcomes.length,
       })
     }
   }
 
-  handleOnClickPrev = () => {
-    // this.setState({
-    //
-    // )}
-  }
-  handleOnClickNext = () => {
-    // this.setState({
-    //
-    // )}
+  componentDidUpdate = (prevProps) => {
+    if (this.props.outcomes !== prevProps.outcomes) {
+      const { outcomes } = this.props;
+      if (outcomes.length) {
+        this.setState({
+          noData: false,
+          date: outcomes[0].date,
+          ...outcomes[0].state,
+          length: outcomes.length
+        })
+      }
+    }
   }
 
+  handleOnClickPrev = () => {
+    let { currentView } = this.state;
+    const { outcomes } = this.props;
+    const isEnabledPrev = currentView > 0;
+    currentView = currentView - 1;
+    if (isEnabledPrev) {
+      this.setState({
+        currentView,
+        ...outcomes[currentView].state,
+        date: outcomes[currentView].date,
+      })
+    }
+  };
+
+  handleOnClickNext = () => {
+    let { currentView, length } = this.state;
+    const { outcomes } = this.props;
+    const isEnabledNext = currentView < length - 1;
+    currentView = currentView + 1;
+    if (isEnabledNext) {
+      this.setState({
+        currentView,
+        ...outcomes[currentView].state,
+        date: outcomes[currentView].date,
+      })
+    }
+  }
 
   render () {
-    console.log(this.state);
-    const { noData } = this.state;
-    // isEnabledPaginationPrev
-    // isEnabledPaginationNext
+    const { noData, examinationsResults, objectiveInspection, plaints,
+      specialistsConclusions, date, currentView, length } = this.state;
+
+    const isEnabledPrev = currentView > 0;
+    const isEnabledNext = currentView < length - 1;
+
     return (
       <div className="recomendation__reception">
         {noData ?
@@ -128,19 +185,41 @@ class Outcomes extends Component {
             <div className="recomendation__reception-header">
                 <i className="fa fa-angle-double-left fa-1x" aria-hidden="true"
                    onClick={this.handleOnClickPrev}
-                   style={ true ? {cursor: 'pointer', color: 'black'} :
+                   style={ isEnabledPrev ? {cursor: 'pointer', color: 'black'} :
                    {cursor: 'default',color: '#bdbcbc'}}
                 />
-                <div className="recomendation__reception-datePicker">
-                  <DatePicker showTime onChange={this.handleOnChangeDate} format={'DD/MM/YYYY HH:mm'} />
+                <div className="recomendation__reception-date">
+                  <label className="reception__date">
+                    {date == null ?
+                        'Дата не указана'
+                      :
+                        dayjs(date).format('DD/MM/YYYY HH:mm')
+                    }
+                  </label>
                 </div>
                 <i className="fa fa-angle-double-right fa-1x" aria-hidden="true"
                   onClick={this.handleOnClickNext}
-                  style={ true ? {cursor: 'pointer', color: 'black'} :
+                  style={ isEnabledNext ? {cursor: 'pointer', color: 'black'} :
                   {cursor: 'default', color: '#bdbcbc'}}
                 />
             </div>
             <div className="recomendation__reception-body">
+              <div className="recomendation__reception-examinationsResults">
+                <label> examinationsResults: </label>
+                <p> {examinationsResults} </p>
+              </div>
+              <div className="recomendation__reception-objectiveInspection">
+                <label> objectiveInspection: </label>
+                <p> {objectiveInspection} </p>
+              </div>
+              <div className="recomendation__reception-plaints">
+                <label> plaints </label>
+                <p> {plaints} </p>
+              </div>
+              <div className="recomendation__reception-specialistsConclusions">
+                <label> specialistsConclusions: </label>
+                <p> {specialistsConclusions} </p>
+              </div>
             </div>
           </Fragment>
         }
@@ -174,9 +253,9 @@ class Recommendation extends Component {
     }
   }
 
-  handleOnClickDrug = (e) => {
+  setCurrentDrug = (value) => {
     const { currentDrug } = this.state;
-    const current = currentDrug === e.target.dataset['index'] ? -1 : e.target.dataset['index'];
+    const current = currentDrug === value ? -1 : value;
     this.setState({
       currentDrug: current
     })
@@ -184,23 +263,26 @@ class Recommendation extends Component {
 
   render() {
     const {results, currentDrug } = this.state;
-    console.log(currentDrug);
     const drugs = results.map((element, index) => (
-        <div className="recomendation__drug" data-index={index} key={index}
-          data-pid={element.pid} onClick={this.handleOnClickDrug}
-          >
-          <Drugs index={index}  drugs={element.drug}/>
-        </div>
+      <div className="recomendation__drug" key={index} data-index={index}
+        data-pid={element.pid}
+        >
+        <Drugs indexP={index} drugs={element.drug} func={this.setCurrentDrug}
+          current={currentDrug} clean={this.props.recommendationClean}
+        />
+      </div>
     ))
     return(
-      <div className="recommendation">
-        <div className="recommendation__leftSide">
-          {drugs}
-        </div>
-        <div className="recommendation__rightSide">
-          {currentDrug !== -1 &&
-            <Outcomes outcomes={results[currentDrug].outcomes}/>
-          }
+      <div className="recommendation-wrap">
+        <div className="recommendation">
+          <div className="recommendation__leftSide">
+            {drugs}
+          </div>
+          <div className="recommendation__rightSide">
+            {currentDrug !== -1 &&
+              <Outcomes outcomes={results[currentDrug].outcomes}/>
+            }
+          </div>
         </div>
       </div>
     )
@@ -209,4 +291,4 @@ class Recommendation extends Component {
 
 export default connect(state => ({
   recomendation: state.recommendations.recommendation
-}), { changePath }) (Recommendation);
+}), { changePath, recommendationClean }) (Recommendation);

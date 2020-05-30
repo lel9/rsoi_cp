@@ -1,5 +1,6 @@
 import {
-  POST_RECOMMENDATIONS
+  POST_RECOMMENDATIONS,
+  RECOMMENDATION_CLEAN
 } from '../constants';
 
 const initialState = {
@@ -28,6 +29,13 @@ const recommendations = function reducer(state = initialState, action) {
         ...state,
         loading: false,
         error: action.payload.error
+      }
+    case RECOMMENDATION_CLEAN + '_SUCCESS':
+      return {
+        loading: false,
+        recommendations: [],
+        recommendation: null,
+        error: null,
       }
     default:
       return state;
