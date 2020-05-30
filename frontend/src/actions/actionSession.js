@@ -12,6 +12,7 @@ import {
   PATH_CLEAN,
   PROFILE_CLEAN,
   STATISTICS_CLEAN,
+  RECOMMENDATION_CLEAN,
   oauthURL,
   registrationURL,
   grant_types
@@ -67,7 +68,7 @@ export const authorization = (username, password) => {
 export const registration = (username, password) => {
   return dispatch => {
     dispatch(registrationStarted());
-    axios.post(registrationURL, {
+    axios.post(registrationURL + 'registration/user', {
       username,
       password
     })
@@ -179,6 +180,7 @@ export const cleanAll = () => {
     dispatch(pathClean());
     dispatch(profileClean());
     dispatch(statisticsClean());
+    dispatch(recommendationClean());
   }
 }
 
@@ -273,26 +275,30 @@ export const commentsClean = () => ({
   type: COMMENTS_CLEAN + '_SUCCESS',
 })
 ////////////////////////////////////////////////////////////////////////////////
-const drugsClean = () => ({
+export const drugsClean = () => ({
   type: DRUGS_CLEAN + '_SUCCESS',
 })
 ////////////////////////////////////////////////////////////////////////////////
-const patientsClean = () => ({
+export const patientsClean = () => ({
   type: PATIENTS_CLEAN + '_SUCCESS',
 })
 ////////////////////////////////////////////////////////////////////////////////
-const receptionsClean = () => ({
+export const receptionsClean = () => ({
   type: RECEPTIONS_CLEAN + '_SUCCESS',
 })
 ////////////////////////////////////////////////////////////////////////////////
-const pathClean = () => ({
+export const pathClean = () => ({
   type: PATH_CLEAN + '_SUCCESS',
 })
 ////////////////////////////////////////////////////////////////////////////////
-const profileClean = () => ({
+export const profileClean = () => ({
   type: PROFILE_CLEAN + '_SUCCESS',
 })
 ////////////////////////////////////////////////////////////////////////////////
-const statisticsClean = () => ({
+export const statisticsClean = () => ({
   type: STATISTICS_CLEAN + '_SUCCESS',
+})
+////////////////////////////////////////////////////////////////////////////////
+export const recommendationClean = () => ({
+  type: RECOMMENDATION_CLEAN + '_SUCCESS',
 })

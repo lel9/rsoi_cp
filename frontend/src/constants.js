@@ -44,6 +44,7 @@ export const GET_USER_BY_IDS = 'GET_USER_BY_IDS';
 export const STATISTICS_CLEAN = 'STATISTICS_CLEAN';
 ////////////////////////////////////////////////////////////////////////////////
 export const POST_RECOMMENDATIONS = 'POST_RECOMENDATIONS';
+export const RECOMMENDATION_CLEAN = 'RECOMMENDATION_CLEAN';
 ////////////////////////////////////////////////////////////////////////////////
 export const drugsPublic = 'http://' + window._env_.api_host + ':' + window._env_.drug_port + '/api/1.0/public/drug';
 export const drugsProtected = 'http://' + window._env_.api_host + ':' + window._env_.drug_port + '/api/1.0/protected/drug';
