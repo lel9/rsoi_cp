@@ -13,9 +13,7 @@ import ru.bmstu.cp.rsoi.statistic.model.ListStatisticOut;
 import ru.bmstu.cp.rsoi.statistic.repository.OperationRepository;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,7 +73,7 @@ public class StatisticService {
 
     private EntityStatisticOut getRow(String entityId, List<Operation> operations) {
         EntityStatisticOut statistic = new EntityStatisticOut();
-        statistic.setEntityId(entityId);
+        statistic.setId(entityId);
 
         List<Operation> entityOperations = operations
                 .stream()
