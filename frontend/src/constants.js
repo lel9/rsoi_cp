@@ -45,17 +45,17 @@ export const STATISTICS_CLEAN = 'STATISTICS_CLEAN';
 ////////////////////////////////////////////////////////////////////////////////
 export const POST_RECOMMENDATIONS = 'POST_RECOMENDATIONS';
 ////////////////////////////////////////////////////////////////////////////////
-export const drugsPublic = 'http://' + process.env.REACT_APP_api_host + ':' + process.env.REACT_APP_drug_port + '/api/1.0/public/drug';
-export const drugsProtected = 'http://' + process.env.REACT_APP_api_host + ':' + process.env.REACT_APP_drug_port + '/api/1.0/protected/drug';
-export const patientsPublic = 'http://' + process.env.REACT_APP_api_host + ':' + process.env.REACT_APP_patient_port + '/api/1.0/public/patient';
-export const patientsProtected = 'http://' + process.env.REACT_APP_api_host + ':' + process.env.REACT_APP_patient_port + '/api/1.0/protected/patient';
-export const commentsPublic = 'http://' + process.env.REACT_APP_api_host + ':' + process.env.REACT_APP_recommendation_port + '/api/1.0/public/recommendation/';
-export const commentsProtected = 'http://' + process.env.REACT_APP_api_host + ':' + process.env.REACT_APP_recommendation_port + '/api/1.0/protected/recommendation/';
-export const profileProtected = 'http://' + process.env.REACT_APP_api_host + ':' + process.env.REACT_APP_profile_port + '/api/1.0/protected/profile/';
-export const oauthURL = 'http://' + process.env.REACT_APP_api_host + ':' + process.env.REACT_APP_session_port + '/oauth/';
-export const registrationURL = 'http://' + process.env.REACT_APP_api_host + ':' + process.env.REACT_APP_session_port + '/registration/user';
-export const statisticsProtected = 'http://' + process.env.REACT_APP_api_host + ':' + process.env.REACT_APP_statistic_port + '/api/1.0/protected/statistic';
-export const recommendationsPublic = 'http://' + process.env.REACT_APP_api_host + ':' + process.env.REACT_APP_analyzer_port + '/api/1.0/public/analyzer';
+export const drugsPublic = 'http://' + window._env_.api_host + ':' + window._env_.drug_port + '/api/1.0/public/drug';
+export const drugsProtected = 'http://' + window._env_.api_host + ':' + window._env_.drug_port + '/api/1.0/protected/drug';
+export const patientsPublic = 'http://' + window._env_.api_host + ':' + window._env_.patient_port + '/api/1.0/public/patient';
+export const patientsProtected = 'http://' + window._env_.api_host + ':' + window._env_.patient_port + '/api/1.0/protected/patient';
+export const commentsPublic = 'http://' + window._env_.api_host + ':' + window._env_.recommendation_port + '/api/1.0/public/recommendation/';
+export const commentsProtected = 'http://' + window._env_.api_host + ':' + window._env_.recommendation_port + '/api/1.0/protected/recommendation/';
+export const profileProtected = 'http://' + window._env_.api_host + ':' + window._env_.profile_port + '/api/1.0/protected/profile/';
+export const oauthURL = 'http://' + window._env_.api_host + ':' + window._env_.session_port + '/oauth/';
+export const registrationURL = 'http://' + window._env_.api_host + ':' + window._env_.session_port + '/registration/user';
+export const statisticsProtected = 'http://' + window._env_.api_host + ':' + window._env_.statistic_port + '/api/1.0/protected/statistic';
+export const recommendationsPublic = 'http://' + window._env_.api_host + ':' + window._env_.analyzer_port + '/api/1.0/public/analyzer';
 
 ////////////////////////////////////////////////////////////////////////////////
 export const grant_types = {
