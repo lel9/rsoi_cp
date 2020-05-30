@@ -25,7 +25,7 @@ import { sessionService } from 'redux-react-session';
 import getHistory from '../modules/history';
 
 const headers = {
-  'Authorization': 'Basic Y2xpZW50OnNlY3JldA==',
+  'Authorization': 'Basic ' + window._env_.auth_secret,
   'Content-Type': 'multipart/form-data',
 }
 

@@ -250,6 +250,7 @@ services:
     volumes:
       - /var/docker/nginx/logs:/var/log/nginx
     environment:
+      - auth_secret=Y2xpZW50OnNlY3JldA==
       - api_host=37.46.134.43
       - drug_port=8080
       - patient_port=8081
