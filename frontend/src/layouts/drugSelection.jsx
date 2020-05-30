@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
-import { Select, Button, Tabs, Radio } from 'antd';
+import { Select, Button, Radio } from 'antd';
 import getHistory from '../modules/history';
 import InputField from '../components/inputField';
 import { changePath } from '../actions/actionPath.js';
 import { addRecommendation } from '../actions/actionRecommendation';
 import { connect } from 'react-redux';
 const { Option } = Select;
-const { TabPane } = Tabs;
 
 
 const Elements = ({obj}) => obj.map((element, index) => (
@@ -36,15 +35,26 @@ class DrugSelection extends Component {
     examinationsResults: '',
     specialistsConclusions: '',
     text : '',
+    sex: '',
+    diseaseAnamnesis: '',
+    lifeAnamnesis: '',
   }
 
-  handleOnClickSex = (value) => {
-    // console.log("hello");
+  handleOnClickSex = (e) => {
     this.setState({
-      sex: value
+      sex: e.target.value
     })
   }
-
+  handleOnChangeDiseaseAnamnesis = (e) => {
+    this.setState({
+      diseaseAnamnesis: e.target.value
+    })
+  }
+  handleOnChangeLifeAnamnesis = (e) => {
+    this.setState({
+      lifeAnamnesis: e.target.value
+    })
+  }
   handleOnChangePlaints = (e) => {
     this.setState({
       plaints: e.target.value
@@ -75,6 +85,7 @@ class DrugSelection extends Component {
     this.props.changePath(getHistory().location.pathname);
     // this.props.setPath(getHistory().location.pathname);
   }
+
   handleOnSubmit = () => {
     const data = this.state;
     const { text } = this.state;
@@ -91,11 +102,15 @@ class DrugSelection extends Component {
 
   render() {
     const { plaints, objectiveInspection, examinationsResults,
-       specialistsConclusions, text } = this.state;
+       specialistsConclusions, text, diseaseAnamnesis, lifeAnamnesis } = this.state;
     const years = genOption(1, 200);
     const month = genOption(1, 12);
 
     const Parametres1 = [
+      {lel9: diseaseAnamnesis, label: "Анамниз заболевания",
+        actionOnChange: this.handleOnChangeDiseaseAnamnesis},
+      {lel9: lifeAnamnesis, label: "Анамнез жизни",
+        actionOnChange: this.handleOnChangeLifeAnamnesis},
       {lel9: plaints, label: "Жалобы",
         actionOnChange: this.handleOnChangePlaints},
       {lel9: objectiveInspection, label: "Объективный осмотр",
@@ -104,23 +119,37 @@ class DrugSelection extends Component {
         actionOnChange: this.handleOnChangeExaminationsResults},
       {lel9: specialistsConclusions, label: "Заключения специалистов",
         actionOnChange: this.handleOnChangeSpecialistsConclusions},
-       ];
-
-    const Parametres2 = [
       {lel9: text, label: "Диагноз",
         actionOnChange: this.handleOnChangeDiagnosis}
        ];
 
     return (
       <div className="drugSelection">
-        <Tabs defaultActiveKey="1" onChange={null}>
-          <TabPane tab="Текущее состояние" key="1">
-              <Elements obj={Parametres1}/>
-          </TabPane>
-          <TabPane tab="Диагноз" key="2">
-            <Elements obj={Parametres2}/>
-          </TabPane>
-        </Tabs>
+        <div className="drugSelection__sex">
+          <label className="drugSelection__sex-tittle">
+            Пол
+          </label>
+          <Radio.Group onChange={this.handleOnClickSex} value={this.state.sex}>
+           <Radio value={"m"}>мужской</Radio>
+           <Radio value={"f"}>женский</Radio>
+         </Radio.Group>
+        </div>
+        <div className="drugSelection__age">
+          <label>Возрат</label>
+          <div className="drugSelection__years">
+            <Select defaultValue="1" style={{ width: 70 }} onChange={null}>
+              {years}
+            </Select>
+            <label>лет</label>
+          </div>
+         <div className="drugSelection__month">
+           <Select defaultValue="1" style={{ width: 70 }} onChange={null}>
+             {month}
+           </Select>
+           <label>мес</label>
+         </div>
+        </div>
+        <Elements obj={Parametres1}/>
         <Button onClick={this.handleOnSubmit}>
           Подбор препаратов
         </Button>

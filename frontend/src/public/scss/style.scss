@@ -220,6 +220,14 @@ p {
         color: #7270b9;
       }
     }
+
+    .statistics__total-info {
+      display: grid;
+      grid-template-columns: 150px 20px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      color: rgb(51, 51, 51);
+    }
   }
 
   .statistics__footer {
@@ -463,31 +471,72 @@ p {
   }
 }
 
-.recomendations {
+.recommendation-wrap {
+  display: table;
   background: white;
   width: 80%;
   margin: 0 auto;
   padding: 30px 20px;
   position: relative;
   height: 100%;
-  display: flex;
-  flex-direction: row;
+  .recommendation {
+    display: grid;
+    grid-template-columns: 450px calc(100% - 450px - 100px);
+    grid-gap: 100px;
 
-  .recomendations__leftSide {
-    min-width: 160px;
-    width: 15vw;
-    .recomendations__preparate {
-      margin-bottom: 10px;
+    .recommendation__leftSide {
+      .recomendation__drug {
+        display: grid;
+        grid-template-columns: 350px calc(100% - 350px - 25px);
+        grid-gap: 25px;
+
+        .recomendation__drug-list {
+          margin-bottom: 15px;
+          border-bottom: 1px solid #e4e4e4;
+          padding-bottom: 15px;
+
+          .recomendation__description {
+            .allDrugs__description-3 {
+              .recomendation__analogies {
+                margin-right: 5px;
+              }
+
+              .allDrugs__description-text {
+                overflow-wrap: break-word;
+              }
+
+              .allDrugs__description-tittle {
+                  margin-right: 5px;
+              }
+            }
+          }
+        }
+      }
+      .recomendation__drug-showAll {
+        // padding-top: 15px;
+      }
     }
-  }
+    .recommendation__rightSide {
+      .recomendation__reception-header {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 20px;
 
-  .recomendations__rightSide {
-    min-width: 500px;
-    width: 45vw;
-    .recomendations__map-header {
-      display: flex;
-      flex-direction: row;
-      height: 30px;
+        .reception__date {
+          margin-left: 20px;
+          margin-right: 10px;
+          font-size: 17px;
+        }
+
+        i {
+          font-size: 25px;
+        }
+      }
+      .recomendation__reception-body {
+        div {
+          margin-top: 10px;
+        }
+      }
     }
   }
 }
@@ -505,42 +554,9 @@ p {
     flex-direction: row;
     margin-bottom: 25px;
 
-    .raioButton__Label {
-      margin-right: 20px;
+    .drugSelection__sex-tittle {
+      margin-right: 15px;
     }
-
-    .radioButton {
-      display: flex;
-      flex-direction: row;
-      height: 25px;
-      margin-bottom: 20px;
-
-      .radioButton-select {
-        display: flex;
-        flex-direction: row;
-        margin-right: 50px;
-
-        div {
-          margin-left: 5px;
-          width: 20px;
-          height: 20px;
-          border: 1px solid;
-          border-radius: 20px;
-          position: relative;
-
-          img {
-            height: 10px;
-            width: 10px;
-            border-radius: 20px;
-            position: absolute;
-            top: 4px;
-            left: 4px;
-          }
-        }
-
-      }
-    }
-
   }
   .drugSelection__age {
     display: flex;

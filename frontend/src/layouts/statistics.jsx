@@ -36,11 +36,6 @@ const columns1 = [
     sorter: (a, b) => a.Watched - b.Watched,
   },
   {
-    title: 'Удалено',
-    dataIndex: 'Removed',
-    key: 'Removed',
-  },
-  {
     title: 'Добавлено рекомендаций',
     dataIndex: 'childCreateCount',
     key: 'childCreateCount',
@@ -87,11 +82,6 @@ const columns2 = [
     key: 'Watched',
     defaultSortOrder: 'descend',
     sorter: (a, b) => a.Watched - b.Watched,
-  },
-  {
-    title: 'Удалено',
-    dataIndex: 'Removed',
-    key: 'Removed',
   },
   {
     title: 'Добавлено осмотров',
@@ -314,7 +304,7 @@ class Statistics extends Component {
   }
 
   render() {
-    const { fill, isDisabled } = this.state;
+    const { fill, totalCreateCount, isDisabled } = this.state;
     const { entity } = this.props;
     const { ids, dateStart, dateEnd } = this.props;
     return (
@@ -341,10 +331,12 @@ class Statistics extends Component {
             <div className="statistics__content">
                 { entity !== '' ? ids.data.entitiesStatistic.length ?
                     <Fragment>
+                      <div className="statistics__total-info">
+                        <p>Добавлено новых: </p>
+                        <label>{totalCreateCount}</label>
+                      </div>
                       <div className="statistics__content-table">
                       <Table dataSource={fill} columns={columns[entity]} size="middle"/>
-                      </div>
-                      <div className="statistics__content-conclusion">
                       </div>
                     </Fragment>
                   :

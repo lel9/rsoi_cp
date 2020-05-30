@@ -16,7 +16,7 @@ const InputField = ({
   const Tag = tag;
 
   return(
-    <div className={"inputF__wrapper " + (disabled ? 'disabled' : '')}>
+    <div className={"inputF__wrapper" + (disabled ? ' disabled' : '')}>
        <div className="inputF__title">
          {label &&
            <label className="inputF__label">{label}</label>
