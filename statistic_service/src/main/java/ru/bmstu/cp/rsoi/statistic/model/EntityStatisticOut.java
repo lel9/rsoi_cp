@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class EntityStatisticOut {
-    private String entityId;
+    private String id;
 
     private Long createCount = 0L;
     private Long deleteCount = 0L;
