@@ -6,7 +6,7 @@ import {
 const initialState = {
   loading: false,
   recommendations: [],
-  recommendation: null,
+  size: 0,
   error: null,
 };
 
@@ -22,7 +22,8 @@ const recommendations = function reducer(state = initialState, action) {
         ...state,
         loading: false,
         error: null,
-        recommendation: action.payload
+        recommendations: action.payload.results,
+        size: action.payload.results.length,
       }
     case POST_RECOMMENDATIONS + '_FAILURE':
       return {

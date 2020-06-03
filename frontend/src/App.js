@@ -15,6 +15,8 @@ import SignIn from './layouts/signIn';
 import SignUp from './layouts/signUp';
 import Profile from './layouts/profile';
 import Statistics from './layouts/statistics';
+import PublicReceptions from './layouts/publicReceptions';
+
 
 import BreadCrumb from './components/breadCrumb';
 
@@ -29,7 +31,7 @@ const Error = () => {
 
 class App extends Component {
   state = {
-    current: 'select-drug',
+    current: '',
     user: 'name',
     isDisabledPatients: true,
     isDisabledStatistics: true,
@@ -107,7 +109,7 @@ class App extends Component {
     const { current, isDisabledPatients, isDisabledStatistics, id } = this.state;
     const { authenticated } = this.props;
     const navigation = [
-      {name: "select-drug", title: "Подбор препарата"},
+      {name: "select-drug", title: "Поиск препарата"},
       {name: "all-drugs", title: "Все препараты"},
       {name: "all-patients", title: "Все пациенты", disabled: isDisabledPatients},
       {name: "statistics", title: "Статистика", disabled: isDisabledStatistics},
@@ -164,14 +166,15 @@ class App extends Component {
               <Route exact path="/select-drug" component={DrugSelection}/>
               <Route exact path="/all-drugs" component={AllDrugs}/>
               <Route exact path="/all-patients" component={AllPatients}/>
-              <Route path="/all-drugs/add-drug" component={AddDrug}/>
+              <Route exact path="/select-drug/recommendation" component={Recommendation}/>
               <Route path="/all-drugs/instruction/:id" component={Instruction}/>
               <Route path="/all-patients/reception/:id" component={Reception}/>
+              <Route path="/select-drug/recommendation/reception/:id" component={PublicReceptions}/>
+              <Route path="/profile/:id" component={Profile}/>
+              <Route path="/all-drugs/add-drug" component={AddDrug}/>
               <Route path="/all-patients/add-patient" component={AddPatient}/>
-              <Route path="/select-drug/recommendation" component={Recommendation}/>
               <Route path="*/sign-in" component={SignIn}/>
               <Route path="/sign-up" component={SignUp}/>
-              <Route path="/profile/:id" component={Profile}/>
               <Route path="/statistics" component={Statistics}/>
               <Route path="*" component={Error}/>
             </Switch>

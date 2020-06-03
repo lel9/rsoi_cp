@@ -1,5 +1,6 @@
 @import '~antd/dist/antd.css';
 @import "./font-awesome.min.css";
+@import "./all.min.css";
 
 html {
   width: 100%;
@@ -326,12 +327,23 @@ p {
   position: relative;
   padding: 30px 20px;
 
+  .reception__top-data {
+    width: 400px;
+    margin-bottom: 20px;
+
+    .reception__top-sex, .reception__top-birthday, .reception__top-pid {
+      display: grid;
+      grid-template-columns: 150px 200px;
+      margin-bottom: 10px;
+    }
+  }
+
   .reception__header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 
-    .reception__header-leftSide{
+    .reception__header-leftSide {
       width: 200px;
     }
 
@@ -356,15 +368,6 @@ p {
         margin-right: 20px;
         font-size: 17px;
       }
-    }
-
-    .reception__header-rightSide {
-      // .ant-btn:nth-child(1) {
-      //   width: 150px;
-      // }
-      // .ant-dropdown-menu-item {
-      //   width: 150px;
-      // }
     }
   }
 
@@ -409,6 +412,52 @@ p {
       }
     }
   }
+}
+
+.receptionPublic {
+  background: white;
+  width: 80%;
+  margin: 0 auto;
+  min-height: 100%;
+  position: relative;
+  padding: 30px 20px;
+
+  .receptionPublic__header {
+    text-align: center;
+
+    .receptionPublic__date {
+      margin-left: 20px;
+      margin-right: 10px;
+      font-size: 17px;
+    }
+
+    i {
+      font-size: 25px;
+    }
+  }
+
+  .receptionPublic__content {
+    .receptionPublic__content-sex {
+      display: grid;
+      grid-gap: 20px;
+      grid-template-columns: 100px calc(100% - 100px - 20px);
+      margin-bottom: 20px;
+    }
+
+    .receptionPublic__content-brth {
+      display: grid;
+      grid-gap: 20px;
+      grid-template-columns: 100px 100px;
+      margin-bottom: 20px;
+    }
+
+    .receptionPublic__years, .receptionPublic__month {
+      label {
+        margin-left: 10px;
+      }
+    }
+  }
+
 }
 
 .instruction {
@@ -481,13 +530,13 @@ p {
   height: 100%;
   .recommendation {
     display: grid;
-    grid-template-columns: 450px calc(100% - 450px - 100px);
+    grid-template-columns: 350px calc(100% - 350px - 100px);
     grid-gap: 100px;
 
     .recommendation__leftSide {
       .recomendation__drug {
         display: grid;
-        grid-template-columns: 350px calc(100% - 350px - 25px);
+        grid-template-columns: 300px calc(100% - 300px - 25px);
         grid-gap: 25px;
 
         .recomendation__drug-list {
@@ -522,20 +571,37 @@ p {
         flex-direction: row;
         margin-bottom: 20px;
 
-        .reception__date {
-          margin-left: 20px;
-          margin-right: 10px;
-          font-size: 17px;
-        }
+        .recomendation__reception-header-center {
+          margin: 0 auto;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          height: 30px;
+          .reception__date {
+            margin-left: 20px;
+            margin-right: 10px;
+            font-size: 17px;
+          }
 
-        i {
-          font-size: 25px;
+          i {
+            font-size: 25px;
+          }
         }
       }
+
       .recomendation__reception-body {
         div {
           margin-top: 10px;
         }
+
+        label {
+            font-weight: 500;
+          }
+
+      }
+
+      .recomendation__reception-button {
+        margin-top: 50px;
       }
     }
   }

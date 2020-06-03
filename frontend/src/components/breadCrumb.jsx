@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 
 const pages = {
   "select-drug": "Поиск препарата",
-  "recomendation": "Рекомендация",
+  "recommendation": "Результаты поиска",
   "add-drug": "Новый препарат",
   "reception": "Просмотр пациента",
   "all-drugs": "Все препараты",

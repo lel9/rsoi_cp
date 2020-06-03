@@ -28,7 +28,7 @@ export const getStatistics = (data) => {
         headers: headers
       })
       .then(res => {
-        const ids = res.data.entitiesStatistic.map(el => {return el.entityId}).join('&ids=');
+        const ids = res.data.entitiesStatistic.map(el => {return el.id}).join('&ids=');
         dispatch(getStatisticsSuccess(res.data));
         if (entity === 'drug') {
           dispatch(getDrugsByIds(ids))

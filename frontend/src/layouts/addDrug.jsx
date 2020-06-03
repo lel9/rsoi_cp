@@ -175,7 +175,6 @@ class AddDrug extends Component {
   }
 
   componentDidUpdate = (prevProps) => {
-    console.log(this.props.error);
     if (this.props.error !== prevProps.error && !this.props.error) {
       this.setState({
         tradeName: '',
@@ -251,7 +250,7 @@ class AddDrug extends Component {
        {lel9: vehicleImpact, label: "Влияние на способность управлять транспортными средствами и механизмами", ref: this.vehicleImpactRef},
      ];
      const Parametres5 = [
-       {lel9: releaseFormVSDosage, label: "Форма выпуска/дозировка", ref: this.releaseFormVSDosageRef},
+       {lel9: releaseFormVSDosage, label: "Форма выпуска", ref: this.releaseFormVSDosageRef},
        {lel9: transportationСonditions, label: "Условия транспортирования", ref: this.transportationСonditionsRef},
        {lel9: storageСonditions, label: "Условия хранения", ref: this.storageСonditionsRef},
        {lel9: storageLife, label: "Срок годности", ref: this.storageLifeRef},
@@ -271,7 +270,7 @@ class AddDrug extends Component {
             <Step title="Шаг 5"/>
           </Steps>
         </div>
-        {error &&
+        {error && error.status === 400 &&
           <div className="emptyField addDrug-emptyField">{error.data.error_description}</div>
         }
         <div className="addDrug__content">

@@ -33,7 +33,7 @@ import {
        return {
          ...state,
          loading: false,
-         error: action.payload.error
+         error: action.payload
        }
 
      case SESSION_LOGOUT + '_SUCCESS':
@@ -83,13 +83,14 @@ import {
        return {
          ...state,
          loading: false,
-         error: action.payload.error
+         error: action.payload
        }
 
      case SESSION_REFRESH + '_STARTED':
        return {
          ...state,
-         loading: true
+         loading: true,
+         error: null,
        }
      case SESSION_REFRESH + '_SUCCESS':
        return {
