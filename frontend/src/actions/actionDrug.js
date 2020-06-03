@@ -37,6 +37,7 @@ export const addDrug = (data) => {
       })
       .catch(err => {
         const error = err.message === 'Network Error' ? err.message : err.response.data
+        console.log(err.message);
         dispatch(handleError(ADD_DRUG, error, addDrug, data))
         dispatch(addDrugFailure(err.response));
       })

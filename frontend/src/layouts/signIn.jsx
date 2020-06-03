@@ -64,7 +64,7 @@ class SignIn extends Component{
     if(username === '' || password === '') {
 
     } else {
-      this.props.authorization(username, password)
+      this.props.authorization({username: username, password: password});
     }
   }
 
@@ -92,10 +92,17 @@ class SignIn extends Component{
 
   componentDidUpdate = (prevProps) => {
     if (this.props.errorS !== prevProps.errorS) {
-      if(this.props.errorS) {
-        this.setState({
-          errorS: this.props.errorS.data.error
-        })
+      if (this.props.errorS.error === undefined) {
+          this.setState({
+            error: this.props.errorS.err
+          })
+          // alert('Сервис временно недоступен')
+      } else {
+        if(this.props.errorS.error) {
+          this.setState({
+            errorS: this.props.errorS.error.data.error
+          })
+        }
       }
     }
   }

@@ -56,6 +56,13 @@ class AllDrugs extends Component {
         })
       }
     }
+    if (this.props.error !== prevProps.error) {
+      if (this.props.error) {
+        this.setState({
+          error: this.props.error.data
+        })
+      }
+    }
   }
 
   handleOnClickAdd = () => {
@@ -176,4 +183,5 @@ export default connect(state => ({
   errorS: state.sessions.error,
   role: state.sessionReducer.user,
   authenticated: state.sessionReducer.authenticated,
+  error: state.drugs.error,
 }),{getDrugs, changePath})(AllDrugs);

@@ -1,5 +1,6 @@
 @import '~antd/dist/antd.css';
 @import "./font-awesome.min.css";
+@import "./all.min.css";
 html {
   width: 100%;
   height: 100%;
@@ -280,6 +281,15 @@ p {
   position: relative;
   padding: 30px 20px;
 }
+.reception .reception__top-data {
+  width: 400px;
+  margin-bottom: 20px;
+}
+.reception .reception__top-data .reception__top-sex, .reception .reception__top-data .reception__top-birthday, .reception .reception__top-data .reception__top-pid {
+  display: grid;
+  grid-template-columns: 150px 200px;
+  margin-bottom: 10px;
+}
 .reception .reception__header {
   display: flex;
   flex-direction: row;
@@ -340,6 +350,41 @@ p {
 }
 .reception .reception__content .reception__content-drugs .reception__content-drugsTittle {
   padding-top: 10px;
+}
+
+.receptionPublic {
+  background: white;
+  width: 80%;
+  margin: 0 auto;
+  min-height: 100%;
+  position: relative;
+  padding: 30px 20px;
+}
+.receptionPublic .receptionPublic__header {
+  text-align: center;
+}
+.receptionPublic .receptionPublic__header .receptionPublic__date {
+  margin-left: 20px;
+  margin-right: 10px;
+  font-size: 17px;
+}
+.receptionPublic .receptionPublic__header i {
+  font-size: 25px;
+}
+.receptionPublic .receptionPublic__content .receptionPublic__content-sex {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: 100px calc(100% - 100px - 20px);
+  margin-bottom: 20px;
+}
+.receptionPublic .receptionPublic__content .receptionPublic__content-brth {
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: 100px 100px;
+  margin-bottom: 20px;
+}
+.receptionPublic .receptionPublic__content .receptionPublic__years label, .receptionPublic .receptionPublic__content .receptionPublic__month label {
+  margin-left: 10px;
 }
 
 .instruction {
@@ -403,12 +448,12 @@ p {
 }
 .recommendation-wrap .recommendation {
   display: grid;
-  grid-template-columns: 450px calc(100% - 450px - 100px);
+  grid-template-columns: 350px calc(100% - 350px - 100px);
   grid-gap: 100px;
 }
 .recommendation-wrap .recommendation .recommendation__leftSide .recomendation__drug {
   display: grid;
-  grid-template-columns: 350px calc(100% - 350px - 25px);
+  grid-template-columns: 300px calc(100% - 300px - 25px);
   grid-gap: 25px;
 }
 .recommendation-wrap .recommendation .recommendation__leftSide .recomendation__drug .recomendation__drug-list {
@@ -430,16 +475,29 @@ p {
   flex-direction: row;
   margin-bottom: 20px;
 }
-.recommendation-wrap .recommendation .recommendation__rightSide .recomendation__reception-header .reception__date {
+.recommendation-wrap .recommendation .recommendation__rightSide .recomendation__reception-header .recomendation__reception-header-center {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 30px;
+}
+.recommendation-wrap .recommendation .recommendation__rightSide .recomendation__reception-header .recomendation__reception-header-center .reception__date {
   margin-left: 20px;
   margin-right: 10px;
   font-size: 17px;
 }
-.recommendation-wrap .recommendation .recommendation__rightSide .recomendation__reception-header i {
+.recommendation-wrap .recommendation .recommendation__rightSide .recomendation__reception-header .recomendation__reception-header-center i {
   font-size: 25px;
 }
 .recommendation-wrap .recommendation .recommendation__rightSide .recomendation__reception-body div {
   margin-top: 10px;
+}
+.recommendation-wrap .recommendation .recommendation__rightSide .recomendation__reception-body label {
+  font-weight: 500;
+}
+.recommendation-wrap .recommendation .recommendation__rightSide .recomendation__reception-button {
+  margin-top: 50px;
 }
 
 .drugSelection {

@@ -30,7 +30,8 @@ const headers = {
   'Content-Type': 'multipart/form-data',
 }
 
-export const authorization = (username, password) => {
+export const authorization = (data) => {
+  const { username, password } = data
   const bodyFormData = new FormData();
   bodyFormData.set('username', username);
   bodyFormData.set('password', password);
@@ -48,24 +49,20 @@ export const authorization = (username, password) => {
       console.log('new_token', res.data);
       dispatch(checkToken(res.data.access_token));
       sessionService.saveSession(res.data)
-      // sessionService.saveSession({
-      //     access_token: "898fc1ee-4af4-4a3d-ac68-7f1bf381579bz",
-      //     expires_in: 3297,
-      //     refresh_token: "7e9e6077-195c-4018-acc7-56ff254790a4",
-      //     scope: "all",
-      //     token_type: "bearer",
-      // })
       .then (() => {
         getHistory().push('/all-drugs');
       });
     })
     .catch(err => {
+      let error = err.message === 'Network Error' ? err.message : err.response.data;
       dispatch(authorizationFailure(err.response));
+      dispatch(handleError(SESSION_AUTHORIZATION, error, authorization, data))
     })
   }
 }
 
-export const registration = (username, password) => {
+export const registration = (data) => {
+  const { username, password } = data
   return dispatch => {
     dispatch(registrationStarted());
     axios.post(registrationURL + 'registration/user', {
@@ -77,7 +74,9 @@ export const registration = (username, password) => {
       getHistory().push('/sign-in');
     })
     .catch(err => {
+      let error = err.message === 'Network Error' ? err.message : err.response.data;
       dispatch(registrationFailure(err.response));
+      dispatch(handleError(REGISTRATION, error, registration, data))
     })
   }
 }
@@ -87,7 +86,7 @@ export const logout = () => {
     dispatch(logoutSuccess())
     sessionService.deleteSession();
     sessionService.deleteUser();
-    getHistory().push('/');
+    getHistory().push('/select-drug');
     dispatch(cleanAll());
   }
 }
@@ -136,37 +135,38 @@ export const checkToken = (access_token) => {
     })
     .then(res => {
       dispatch(checkSuccess(res.data));
-      console.log(res.data);
       sessionService.saveUser(res.data)
       .then (() => {
         // getHistory().push('/pewpew');
       });
     })
     .catch(err => {
+      let error = err.message === 'Network Error' ? err.message : err.response.data;
       dispatch(checkFailure(err.response));
+      dispatch(handleError(SESSION_CHECK, error, checkToken, access_token))
     })
   }
 }
 
 export const handleError = (dst, err, func, data) => {
   return dispatch => {
-    console.log(err);
-    sessionService.loadSession().then(session => {
       if (err === 'Network Error') {
-        dispatch(error(dst, err.error));
+        dispatch(error(dst, err));
         alert('Сервис временно недоступен');
       }
       else {
-        switch (err.error) {
-          case 'invalid_token':
-            dispatch(refreshToken(session.refresh_token, func, data));
-            break;
-          default:
-            alert(err.error_description);
-            break;
+        sessionService.loadSession().then(session => {
+          switch (err.error) {
+            case 'invalid_token':
+              dispatch(refreshToken(session.refresh_token, func, data));
+              break;
+            default:
+              console.log(err);
+              alert(err.error_description);
+              break;
         }
-      }
-    });
+      });
+    }
   }
 }
 

@@ -14,7 +14,6 @@ import { drugEnglToRus } from '../constants';
 const { Option } =  Select;
 const { TabPane } = Tabs;
 
-window.dayjs = dayjs;
 
 const Elements = ({obj, classN}) => obj.map((element, index) => (
   <InputField
@@ -117,7 +116,7 @@ class Reception extends Component {
           lengthReceptions: this.props.receptions.length,
           currentView: this.props.receptions.length,
           type: 'read',
-          rid: this.props.reception.data,
+          rid: this.props.reception.id,
           disabled: true
         })
       }
@@ -247,9 +246,9 @@ class Reception extends Component {
 
   handleOnClickPrev = () => {
     let { currentView } = this.state;
-    const isEnabledPaginationPrev = currentView > 1;
+    const isEnabledPrev = currentView > 1;
     currentView = currentView - 1;
-    if (isEnabledPaginationPrev) {
+    if (isEnabledPrev) {
       this.setState({
         ...this.props.receptions.slice(currentView - 1)[0].state,
         rid: this.props.receptions.slice(currentView - 1)[0].id,
@@ -265,9 +264,9 @@ class Reception extends Component {
 
   handleOnClickNext = () => {
     let { currentView, lengthReceptions } = this.state;
-    const isEnabledPaginationNext = currentView < lengthReceptions;
+    const isEnabledNext = currentView < lengthReceptions;
     currentView = currentView + 1;
-    if (isEnabledPaginationNext) {
+    if (isEnabledNext) {
       this.setState({
         ...this.props.receptions.slice(currentView - 1)[0].state,
         rid: this.props.receptions.slice(currentView - 1)[0].id,
@@ -345,8 +344,8 @@ class Reception extends Component {
     )
 
     const isDisabledMenu = !lengthReceptions;
-    const isEnabledPaginationPrev = currentView > 1;
-    const isEnabledPaginationNext = currentView < lengthReceptions;
+    const isEnabledPrev = currentView > 1;
+    const isEnabledNext = currentView < lengthReceptions;
 
     const menu = (
       <Menu>
@@ -386,27 +385,29 @@ class Reception extends Component {
       <div className="reception">
         { isDisabledGet ?
           <Fragment>
-            <div className="reception__header">
-              <div className="reception__header-data">
-                <div className="reception__header-sex">
-                  <p>Пол</p>
-                  <label>
-                    {sexP === 'f' ? 'Женский' : this.sex === 'm' ? 'Мужской' : 'не указан'}
-                  </label>
-                </div>
-                <div className="reception__header-birthday">
-                  <p>Дата рождения</p>
-                  <label>
-                    {birthdayP ? dayjs(birthdayP).format('DD/MM/YYYY') : 'не указана'}
-                  </label>
-                </div>
-                <div className="reception__header-pid">
-                  <p>Идентификатор</p>
-                  <label>
-                    {cardIdP}
-                  </label>
-                </div>
+
+            <div className="reception__top-data">
+              <div className="reception__top-sex">
+                <p>Пол:</p>
+                <label>
+                  {sexP === 'f' ? 'Женский' : this.sex === 'm' ? 'Мужской' : 'не указан'}
+                </label>
               </div>
+              <div className="reception__top-birthday">
+                <p>Дата рождения:</p>
+                <label>
+                  {birthdayP ? dayjs(birthdayP).format('DD/MM/YYYY') : 'не указана'}
+                </label>
+              </div>
+              <div className="reception__top-pid">
+                <p>Идентификатор:</p>
+                <label>
+                  {cardIdP}
+                </label>
+              </div>
+            </div>
+
+            <div className="reception__header">
               <div className="reception__header-center">
                 {type === 'new' ?
                     <DatePicker showTime onChange={this.handleOnChangeDate} format={'DD/MM/YYYY HH:mm'} />
@@ -416,7 +417,7 @@ class Reception extends Component {
                       {disabled &&
                       <i className="fa fa-angle-double-left fa-1x" aria-hidden="true"
                          onClick={this.handleOnClickPrev}
-                         style={isEnabledPaginationPrev ? {cursor: 'pointer', color: 'black'} : {
+                         style={isEnabledPrev ? {cursor: 'pointer', color: 'black'} : {
                            cursor: 'default',
                            color: '#bdbcbc'
                          }}
@@ -426,7 +427,7 @@ class Reception extends Component {
                       {disabled &&
                       <i className="fa fa-angle-double-right fa-1x" aria-hidden="true"
                         onClick={this.handleOnClickNext}
-                        style={isEnabledPaginationNext ? {cursor: 'pointer', color: 'black'} : {cursor: 'default', color: '#bdbcbc'}}
+                        style={isEnabledNext ? {cursor: 'pointer', color: 'black'} : {cursor: 'default', color: '#bdbcbc'}}
                         />
                       }
                     </Fragment>

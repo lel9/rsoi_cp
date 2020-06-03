@@ -67,7 +67,8 @@ class SignUp extends Component{
         isEmpty: true
       })
     } else {
-      this.props.registration(username, password);
+
+      this.props.registration({username: username, password: password});
       this.setState({
         isEmpty: false
       })
@@ -102,10 +103,18 @@ class SignUp extends Component{
 
   componentDidUpdate = (prevProps) => {
     if (this.props.errorS !== prevProps.errorS) {
-      if(this.props.errorS) {
-        this.setState({
-          errorS: this.props.errorS.data.error
-        })
+      // console.log(this.props.errorS);
+      if (this.props.errorS.error === undefined) {
+          this.setState({
+            error: this.props.errorS.err
+          })
+          // alert('Сервис временно недоступен')
+      } else {
+        if(this.props.errorS.error) {
+          this.setState({
+            errorS: this.props.errorS.error.data.error
+          })
+        }
       }
     }
   }

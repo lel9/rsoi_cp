@@ -38,6 +38,7 @@ class DrugSelection extends Component {
     sex: '',
     diseaseAnamnesis: '',
     lifeAnamnesis: '',
+    noData: false,
   }
 
   handleOnClickSex = (e) => {
@@ -84,6 +85,7 @@ class DrugSelection extends Component {
   componentDidMount = () => {
     this.props.changePath(getHistory().location.pathname);
     // this.props.setPath(getHistory().location.pathname);
+    console.log('pewpew');
   }
 
   handleOnSubmit = () => {
@@ -95,14 +97,24 @@ class DrugSelection extends Component {
   }
 
   componentDidUpdate = (prevProps) => {
-    if (this.props.recommendation !== prevProps.recommendation) {
-      getHistory().push(`/select-drug/recommendation`)
+    if (this.props.results !== prevProps.results) {
+      if (JSON.stringify(prevProps.recommendations) !== JSON.stringify(this.props.recommendations)) {
+        getHistory().push(`/select-drug/recommendation`)
+        this.setState({
+          noData: false
+        })
+      }
+      if (!this.props.results.size) {
+        this.setState({
+          noData: true
+        })
+      }
     }
   }
 
   render() {
     const { plaints, objectiveInspection, examinationsResults,
-       specialistsConclusions, text, diseaseAnamnesis, lifeAnamnesis } = this.state;
+       specialistsConclusions, text, diseaseAnamnesis, lifeAnamnesis, noData } = this.state;
     const years = genOption(1, 200);
     const month = genOption(1, 12);
 
@@ -123,8 +135,14 @@ class DrugSelection extends Component {
         actionOnChange: this.handleOnChangeDiagnosis}
        ];
 
+       // console.log(noData);
     return (
       <div className="drugSelection">
+        { noData &&
+          <div className="drugSelection__noData">
+            Не удалось найти препараты для введенных данных
+          </div>
+        }
         <div className="drugSelection__sex">
           <label className="drugSelection__sex-tittle">
             Пол
@@ -151,7 +169,7 @@ class DrugSelection extends Component {
         </div>
         <Elements obj={Parametres1}/>
         <Button onClick={this.handleOnSubmit}>
-          Подбор препаратов
+          Поиск препаратов
         </Button>
       </div>
     )
@@ -159,5 +177,6 @@ class DrugSelection extends Component {
 }
 
 export default connect(state => ({
-  recommendation: state.recommendations.recommendation
+  recommendations: state.recommendations.recommendations,
+  results: state.recommendations
 }), { addRecommendation, changePath })(DrugSelection);

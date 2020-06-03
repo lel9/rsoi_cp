@@ -111,7 +111,7 @@ const columns3 = [
     colName: 'user',
     dataIndex: 'data',
     key: 'data',
-    fields: ['entityId'],
+    fields: ['id'],
     render: (data) => (
         <>
           {
@@ -189,7 +189,6 @@ class Statistics extends Component {
       }
       fill = this.fillData(this.props.ids.data.entitiesStatistic,
         results, columns[entity]);
-        console.log(fill);
       this.setState({
         fill
       })
@@ -225,26 +224,14 @@ class Statistics extends Component {
     if (this.props.statistics !== nextProps.statistics) {
       return true;
     }
-    if (this.state.isDisabled !== nextState.isDisabled) {
-      return true;
-    }
-    if (this.state.fill !== nextState.fill) {
-      return true;
-    }
-    if (this.state.childTotalCreateCount !== nextState.childTotalCreateCount) {
-      return true;
-    }
-    if (this.state.childTotalDeleteCount !== nextState.childTotalDeleteCount) {
-      return true;
-    }
-    if (this.state.childTotalUpdateCount !== nextState.childTotalUpdateCount) {
-      return true;
-    }
     if (this.props.dateStart !== nextProps.dateStart) {
       return true;
     }
     if (this.props.dateEnd !== nextProps.dateEnd) {
       return true;
+    }
+    if (this.state !== nextState) {
+      return true
     }
     return false;
   }
@@ -254,8 +241,9 @@ class Statistics extends Component {
     if (columns[0].colName === "user") {
       statistics = statistics.entitiesStatistic;
     }
-    entitiesStatistic.map((element, index) => {
-      const data = columns[0].fields.map((element, index1) => {
+    entitiesStatistic.map(element => {
+      const index = statistics.map(val => (val.id)).indexOf(element['id']);
+      const data = columns[0].fields.map(element => {
         const statisticsElement = Object(statistics[index])[element];
         if (element === "birthday")
           return statisticsElement !== null && statisticsElement !== '' ? dayjs(statisticsElement).format('DD/MM/YYYY') : 'дата рождения не указана';
