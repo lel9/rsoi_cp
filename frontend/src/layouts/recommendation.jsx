@@ -6,7 +6,6 @@ import dayjs from 'dayjs'
 
 import getHistory from '../modules/history';
 import { changePath } from '../actions/actionPath';
-import { drugEnglToRus } from '../constants';
 import { recommendationClean } from '../actions/actionSession';
 
 class Drugs extends Component {
@@ -247,20 +246,36 @@ class Recommendation extends Component {
     pid: '',
     results: [],
     currentDrug: -1,
-    recommendations: []
+    recommendations: [],
+    isLoading: false,
+    noData: false,
   }
 
   componentDidMount = () => {
     this.props.changePath(getHistory().location.pathname);
-    this.setState({
-      recommendations: this.props.recommendations
-    })
-    // if (!this.props.recommendations.length) {
-    //   getHistory().push(`/select-drug`)
-    // } else {
-    //   // no data
-    // }
+    if (this.props.loading) {
+      this.setState({
+        isLoading: this.props.loading
+      })
+    }
   }
+
+  componentDidUpdate = (prevProps) => {
+
+    if (this.props.recommendations !== prevProps.recommendations) {
+      this.setState({
+        recommendations: this.props.recommendations,
+        noData: this.props.recommendations.length ? false : true,
+      })
+    }
+
+    if (this.props.loading !== prevProps.loading) {
+      this.setState({
+        isLoading: this.props.loading
+      })
+    }
+  }
+
 
   setCurrentDrug = (value) => {
     const { currentDrug } = this.state;
@@ -271,7 +286,7 @@ class Recommendation extends Component {
   }
 
   render() {
-    const { currentDrug, recommendations } = this.state;
+    const { currentDrug, recommendations, isLoading, noData } = this.state;
     const drugs = recommendations.map((element, index) => (
       <div className="recomendation__drug" key={index} data-index={index}
         data-pid={element.pid}
@@ -281,25 +296,36 @@ class Recommendation extends Component {
           />
       </div>
     ))
+
     return(
-      <div className="recommendation-wrap">
-        <div className="recommendation">
-          <div className="recommendation__leftSide">
-            {drugs}
-          </div>
-          <div className="recommendation__rightSide">
-            {currentDrug !== -1 &&
-              <Outcomes outcomes={recommendations[currentDrug].outcomes}
-                pid={recommendations[currentDrug].pid}
-              />
-            }
-          </div>
+        <div className="recommendation-wrap">
+          { isLoading &&
+            <div className="lds-ring"><div></div><div></div><div></div><div></div></div>
+          }
+          {noData ?
+            <div className="recommendation__noData">
+              Не удалось найти препараты для введенных данных
+            </div>
+            :
+            <div className="recommendation">
+              <div className="recommendation__leftSide">
+                {drugs}
+              </div>
+              <div className="recommendation__rightSide">
+                {currentDrug !== -1 &&
+                  <Outcomes outcomes={recommendations[currentDrug].outcomes}
+                    pid={recommendations[currentDrug].pid}
+                  />
+                }
+              </div>
+            </div>
+          }
         </div>
-      </div>
-    )
+      )
   }
 }
 
 export default connect(state => ({
   recommendations: state.recommendations.recommendations,
+  loading: state.recommendations.loading,
 }), { changePath, recommendationClean }) (Recommendation);
