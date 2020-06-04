@@ -189,9 +189,9 @@ public class ReceptionService {
                                             String patientId,
                                             List<String> drugId) {
 
-        List<Reception> allByDiagnosisText = (diagnosisText != null && !diagnosisText.isEmpty()) ?
-                                                    receptionRepository.findAllByDiagnosisText(diagnosisText) :
-                                                    receptionRepository.findAll();
+        List<Reception> allByDiagnosisText = //(diagnosisText != null && !diagnosisText.isEmpty()) ?
+                                                    receptionRepository.findAllByDiagnosisText(diagnosisText);// :
+                                                    //receptionRepository.findAll();
         OffsetDateTime start;
         OffsetDateTime end;
         try {

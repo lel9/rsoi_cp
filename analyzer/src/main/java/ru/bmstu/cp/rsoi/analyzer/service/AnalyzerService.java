@@ -141,13 +141,11 @@ public class AnalyzerService {
                 }
             }
             if (pid != null) {
-                List<DrugOutShort> drugsOuts = new ArrayList<>();
-                drugsOuts.add(modelMapper.map(key, DrugOutShort.class));
-                List<DrugOutShort> analogs = getAnalogs(key.getActiveSubstance())
-                            .stream()
-                            .map(analog -> modelMapper.map(analog, DrugOutShort.class))
-                            .collect(Collectors.toList());
-                    drugsOuts.addAll(analogs);
+                //drugsOuts.add(modelMapper.map(key, DrugOutShort.class));
+                DrugOut drug = getDrug(key.getId());
+                List<DrugOutShort> drugsOuts = getAnalogs(drug.getActiveSubstance())
+                        .stream()
+                        .map(analog -> modelMapper.map(analog, DrugOutShort.class)).collect(Collectors.toList());
                 List<ReceptionOut> outs = outcomes
                             .stream()
                             .map(outcome -> modelMapper.map(outcome, ReceptionOut.class))
@@ -204,6 +202,24 @@ public class AnalyzerService {
         }
 
         return new ListSearchResultsOut(results);
+    }
+
+    private DrugOut getDrug(String id) throws URISyntaxException {
+        try {
+            return callDrugServiceById(id);
+        } catch (HttpStatusCodeException ex) {
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                TOKEN = getToken();
+                try {
+                    return callDrugServiceById(id);
+                } catch (Exception ex3) {
+                    throw new FailureWhenSearchException();
+                }
+            }
+            throw new FailureWhenSearchException();
+        } catch (Exception ex) {
+            throw new FailureWhenSearchException();
+        }
     }
 
     private List<DrugOut> getAnalogs(String activeSubstance) throws URISyntaxException {
@@ -284,6 +300,19 @@ public class AnalyzerService {
         if (body == null)
             throw new FailureWhenSearchException();
         return body.getResults();
+    }
+
+    private DrugOut callDrugServiceById(String id) {
+        String url = "http://" + drugServiceHost + ":" + drugServicePort + "/api/1.0/public/drug/" + id;
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+        URI thirdPartyApi = builder.buildAndExpand().encode().toUri();
+
+        ResponseEntity<DrugOut> exchange = restTemplate.exchange(thirdPartyApi,
+                HttpMethod.GET, new HttpEntity<>(createHeaders()), DrugOut.class);
+        DrugOut body = exchange.getBody();
+        if (body == null)
+            throw new FailureWhenSearchException();
+        return body;
     }
 
     private List<ReceptionWithPatientOut> callPatientService(String date,
