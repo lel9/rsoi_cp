@@ -17,17 +17,10 @@ import Profile from './layouts/profile';
 import Statistics from './layouts/statistics';
 import PublicReceptions from './layouts/publicReceptions';
 
-
 import BreadCrumb from './components/breadCrumb';
 
 import { changePath } from './actions/actionPath';
 import { logout } from './actions/actionSession';
-
-const Error = () => {
-  return (
-    <div> 404 NOT FOUND</div>
-  )
-}
 
 class App extends Component {
   state = {
@@ -176,7 +169,6 @@ class App extends Component {
               <Route path="*/sign-in" component={SignIn}/>
               <Route path="/sign-up" component={SignUp}/>
               <Route path="/statistics" component={Statistics}/>
-              <Route path="*" component={Error}/>
             </Switch>
           </div>
         </div>

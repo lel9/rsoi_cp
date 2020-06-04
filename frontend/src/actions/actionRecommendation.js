@@ -30,7 +30,7 @@ export const addRecommendation = (data) => {
 }
 
 const addRecommendationStarted = () => ({
-  type: POST_RECOMMENDATIONS + '_STARTED'
+  type: POST_RECOMMENDATIONS + '_STARTED',
 })
 const addRecommendationSuccess = (data) => ({
   type: POST_RECOMMENDATIONS + '_SUCCESS',
@@ -42,5 +42,5 @@ const addRecommendationFailure = (error) => ({
   type: POST_RECOMMENDATIONS + '_FAILURE',
   payload: {
     error
-  }
+  },
 })

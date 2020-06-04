@@ -38,7 +38,6 @@ class DrugSelection extends Component {
     sex: '',
     diseaseAnamnesis: '',
     lifeAnamnesis: '',
-    noData: false,
   }
 
   handleOnClickSex = (e) => {
@@ -85,7 +84,6 @@ class DrugSelection extends Component {
   componentDidMount = () => {
     this.props.changePath(getHistory().location.pathname);
     // this.props.setPath(getHistory().location.pathname);
-    console.log('pewpew');
   }
 
   handleOnSubmit = () => {
@@ -98,28 +96,18 @@ class DrugSelection extends Component {
 
   componentDidUpdate = (prevProps) => {
     if (this.props.results !== prevProps.results) {
-      if (JSON.stringify(prevProps.recommendations) !== JSON.stringify(this.props.recommendations)) {
-        getHistory().push(`/select-drug/recommendation`)
-        this.setState({
-          noData: false
-        })
-      }
-      if (!this.props.results.size) {
-        this.setState({
-          noData: true
-        })
-      }
+      getHistory().push(`/select-drug/recommendation`)
     }
   }
 
   render() {
     const { plaints, objectiveInspection, examinationsResults,
-       specialistsConclusions, text, diseaseAnamnesis, lifeAnamnesis, noData } = this.state;
-    const years = genOption(1, 200);
-    const month = genOption(1, 12);
+       specialistsConclusions, text, diseaseAnamnesis, lifeAnamnesis } = this.state;
+    const years = genOption(0, 120);
+    const month = genOption(0, 11);
 
     const Parametres1 = [
-      {lel9: diseaseAnamnesis, label: "Анамниз заболевания",
+      {lel9: diseaseAnamnesis, label: "Анамнез заболевания",
         actionOnChange: this.handleOnChangeDiseaseAnamnesis},
       {lel9: lifeAnamnesis, label: "Анамнез жизни",
         actionOnChange: this.handleOnChangeLifeAnamnesis},
@@ -135,14 +123,8 @@ class DrugSelection extends Component {
         actionOnChange: this.handleOnChangeDiagnosis}
        ];
 
-       // console.log(noData);
     return (
       <div className="drugSelection">
-        { noData &&
-          <div className="drugSelection__noData">
-            Не удалось найти препараты для введенных данных
-          </div>
-        }
         <div className="drugSelection__sex">
           <label className="drugSelection__sex-tittle">
             Пол
@@ -153,15 +135,15 @@ class DrugSelection extends Component {
          </Radio.Group>
         </div>
         <div className="drugSelection__age">
-          <label>Возрат</label>
+          <label>Возраcт</label>
           <div className="drugSelection__years">
-            <Select defaultValue="1" style={{ width: 70 }} onChange={null}>
+            <Select defaultValue="0" style={{ width: 70 }} onChange={null}>
               {years}
             </Select>
             <label>лет</label>
           </div>
          <div className="drugSelection__month">
-           <Select defaultValue="1" style={{ width: 70 }} onChange={null}>
+           <Select defaultValue="0" style={{ width: 70 }} onChange={null}>
              {month}
            </Select>
            <label>мес</label>
