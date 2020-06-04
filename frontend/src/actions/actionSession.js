@@ -65,7 +65,7 @@ export const registration = (data) => {
   const { username, password } = data
   return dispatch => {
     dispatch(registrationStarted());
-    axios.post(registrationURL + 'registration/user', {
+    axios.post(registrationURL, {
       username,
       password
     })
