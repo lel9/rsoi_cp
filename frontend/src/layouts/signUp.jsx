@@ -104,7 +104,7 @@ class SignUp extends Component{
   componentDidUpdate = (prevProps) => {
     if (this.props.errorS !== prevProps.errorS) {
       // console.log(this.props.errorS);
-      if (this.props.errorS.error === undefined) {
+      if (this.props.errorS && this.props.errorS.error === undefined) {
           this.setState({
             error: this.props.errorS.err
           })
