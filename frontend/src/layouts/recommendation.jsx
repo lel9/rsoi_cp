@@ -41,7 +41,7 @@ class Drugs extends Component {
   render() {
     const { current, drugs } = this.state;
     const { indexP } = this.props;
-    const data = drugs.length ? drugs.slice(1, drugs.length - 1) : [];
+    const data = drugs.length ? drugs.slice(1, drugs.length) : [];
     const analogies = data.map((element, index) => (
         <span key={index} className="recomendation__analogies">
           <Link to={`/all-drugs/instruction/${element.id}`} onClick={this.handleOnClickLink}>
