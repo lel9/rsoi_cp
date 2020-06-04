@@ -98,7 +98,7 @@ class SignIn extends Component{
           })
           // alert('Сервис временно недоступен')
       } else {
-        if(this.props.errorS.error) {
+        if(this.props.errorS && this.props.errorS.error) {
           this.setState({
             errorS: this.props.errorS.error.data.error
           })
